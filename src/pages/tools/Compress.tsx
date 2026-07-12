@@ -1,0 +1,115 @@
+import { useState } from "react";
+import { FileArchive } from "lucide-react";
+import Dropzone from "../../components/Dropzone";
+import ResultPanel from "../../components/ResultPanel";
+import ToolPage from "../../components/ToolPage";
+import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
+import { useSinglePdf } from "../../hooks/useSinglePdf";
+import { COMPRESS_PRESETS, compressPdf } from "../../lib/ops";
+import type { CompressPreset } from "../../lib/ops";
+import { baseName, formatBytes, pdfBlob } from "../../lib/utils";
+import type { OutputFile } from "../../lib/utils";
+
+export default function Compress() {
+  const pdf = useSinglePdf();
+  const [preset, setPreset] = useState<CompressPreset>("recommended");
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<{ file: OutputFile; note: string } | null>(null);
+
+  async function run() {
+    if (!pdf.bytes || !pdf.file) return;
+    setBusy(true);
+    setProgress(0);
+    pdf.setError("");
+    try {
+      const { dpi, quality } = COMPRESS_PRESETS[preset];
+      const out = await compressPdf(pdf.bytes, { dpi, quality }, (done, total) =>
+        setProgress(done / total),
+      );
+      const before = pdf.file.size;
+      const after = out.byteLength;
+      const saved = Math.max(0, Math.round((1 - after / before) * 100));
+      setResult({
+        file: { name: `${baseName(pdf.file.name)}-compressed.pdf`, blob: pdfBlob(out) },
+        note:
+          after < before
+            ? `${formatBytes(before)} → ${formatBytes(after)} (${saved}% smaller)`
+            : `This file didn't get smaller (${formatBytes(before)} → ${formatBytes(after)}) — it's likely already well optimized.`,
+      });
+    } catch (err) {
+      pdf.setError(err instanceof Error ? err.message : "Compression failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function reset() {
+    pdf.reset();
+    setResult(null);
+  }
+
+  return (
+    <ToolPage>
+      {result ? (
+        <ResultPanel files={[result.file]} note={result.note} onReset={reset} />
+      ) : !pdf.file ? (
+        <div className="space-y-4">
+          <Dropzone
+            accept="application/pdf,.pdf"
+            onFiles={pdf.onFiles}
+            hint="Select one PDF file"
+          />
+          <ErrorBox>{pdf.error}</ErrorBox>
+        </div>
+      ) : (
+        <Card className="space-y-5">
+          <p className="text-sm text-slate-500">
+            <span className="font-semibold text-slate-800">{pdf.file.name}</span> —{" "}
+            {pdf.pageCount} page{pdf.pageCount === 1 ? "" : "s"},{" "}
+            {formatBytes(pdf.file.size)}
+          </p>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            {(Object.keys(COMPRESS_PRESETS) as CompressPreset[]).map((key) => {
+              const p = COMPRESS_PRESETS[key];
+              return (
+                <button
+                  key={key}
+                  onClick={() => setPreset(key)}
+                  className={`rounded-xl px-4 py-3 text-left ring-1 transition-colors ${
+                    preset === key
+                      ? "bg-indigo-50 ring-2 ring-indigo-500"
+                      : "bg-white ring-slate-200 hover:ring-indigo-300"
+                  }`}
+                >
+                  <span className="block text-sm font-semibold text-slate-800">
+                    {p.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-slate-500">{p.hint}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs text-amber-800 ring-1 ring-amber-200">
+            Pages are re-rendered as images to achieve maximum compression, so text
+            will no longer be selectable in the output. Best for scans, presentations
+            and image-heavy documents.
+          </p>
+
+          {busy && <ProgressBar value={progress} />}
+          <ErrorBox>{pdf.error}</ErrorBox>
+          <div className="flex gap-3">
+            <Button onClick={run} busy={busy}>
+              <FileArchive className="h-4 w-4" /> Compress PDF
+            </Button>
+            <Button variant="ghost" onClick={reset}>
+              Choose another file
+            </Button>
+          </div>
+        </Card>
+      )}
+    </ToolPage>
+  );
+}
