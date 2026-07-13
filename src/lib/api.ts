@@ -7,6 +7,7 @@
 import type { WorkerRequest, WorkerResponse } from "../worker/protocol";
 import type {
   CompressOptions,
+  DocSummary,
   ImagesToPdfOptions,
   PageEdit,
   PageNumberOptions,
@@ -124,3 +125,6 @@ export const renderThumbnails = (
   targetWidth: number,
   onProgress?: ProgressCallback,
 ) => call<string[]>("thumbnails", [bytes, targetWidth], onProgress);
+
+export const getDocSummary = (bytes: Uint8Array, targetWidth?: number) =>
+  call<DocSummary>("docSummary", [bytes, targetWidth]);

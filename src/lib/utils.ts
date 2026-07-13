@@ -44,6 +44,28 @@ export function parsePageRanges(input: string, pageCount: number): number[][] {
   return ranges;
 }
 
+/** Turn a set of 0-based page indices into range text like "1-3, 5". */
+export function indicesToRangeText(indices: Iterable<number>): string {
+  const sorted = [...new Set(indices)].sort((a, b) => a - b);
+  const parts: string[] = [];
+  for (let i = 0; i < sorted.length; ) {
+    let j = i;
+    while (j + 1 < sorted.length && sorted[j + 1] === sorted[j] + 1) j++;
+    parts.push(i === j ? `${sorted[i] + 1}` : `${sorted[i] + 1}-${sorted[j] + 1}`);
+    i = j + 1;
+  }
+  return parts.join(", ");
+}
+
+/** Non-throwing variant of parsePageRanges for live UI syncing. */
+export function tryParseIndices(input: string, pageCount: number): number[] | null {
+  try {
+    return [...new Set(parsePageRanges(input, pageCount).flat())];
+  } catch {
+    return null;
+  }
+}
+
 export interface OutputFile {
   name: string;
   blob: Blob;

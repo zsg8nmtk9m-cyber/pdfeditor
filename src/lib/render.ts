@@ -7,6 +7,7 @@
  */
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import type { PDFDocumentProxy } from "pdfjs-dist";
+import type { DocSummary } from "./types";
 
 GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -61,6 +62,38 @@ export async function renderPage(
 export function releaseCanvas(canvas: OffscreenCanvas): void {
   canvas.width = 0;
   canvas.height = 0;
+}
+
+/**
+ * Cheap per-file summary for pickers: page count plus a first-page
+ * thumbnail. Never throws — unreadable (e.g. encrypted) files yield
+ * `{ pageCount: 0, thumbnail: null }` so callers can show a fallback.
+ */
+export async function renderDocSummary(
+  bytes: Uint8Array,
+  targetWidth = 200,
+): Promise<DocSummary> {
+  try {
+    const pdf = await openForRender(bytes);
+    try {
+      const page = await pdf.getPage(1);
+      const base = page.getViewport({ scale: 1 });
+      page.cleanup();
+      const { canvas } = await renderPage(pdf, 0, targetWidth / base.width);
+      const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.8 });
+      releaseCanvas(canvas);
+      return {
+        pageCount: pdf.numPages,
+        thumbnail: new FileReaderSync().readAsDataURL(blob),
+        widthPts: base.width,
+        heightPts: base.height,
+      };
+    } finally {
+      await pdf.destroy();
+    }
+  } catch {
+    return { pageCount: 0, thumbnail: null, widthPts: 0, heightPts: 0 };
+  }
 }
 
 /**

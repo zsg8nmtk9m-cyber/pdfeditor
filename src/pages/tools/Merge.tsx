@@ -1,24 +1,60 @@
-import { useState } from "react";
-import { Combine } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Combine, FileWarning, Loader2, X } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
-import FileList from "../../components/FileList";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox } from "../../components/ui";
-import { mergePdfs } from "../../lib/api";
-import { pdfBlob, readFileBytes } from "../../lib/utils";
+import { getDocSummary, mergePdfs } from "../../lib/api";
+import { formatBytes, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
+interface MergeItem {
+  id: number;
+  file: File;
+  bytes: Uint8Array;
+  /** Null while the preview is still rendering. */
+  pageCount: number | null;
+  thumbnail: string | null;
+}
+
+let nextItemId = 1;
+
 export default function Merge() {
-  const [files, setFiles] = useState<File[]>([]);
+  const [items, setItems] = useState<MergeItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<OutputFile | null>(null);
+  const dragIndex = useRef<number | null>(null);
 
-  function move(i: number, dir: -1 | 1) {
-    setFiles((prev) => {
+  async function addFiles(files: File[]) {
+    for (const file of files) {
+      const id = nextItemId++;
+      try {
+        const bytes = await readFileBytes(file);
+        setItems((prev) => [
+          ...prev,
+          { id, file, bytes, pageCount: null, thumbnail: null },
+        ]);
+        const summary = await getDocSummary(bytes);
+        setItems((prev) =>
+          prev.map((it) =>
+            it.id === id
+              ? { ...it, pageCount: summary.pageCount, thumbnail: summary.thumbnail }
+              : it,
+          ),
+        );
+      } catch {
+        setError(`Could not read "${file.name}".`);
+      }
+    }
+  }
+
+  function move(index: number, to: number) {
+    if (to < 0 || to >= items.length || to === index) return;
+    setItems((prev) => {
       const next = [...prev];
-      [next[i], next[i + dir]] = [next[i + dir], next[i]];
+      const [item] = next.splice(index, 1);
+      next.splice(to, 0, item);
       return next;
     });
   }
@@ -27,8 +63,7 @@ export default function Merge() {
     setBusy(true);
     setError("");
     try {
-      const inputs = await Promise.all(files.map(readFileBytes));
-      const merged = await mergePdfs(inputs);
+      const merged = await mergePdfs(items.map((it) => it.bytes));
       setResult({ name: "merged.pdf", blob: pdfBlob(merged) });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Merging failed.");
@@ -38,7 +73,7 @@ export default function Merge() {
   }
 
   function reset() {
-    setFiles([]);
+    setItems([]);
     setResult(null);
     setError("");
   }
@@ -48,28 +83,104 @@ export default function Merge() {
       {result ? (
         <ResultPanel files={[result]} onReset={reset} />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <Dropzone
             accept="application/pdf,.pdf"
             multiple
-            compact={files.length > 0}
-            onFiles={(f) => setFiles((prev) => [...prev, ...f])}
+            compact={items.length > 0}
+            onFiles={addFiles}
             hint="Select two or more PDF files"
           />
-          {files.length > 0 && (
+
+          {items.length > 0 && (
             <>
-              <FileList
-                files={files}
-                onRemove={(i) => setFiles((prev) => prev.filter((_, j) => j !== i))}
-                onMove={move}
-              />
-              <ErrorBox>{error}</ErrorBox>
               <p className="text-sm text-slate-500">
-                Files are merged top to bottom — use the arrows to reorder.
+                Files are merged left to right — drag the cards (or use the arrows) to
+                reorder.
               </p>
-              <Button onClick={run} busy={busy} disabled={files.length < 2}>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                {items.map((item, i) => (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={() => (dragIndex.current = i)}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      const from = dragIndex.current;
+                      if (from !== null && from !== i) {
+                        move(from, i);
+                        dragIndex.current = i;
+                      }
+                    }}
+                    onDragEnd={() => (dragIndex.current = null)}
+                    className="group relative cursor-grab rounded-xl bg-white p-2.5 shadow-sm ring-1 ring-slate-200 transition-shadow hover:shadow-md active:cursor-grabbing"
+                  >
+                    <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-lg bg-slate-100">
+                      {item.pageCount === null ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-slate-300" />
+                      ) : item.thumbnail ? (
+                        <img
+                          src={item.thumbnail}
+                          alt={`First page of ${item.file.name}`}
+                          draggable={false}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      ) : (
+                        <span className="flex flex-col items-center gap-1 px-2 text-center text-amber-600">
+                          <FileWarning className="h-6 w-6" />
+                          <span className="text-[10px] font-semibold leading-tight">
+                            Can't preview — file may be password-protected
+                          </span>
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 truncate text-xs font-semibold text-slate-800">
+                      {item.file.name}
+                    </p>
+                    <p className="text-[11px] text-slate-400">
+                      {item.pageCount !== null && item.pageCount > 0
+                        ? `${item.pageCount} page${item.pageCount === 1 ? "" : "s"} · `
+                        : ""}
+                      {formatBytes(item.file.size)}
+                    </p>
+                    <span className="absolute left-2 top-2 rounded-md bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {i + 1}
+                    </span>
+                    <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                      <button
+                        aria-label={`Move ${item.file.name} earlier`}
+                        disabled={i === 0}
+                        onClick={() => move(i, i - 1)}
+                        className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600 disabled:opacity-40"
+                      >
+                        <ArrowLeft className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        aria-label={`Move ${item.file.name} later`}
+                        disabled={i === items.length - 1}
+                        onClick={() => move(i, i + 1)}
+                        className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600 disabled:opacity-40"
+                      >
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        aria-label={`Remove ${item.file.name}`}
+                        onClick={() =>
+                          setItems((prev) => prev.filter((it) => it.id !== item.id))
+                        }
+                        className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-rose-600"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <ErrorBox>{error}</ErrorBox>
+              <Button onClick={run} busy={busy} disabled={items.length < 2}>
                 <Combine className="h-4 w-4" />
-                Merge {files.length} PDF{files.length === 1 ? "" : "s"}
+                Merge {items.length} PDF{items.length === 1 ? "" : "s"}
               </Button>
             </>
           )}

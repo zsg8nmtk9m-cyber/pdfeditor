@@ -83,6 +83,18 @@ export interface PdfToImagesOptions {
   quality: number;
 }
 
+// ---------------------------------------------------------------- Summaries
+
+/** Lightweight per-file info for pickers: first-page preview + page count. */
+export interface DocSummary {
+  pageCount: number;
+  /** Data URL of the first page, or null if the file couldn't be rendered. */
+  thumbnail: string | null;
+  /** First-page size in PDF points (0 when the file couldn't be rendered). */
+  widthPts: number;
+  heightPts: number;
+}
+
 // ---------------------------------------------------------------- Metadata
 
 export interface PdfMetadata {

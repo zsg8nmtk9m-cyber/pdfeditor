@@ -5,7 +5,7 @@
  * argument (operations that don't take one simply ignore it).
  */
 import * as ops from "../lib/ops";
-import { renderThumbnails } from "../lib/render";
+import { renderDocSummary, renderThumbnails } from "../lib/render";
 import type { WorkerRequest, WorkerResponse } from "./protocol";
 
 // The worker global; typed loosely because tsconfig uses the DOM lib.
@@ -33,6 +33,7 @@ const handlers: Record<string, (...args: any[]) => Promise<unknown>> = {
   compress: ops.compressPdf,
   pdfToImages: ops.pdfToImages,
   thumbnails: renderThumbnails,
+  docSummary: renderDocSummary,
 };
 
 /** Output buffers are transferred (not copied) back to the UI thread. */

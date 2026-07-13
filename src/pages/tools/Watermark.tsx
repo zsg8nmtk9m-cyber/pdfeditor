@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Stamp } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
+import FileSummary from "../../components/FileSummary";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, Select, inputClass } from "../../components/ui";
@@ -66,10 +67,12 @@ export default function Watermark() {
         </div>
       ) : (
         <Card className="space-y-5">
-          <p className="text-sm text-slate-500">
-            <span className="font-semibold text-slate-800">{pdf.file.name}</span> —{" "}
-            {pdf.pageCount} page{pdf.pageCount === 1 ? "" : "s"}
-          </p>
+          <FileSummary
+            name={pdf.file.name}
+            size={pdf.file.size}
+            pageCount={pdf.pageCount}
+            thumbnail={pdf.summary?.thumbnail ?? null}
+          />
 
           <Field label="Watermark text">
             <input
@@ -123,19 +126,52 @@ export default function Watermark() {
             </Field>
           </div>
 
-          {/* Live preview approximation */}
-          <div className="relative flex h-44 items-center justify-center overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200">
-            <span
-              className="select-none whitespace-nowrap font-bold"
-              style={{
-                color,
-                opacity: opacity / 100,
-                fontSize: `${Math.min(fontSize, 60)}px`,
-                transform: diagonal ? "rotate(-30deg)" : undefined,
-              }}
-            >
-              {text || "Preview"}
-            </span>
+          {/* Live preview over the document's real first page. The font size
+              and diagonal angle are scaled from PDF points to preview pixels
+              so what you see closely matches the output. */}
+          <div className="relative flex h-64 items-center justify-center overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200 py-3">
+            {pdf.summary?.thumbnail ? (
+              <div className="relative h-full">
+                <img
+                  src={pdf.summary.thumbnail}
+                  alt="First page"
+                  className="h-full w-auto shadow-sm"
+                />
+                <span
+                  className="absolute left-1/2 top-1/2 select-none whitespace-nowrap font-bold"
+                  style={{
+                    color,
+                    opacity: opacity / 100,
+                    fontSize: `${
+                      fontSize * (232 / Math.max(pdf.summary.heightPts, 1))
+                    }px`,
+                    transform: `translate(-50%, -50%) rotate(${
+                      diagonal
+                        ? -Math.round(
+                            (Math.atan2(pdf.summary.heightPts, pdf.summary.widthPts) *
+                              180) /
+                              Math.PI,
+                          )
+                        : 0
+                    }deg)`,
+                  }}
+                >
+                  {text || "Preview"}
+                </span>
+              </div>
+            ) : (
+              <span
+                className="select-none whitespace-nowrap font-bold"
+                style={{
+                  color,
+                  opacity: opacity / 100,
+                  fontSize: `${Math.min(fontSize, 60)}px`,
+                  transform: diagonal ? "rotate(-45deg)" : undefined,
+                }}
+              >
+                {text || "Preview"}
+              </span>
+            )}
             <span className="absolute bottom-2 right-3 text-[10px] uppercase tracking-wider text-slate-400">
               Preview
             </span>

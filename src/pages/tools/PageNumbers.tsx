@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ListOrdered } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
+import FileSummary from "../../components/FileSummary";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, Select, inputClass } from "../../components/ui";
@@ -58,10 +59,12 @@ export default function PageNumbers() {
         </div>
       ) : (
         <Card className="space-y-5">
-          <p className="text-sm text-slate-500">
-            <span className="font-semibold text-slate-800">{pdf.file.name}</span> —{" "}
-            {pdf.pageCount} page{pdf.pageCount === 1 ? "" : "s"}
-          </p>
+          <FileSummary
+            name={pdf.file.name}
+            size={pdf.file.size}
+            pageCount={pdf.pageCount}
+            thumbnail={pdf.summary?.thumbnail ?? null}
+          />
 
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Position">

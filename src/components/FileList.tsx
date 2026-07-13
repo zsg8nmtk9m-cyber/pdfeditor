@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import { ArrowDown, ArrowUp, FileText, Image as ImageIcon, X } from "lucide-react";
 import { formatBytes } from "../lib/utils";
 
@@ -11,6 +12,13 @@ interface FileListProps {
 
 export default function FileList({ files, onRemove, onMove, kind = "pdf" }: FileListProps) {
   const Icon = kind === "pdf" ? FileText : ImageIcon;
+  // Image files get a real preview via object URLs (revoked on change/unmount).
+  const previews = useMemo(
+    () => (kind === "image" ? files.map((f) => URL.createObjectURL(f)) : []),
+    [files, kind],
+  );
+  useEffect(() => () => previews.forEach((url) => URL.revokeObjectURL(url)), [previews]);
+
   return (
     <ul className="space-y-2">
       {files.map((file, i) => (
@@ -18,9 +26,19 @@ export default function FileList({ files, onRemove, onMove, kind = "pdf" }: File
           key={`${file.name}-${i}`}
           className="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-sm ring-1 ring-slate-200"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-500">
-            <Icon className="h-4.5 w-4.5" />
-          </span>
+          {kind === "image" ? (
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200">
+              <img
+                src={previews[i]}
+                alt={file.name}
+                className="h-full w-full object-cover"
+              />
+            </span>
+          ) : (
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-500">
+              <Icon className="h-4.5 w-4.5" />
+            </span>
+          )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium text-slate-800">{file.name}</p>
             <p className="text-xs text-slate-400">{formatBytes(file.size)}</p>
