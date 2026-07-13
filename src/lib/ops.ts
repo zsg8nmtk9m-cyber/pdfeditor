@@ -6,6 +6,7 @@
 import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import { openForRender, releaseCanvas, renderPage } from "./render";
 import type {
+  AnnotationElement,
   CompressOptions,
   ImagesToPdfOptions,
   NumberFormat,
@@ -17,6 +18,7 @@ import type {
   ProgressCallback,
   WatermarkOptions,
 } from "./types";
+import { TEXT_BASELINE, TEXT_LINE_HEIGHT } from "./types";
 
 export class EncryptedPdfError extends Error {
   constructor() {
@@ -314,6 +316,96 @@ export async function pdfToImages(
   } finally {
     await pdf.destroy();
   }
+}
+
+// ---------------------------------------------------------------- Annotate
+
+function dataUrlToBytes(dataUrl: string): Uint8Array {
+  const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+}
+
+/**
+ * Map a point from display space (page as rendered by pdf.js: rotation
+ * applied, origin top-left, y down) into unrotated PDF space (origin
+ * bottom-left, y up). W/H are the page's unrotated dimensions and R its
+ * rotation. Derived from pdf.js's viewport transform:
+ *   R=0:   u = x,     v = H - y      R=90:  u = y,     v = x
+ *   R=180: u = W - x, v = y          R=270: u = H - y, v = W - x
+ */
+function displayToPdf(R: number, W: number, H: number, u: number, v: number) {
+  switch (R) {
+    case 90:
+      return { x: v, y: u };
+    case 180:
+      return { x: W - u, y: v };
+    case 270:
+      return { x: W - v, y: H - u };
+    default:
+      return { x: u, y: H - v };
+  }
+}
+
+/** Content drawn on a rotated page must itself be rotated to appear upright. */
+function contentRotation(R: number): number {
+  return R === 270 ? -90 : R;
+}
+
+/**
+ * Flatten annotate-editor elements (text boxes and signature images) into
+ * the document's page content.
+ */
+export async function annotatePdf(
+  srcBytes: Uint8Array,
+  elements: AnnotationElement[],
+): Promise<Uint8Array> {
+  const doc = await loadPdf(srcBytes);
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const imageCache = new Map<string, Awaited<ReturnType<typeof doc.embedPng>>>();
+
+  for (const el of elements) {
+    const page = doc.getPage(el.pageIndex);
+    const { width: W, height: H } = page.getSize();
+    const R = ((page.getRotation().angle % 360) + 360) % 360;
+    const rotate = degrees(contentRotation(R));
+
+    if (el.kind === "image" && el.imageDataUrl) {
+      let image = imageCache.get(el.imageDataUrl);
+      if (!image) {
+        image = await doc.embedPng(dataUrlToBytes(el.imageDataUrl));
+        imageCache.set(el.imageDataUrl, image);
+      }
+      // drawImage anchors at the image's bottom-left and rotates around it;
+      // pick the anchor so the image covers the element's display rect.
+      let anchor: { x: number; y: number };
+      switch (R) {
+        case 90:
+          anchor = { x: el.y + el.h, y: el.x };
+          break;
+        case 180:
+          anchor = { x: W - el.x, y: el.y + el.h };
+          break;
+        case 270:
+          anchor = { x: W - el.y - el.h, y: H - el.x };
+          break;
+        default:
+          anchor = { x: el.x, y: H - el.y - el.h };
+      }
+      page.drawImage(image, { ...anchor, width: el.w, height: el.h, rotate });
+    } else if (el.kind === "text" && el.text) {
+      const size = el.fontSize ?? 16;
+      const color = hexToRgb(el.color ?? "#111827");
+      // Draw line by line so multi-line text follows the display layout on
+      // rotated pages too (drawText's own lineHeight assumes rotation 0).
+      el.text.split("\n").forEach((line, i) => {
+        if (!line) return;
+        const baseline = el.y + size * TEXT_BASELINE + i * size * TEXT_LINE_HEIGHT;
+        const { x, y } = displayToPdf(R, W, H, el.x, baseline);
+        page.drawText(line, { x, y, size, font, color, rotate });
+      });
+    }
+  }
+  return doc.save();
 }
 
 // ---------------------------------------------------------------- Protect / unlock

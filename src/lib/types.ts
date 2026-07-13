@@ -95,6 +95,42 @@ export interface DocSummary {
   heightPts: number;
 }
 
+// ---------------------------------------------------------------- Annotate
+
+/**
+ * An element placed on a page by the Sign & Annotate editor.
+ *
+ * Coordinates are in DISPLAY space: the page as pdf.js renders it (rotation
+ * applied), in points, origin at the top-left, y growing downward. The
+ * annotate operation maps these into each page's unrotated PDF space.
+ */
+export interface AnnotationElement {
+  pageIndex: number;
+  kind: "text" | "image";
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  text?: string;
+  fontSize?: number;
+  /** Hex color like "#111827". */
+  color?: string;
+  /** PNG data URL (signatures). */
+  imageDataUrl?: string;
+}
+
+/** Font metrics shared by the editor UI and the PDF export for WYSIWYG. */
+export const TEXT_BASELINE = 0.9;
+export const TEXT_LINE_HEIGHT = 1.2;
+
+/** A single page rendered for the editor. */
+export interface PageImage {
+  dataUrl: string;
+  /** Display size in points (rotation applied). */
+  widthPts: number;
+  heightPts: number;
+}
+
 // ---------------------------------------------------------------- Metadata
 
 export interface PdfMetadata {

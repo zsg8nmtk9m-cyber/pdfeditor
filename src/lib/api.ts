@@ -6,10 +6,12 @@
  */
 import type { WorkerRequest, WorkerResponse } from "../worker/protocol";
 import type {
+  AnnotationElement,
   CompressOptions,
   DocSummary,
   ImagesToPdfOptions,
   PageEdit,
+  PageImage,
   PageNumberOptions,
   PdfMetadata,
   PdfToImagesOptions,
@@ -128,3 +130,9 @@ export const renderThumbnails = (
 
 export const getDocSummary = (bytes: Uint8Array, targetWidth?: number) =>
   call<DocSummary>("docSummary", [bytes, targetWidth]);
+
+export const renderPageImage = (bytes: Uint8Array, pageIndex: number, scale?: number) =>
+  call<PageImage>("pageImage", [bytes, pageIndex, scale]);
+
+export const annotatePdf = (bytes: Uint8Array, elements: AnnotationElement[]) =>
+  call<Uint8Array>("annotate", [bytes, elements]);

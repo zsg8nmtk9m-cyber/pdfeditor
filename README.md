@@ -14,7 +14,7 @@ no file-size limits to enforce, and nothing sensitive ever leaves the device.
 | Organize | Merge · Split (ranges / extract / every page) · Organize (drag-reorder, rotate, delete pages) · Rotate |
 | Optimize | Compress (3 presets, re-renders pages as JPEG) |
 | Convert  | PDF → PNG/JPG images · JPG/PNG/WebP/GIF/BMP images → PDF |
-| Edit     | Text watermark · Page numbers · Metadata editor |
+| Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Text watermark · Page numbers · Metadata editor |
 | Security | Protect (AES password encryption) · Unlock (remove a known password) |
 
 Multiple output files (split parts, page images) can be downloaded

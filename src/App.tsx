@@ -8,6 +8,7 @@ import Rotate from "./pages/tools/Rotate";
 import Compress from "./pages/tools/Compress";
 import PdfToImages from "./pages/tools/PdfToImages";
 import ImagesToPdf from "./pages/tools/ImagesToPdf";
+import Annotate from "./pages/tools/Annotate";
 import Watermark from "./pages/tools/Watermark";
 import PageNumbers from "./pages/tools/PageNumbers";
 import Metadata from "./pages/tools/Metadata";
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="/compress" element={<Compress />} />
           <Route path="/pdf-to-images" element={<PdfToImages />} />
           <Route path="/images-to-pdf" element={<ImagesToPdf />} />
+          <Route path="/annotate" element={<Annotate />} />
           <Route path="/watermark" element={<Watermark />} />
           <Route path="/page-numbers" element={<PageNumbers />} />
           <Route path="/metadata" element={<Metadata />} />

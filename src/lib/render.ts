@@ -7,7 +7,7 @@
  */
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import type { PDFDocumentProxy } from "pdfjs-dist";
-import type { DocSummary } from "./types";
+import type { DocSummary, PageImage } from "./types";
 
 GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -93,6 +93,23 @@ export async function renderDocSummary(
     }
   } catch {
     return { pageCount: 0, thumbnail: null, widthPts: 0, heightPts: 0 };
+  }
+}
+
+/** Render one page at high resolution for the annotate editor. */
+export async function renderPageImage(
+  bytes: Uint8Array,
+  pageIndex: number,
+  scale = 2,
+): Promise<PageImage> {
+  const pdf = await openForRender(bytes);
+  try {
+    const { canvas, widthPts, heightPts } = await renderPage(pdf, pageIndex, scale);
+    const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.9 });
+    releaseCanvas(canvas);
+    return { dataUrl: new FileReaderSync().readAsDataURL(blob), widthPts, heightPts };
+  } finally {
+    await pdf.destroy();
   }
 }
 

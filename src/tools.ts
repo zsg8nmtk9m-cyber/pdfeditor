@@ -7,6 +7,7 @@ import {
   FileArchive,
   Images,
   FileImage,
+  PenLine,
   Stamp,
   ListOrdered,
   Lock,
@@ -106,6 +107,17 @@ export const TOOLS: ToolMeta[] = [
     icon: FileImage,
     category: "Convert",
     accent: "bg-orange-100 text-orange-600",
+  },
+  {
+    id: "annotate",
+    path: "/annotate",
+    name: "Sign & Annotate",
+    tagline: "Sign and add text to any page",
+    description:
+      "Draw or type your signature, place it anywhere, and add text notes to any page. Everything is flattened into the PDF — no special reader needed.",
+    icon: PenLine,
+    category: "Edit",
+    accent: "bg-lime-100 text-lime-600",
   },
   {
     id: "watermark",
