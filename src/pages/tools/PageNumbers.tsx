@@ -5,8 +5,8 @@ import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, Select, inputClass } from "../../components/ui";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
-import { addPageNumbers } from "../../lib/ops";
-import type { NumberFormat, NumberPosition } from "../../lib/ops";
+import { addPageNumbers } from "../../lib/api";
+import type { NumberFormat, NumberPosition } from "../../lib/types";
 import { baseName, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

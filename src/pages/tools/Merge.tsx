@@ -5,7 +5,7 @@ import FileList from "../../components/FileList";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox } from "../../components/ui";
-import { mergePdfs } from "../../lib/ops";
+import { mergePdfs } from "../../lib/api";
 import { pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

@@ -32,21 +32,35 @@ individually or as a single ZIP.
 - [`fflate`](https://github.com/101arrowz/fflate) — ZIP downloads
 - [`lucide-react`](https://lucide.dev) — icons
 
-### Code layout
+### Architecture
+
+All PDF processing runs in a dedicated **Web Worker** so large files never
+freeze the UI. The worker owns pdf-lib and pdf.js (rendering via
+`OffscreenCanvas`); the main bundle stays small (~74 KB gzipped) because the
+heavy libraries load in the worker chunk, off the critical path. UI code
+calls operations through a typed message-passing client with the same
+signatures as the underlying functions, including per-page progress
+callbacks. ZIP packaging uses fflate's async API, which parallelizes in its
+own worker threads.
 
 ```
 src/
-  lib/ops.ts        # every PDF operation (pure functions over Uint8Array)
-  lib/render.ts     # pdf.js helpers: thumbnails, page rasterization
-  lib/utils.ts      # page-range parsing, downloads, ZIP packaging
-  tools.ts          # tool registry (name, route, icon, category) drives home page
-  hooks/            # shared single-PDF upload state machine
-  components/       # Dropzone, FileList, ResultPanel, ToolPage chrome, UI kit
-  pages/tools/      # one thin page component per tool
+  worker/pdf.worker.ts  # the PDF engine: maps ops onto lib functions
+  worker/protocol.ts    # request/response/progress message types
+  lib/api.ts            # typed worker client — what UI code imports
+  lib/ops.ts            # every PDF operation (pure functions over Uint8Array)
+  lib/render.ts         # pdf.js helpers: thumbnails, page rasterization
+  lib/types.ts          # shared option types (no runtime PDF deps)
+  lib/utils.ts          # page-range parsing, downloads, ZIP packaging
+  tools.ts              # tool registry (name, route, icon, category)
+  hooks/                # shared single-PDF upload state machine
+  components/           # Dropzone, FileList, ResultPanel, ToolPage chrome, UI kit
+  pages/tools/          # one thin page component per tool
 ```
 
-Adding a tool = one entry in `tools.ts`, one operation in `lib/ops.ts`, one
-page in `pages/tools/`, one route in `App.tsx`.
+Adding a tool = one entry in `tools.ts`, one operation in `lib/ops.ts` plus a
+handler line in `pdf.worker.ts` and a wrapper in `lib/api.ts`, one page in
+`pages/tools/`, one route in `App.tsx`.
 
 ## Development
 

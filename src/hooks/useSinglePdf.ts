@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { getPageCount } from "../lib/ops";
+import { getPageCount } from "../lib/api";
 import { readFileBytes } from "../lib/utils";
 
 /**

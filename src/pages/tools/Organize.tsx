@@ -4,8 +4,7 @@ import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
-import { rebuildPdf } from "../../lib/ops";
-import { renderThumbnails } from "../../lib/render";
+import { rebuildPdf, renderThumbnails } from "../../lib/api";
 import { baseName, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

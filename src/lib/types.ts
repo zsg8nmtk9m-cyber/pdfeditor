@@ -1,0 +1,95 @@
+/**
+ * Shared option/result types for PDF operations. Kept free of any runtime
+ * PDF dependencies so UI code can import them without pulling pdf-lib or
+ * pdf.js into the main-thread bundle — the heavy libraries live only in the
+ * worker (see src/worker/pdf.worker.ts).
+ */
+
+export type ProgressCallback = (done: number, total: number) => void;
+
+// ---------------------------------------------------------------- Organize
+
+export interface PageEdit {
+  /** Index of the page in the source document. */
+  srcIndex: number;
+  /** Extra clockwise rotation to apply, in degrees (0/90/180/270). */
+  rotation: number;
+}
+
+// ---------------------------------------------------------------- Watermark
+
+export interface WatermarkOptions {
+  text: string;
+  fontSize: number;
+  /** 0–1 */
+  opacity: number;
+  /** Hex color like "#ff0000". */
+  color: string;
+  diagonal: boolean;
+}
+
+// ---------------------------------------------------------------- Page numbers
+
+export type NumberPosition =
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right"
+  | "top-left"
+  | "top-center"
+  | "top-right";
+
+export type NumberFormat = "n" | "n-of-total" | "page-n-of-total";
+
+export interface PageNumberOptions {
+  position: NumberPosition;
+  format: NumberFormat;
+  fontSize: number;
+  /** 1-based number given to the first page. */
+  startAt: number;
+}
+
+// ---------------------------------------------------------------- Images → PDF
+
+export type PageSizeMode = "fit" | "a4" | "letter";
+
+export interface ImagesToPdfOptions {
+  pageSize: PageSizeMode;
+  margin: number;
+}
+
+// ---------------------------------------------------------------- Compress
+
+export interface CompressOptions {
+  /** Render resolution in DPI (72 = original point size). */
+  dpi: number;
+  /** JPEG quality 0–1. */
+  quality: number;
+}
+
+export const COMPRESS_PRESETS = {
+  low: { dpi: 150, quality: 0.8, label: "Less compression", hint: "High quality, larger file" },
+  recommended: { dpi: 120, quality: 0.65, label: "Recommended", hint: "Good quality, good compression" },
+  extreme: { dpi: 90, quality: 0.45, label: "Extreme", hint: "Smaller file, lower quality" },
+} as const;
+
+export type CompressPreset = keyof typeof COMPRESS_PRESETS;
+
+// ---------------------------------------------------------------- PDF → images
+
+export interface PdfToImagesOptions {
+  format: "png" | "jpeg";
+  /** Render scale: 1 = 72 dpi, 2 = 144 dpi, 3 = 216 dpi. */
+  scale: number;
+  quality: number;
+}
+
+// ---------------------------------------------------------------- Metadata
+
+export interface PdfMetadata {
+  title: string;
+  author: string;
+  subject: string;
+  keywords: string;
+  creator: string;
+  producer: string;
+}

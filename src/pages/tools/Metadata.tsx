@@ -4,8 +4,8 @@ import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, inputClass } from "../../components/ui";
-import { readMetadata, writeMetadata } from "../../lib/ops";
-import type { PdfMetadata } from "../../lib/ops";
+import { readMetadata, writeMetadata } from "../../lib/api";
+import type { PdfMetadata } from "../../lib/types";
 import { baseName, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

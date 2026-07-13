@@ -5,8 +5,9 @@ import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
-import { COMPRESS_PRESETS, compressPdf } from "../../lib/ops";
-import type { CompressPreset } from "../../lib/ops";
+import { compressPdf } from "../../lib/api";
+import { COMPRESS_PRESETS } from "../../lib/types";
+import type { CompressPreset } from "../../lib/types";
 import { baseName, formatBytes, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

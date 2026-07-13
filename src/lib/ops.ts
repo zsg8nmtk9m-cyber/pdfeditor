@@ -1,9 +1,22 @@
 /**
  * All PDF manipulation operations, built on pdf-lib (@cantoo fork, which adds
- * AES encryption support). Everything runs locally in the browser.
+ * AES encryption support). This module runs INSIDE the PDF worker — UI code
+ * calls these through src/lib/api.ts.
  */
 import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
-import { canvasToBlob, openForRender, renderPage } from "./render";
+import { openForRender, releaseCanvas, renderPage } from "./render";
+import type {
+  CompressOptions,
+  ImagesToPdfOptions,
+  NumberFormat,
+  PageEdit,
+  PageNumberOptions,
+  PageSizeMode,
+  PdfMetadata,
+  PdfToImagesOptions,
+  ProgressCallback,
+  WatermarkOptions,
+} from "./types";
 
 export class EncryptedPdfError extends Error {
   constructor() {
@@ -58,13 +71,6 @@ export async function extractPages(
 
 // ---------------------------------------------------------------- Organize
 
-export interface PageEdit {
-  /** Index of the page in the source document. */
-  srcIndex: number;
-  /** Extra clockwise rotation to apply, in degrees (0/90/180/270). */
-  rotation: number;
-}
-
 /** Rebuild a document from an ordered list of (possibly rotated) source pages. */
 export async function rebuildPdf(
   srcBytes: Uint8Array,
@@ -105,16 +111,6 @@ export async function rotatePdf(
 }
 
 // ---------------------------------------------------------------- Watermark
-
-export interface WatermarkOptions {
-  text: string;
-  fontSize: number;
-  /** 0–1 */
-  opacity: number;
-  /** Hex color like "#ff0000". */
-  color: string;
-  diagonal: boolean;
-}
 
 function hexToRgb(hex: string) {
   const m = hex.replace("#", "");
@@ -162,24 +158,6 @@ export async function addWatermark(
 
 // ---------------------------------------------------------------- Page numbers
 
-export type NumberPosition =
-  | "bottom-left"
-  | "bottom-center"
-  | "bottom-right"
-  | "top-left"
-  | "top-center"
-  | "top-right";
-
-export type NumberFormat = "n" | "n-of-total" | "page-n-of-total";
-
-export interface PageNumberOptions {
-  position: NumberPosition;
-  format: NumberFormat;
-  fontSize: number;
-  /** 1-based number given to the first page. */
-  startAt: number;
-}
-
 function numberLabel(format: NumberFormat, n: number, total: number): string {
   switch (format) {
     case "n":
@@ -225,34 +203,26 @@ export async function addPageNumbers(
 
 // ---------------------------------------------------------------- Images → PDF
 
-export type PageSizeMode = "fit" | "a4" | "letter";
-
 const PAGE_SIZES: Record<Exclude<PageSizeMode, "fit">, [number, number]> = {
   a4: [595.28, 841.89],
   letter: [612, 792],
 };
 
-export interface ImagesToPdfOptions {
-  pageSize: PageSizeMode;
-  margin: number;
-}
-
 /** Convert an arbitrary browser-decodable image into PNG bytes via canvas. */
 async function transcodeToPng(file: File): Promise<Uint8Array> {
   const bitmap = await createImageBitmap(file);
-  const canvas = document.createElement("canvas");
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
+  const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   canvas.getContext("2d")!.drawImage(bitmap, 0, 0);
   bitmap.close();
-  const blob = await canvasToBlob(canvas, "image/png");
+  const blob = await canvas.convertToBlob({ type: "image/png" });
+  releaseCanvas(canvas);
   return new Uint8Array(await blob.arrayBuffer());
 }
 
 export async function imagesToPdf(
   files: File[],
   opts: ImagesToPdfOptions,
-  onProgress?: (done: number, total: number) => void,
+  onProgress?: ProgressCallback,
 ): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   let done = 0;
@@ -289,21 +259,6 @@ export async function imagesToPdf(
 
 // ---------------------------------------------------------------- Compress
 
-export interface CompressOptions {
-  /** Render resolution in DPI (72 = original point size). */
-  dpi: number;
-  /** JPEG quality 0–1. */
-  quality: number;
-}
-
-export const COMPRESS_PRESETS = {
-  low: { dpi: 150, quality: 0.8, label: "Less compression", hint: "High quality, larger file" },
-  recommended: { dpi: 120, quality: 0.65, label: "Recommended", hint: "Good quality, good compression" },
-  extreme: { dpi: 90, quality: 0.45, label: "Extreme", hint: "Smaller file, lower quality" },
-} as const;
-
-export type CompressPreset = keyof typeof COMPRESS_PRESETS;
-
 /**
  * Compress by re-rendering each page to a JPEG at the requested DPI and
  * rebuilding the document. Very effective on scanned/graphic-heavy PDFs;
@@ -312,7 +267,7 @@ export type CompressPreset = keyof typeof COMPRESS_PRESETS;
 export async function compressPdf(
   srcBytes: Uint8Array,
   opts: CompressOptions,
-  onProgress?: (done: number, total: number) => void,
+  onProgress?: ProgressCallback,
 ): Promise<Uint8Array> {
   const pdf = await openForRender(srcBytes);
   try {
@@ -320,12 +275,11 @@ export async function compressPdf(
     const scale = opts.dpi / 72;
     for (let i = 0; i < pdf.numPages; i++) {
       const { canvas, widthPts, heightPts } = await renderPage(pdf, i, scale);
-      const blob = await canvasToBlob(canvas, "image/jpeg", opts.quality);
+      const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: opts.quality });
+      releaseCanvas(canvas);
       const jpg = await out.embedJpg(await blob.arrayBuffer());
       const page = out.addPage([widthPts, heightPts]);
       page.drawImage(jpg, { x: 0, y: 0, width: widthPts, height: heightPts });
-      canvas.width = 0; // release canvas memory eagerly
-      canvas.height = 0;
       onProgress?.(i + 1, pdf.numPages);
     }
     return out.save();
@@ -336,17 +290,10 @@ export async function compressPdf(
 
 // ---------------------------------------------------------------- PDF → images
 
-export interface PdfToImagesOptions {
-  format: "png" | "jpeg";
-  /** Render scale: 1 = 72 dpi, 2 = 144 dpi, 3 = 216 dpi. */
-  scale: number;
-  quality: number;
-}
-
 export async function pdfToImages(
   srcBytes: Uint8Array,
   opts: PdfToImagesOptions,
-  onProgress?: (done: number, total: number) => void,
+  onProgress?: ProgressCallback,
 ): Promise<Blob[]> {
   const pdf = await openForRender(srcBytes);
   try {
@@ -354,14 +301,13 @@ export async function pdfToImages(
     for (let i = 0; i < pdf.numPages; i++) {
       const { canvas } = await renderPage(pdf, i, opts.scale);
       blobs.push(
-        await canvasToBlob(
-          canvas,
-          opts.format === "png" ? "image/png" : "image/jpeg",
-          opts.format === "jpeg" ? opts.quality : undefined,
+        await canvas.convertToBlob(
+          opts.format === "png"
+            ? { type: "image/png" }
+            : { type: "image/jpeg", quality: opts.quality },
         ),
       );
-      canvas.width = 0;
-      canvas.height = 0;
+      releaseCanvas(canvas);
       onProgress?.(i + 1, pdf.numPages);
     }
     return blobs;
@@ -411,15 +357,6 @@ export async function isEncrypted(bytes: Uint8Array): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------- Metadata
-
-export interface PdfMetadata {
-  title: string;
-  author: string;
-  subject: string;
-  keywords: string;
-  creator: string;
-  producer: string;
-}
 
 export async function readMetadata(bytes: Uint8Array): Promise<PdfMetadata> {
   const doc = await loadPdf(bytes);

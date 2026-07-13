@@ -1,4 +1,4 @@
-import { zipSync } from "fflate";
+import { zip } from "fflate";
 
 export function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B";
@@ -70,7 +70,10 @@ export async function makeZip(files: OutputFile[], zipName: string): Promise<Out
   for (const f of files) {
     entries[f.name] = new Uint8Array(await f.blob.arrayBuffer());
   }
-  const zipped = zipSync(entries, { level: 6 });
+  // fflate's async zip compresses entries in parallel worker threads.
+  const zipped = await new Promise<Uint8Array>((resolve, reject) =>
+    zip(entries, { level: 6 }, (err, data) => (err ? reject(err) : resolve(data))),
+  );
   return {
     name: zipName,
     blob: new Blob([zipped], { type: "application/zip" }),

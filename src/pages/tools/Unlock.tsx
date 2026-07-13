@@ -5,7 +5,7 @@ import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, inputClass } from "../../components/ui";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
-import { isEncrypted, unlockPdf } from "../../lib/ops";
+import { isEncrypted, unlockPdf } from "../../lib/api";
 import { baseName, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

@@ -5,7 +5,7 @@ import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, Select, inputClass } from "../../components/ui";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
-import { addWatermark } from "../../lib/ops";
+import { addWatermark } from "../../lib/api";
 import { baseName, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

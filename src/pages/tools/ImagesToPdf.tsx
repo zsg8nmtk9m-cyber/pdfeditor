@@ -5,8 +5,8 @@ import FileList from "../../components/FileList";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox, Field, ProgressBar, Select } from "../../components/ui";
-import { imagesToPdf } from "../../lib/ops";
-import type { PageSizeMode } from "../../lib/ops";
+import { imagesToPdf } from "../../lib/api";
+import type { PageSizeMode } from "../../lib/types";
 import { pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 

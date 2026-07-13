@@ -1,6 +1,9 @@
 /**
- * Rendering helpers built on pdf.js — used for thumbnails, previews,
- * PDF→image conversion and (rasterizing) compression.
+ * Rendering helpers built on pdf.js — used for thumbnails, PDF→image
+ * conversion and (rasterizing) compression.
+ *
+ * This module runs INSIDE the PDF worker (see src/worker/pdf.worker.ts), so
+ * all drawing uses OffscreenCanvas — no DOM access.
  */
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import type { PDFDocumentProxy } from "pdfjs-dist";
@@ -9,6 +12,11 @@ GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url,
 ).toString();
+
+// Available in workers but missing from TypeScript's DOM lib.
+declare class FileReaderSync {
+  readAsDataURL(blob: Blob): string;
+}
 
 /**
  * Open a document with pdf.js. pdf.js transfers the buffer to its worker
@@ -22,7 +30,7 @@ export async function openForRender(
 }
 
 export interface RenderedPage {
-  canvas: HTMLCanvasElement;
+  canvas: OffscreenCanvas;
   /** Page size in PDF points (after rotation). */
   widthPts: number;
   heightPts: number;
@@ -35,15 +43,24 @@ export async function renderPage(
 ): Promise<RenderedPage> {
   const page = await pdf.getPage(pageIndex + 1);
   const viewport = page.getViewport({ scale });
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.floor(viewport.width));
-  canvas.height = Math.max(1, Math.floor(viewport.height));
+  const canvas = new OffscreenCanvas(
+    Math.max(1, Math.floor(viewport.width)),
+    Math.max(1, Math.floor(viewport.height)),
+  );
   const ctx = canvas.getContext("2d", { alpha: false })!;
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  await page.render({ canvasContext: ctx, viewport }).promise;
+  await page.render({
+    canvasContext: ctx as unknown as CanvasRenderingContext2D,
+    viewport,
+  }).promise;
   page.cleanup();
   return { canvas, widthPts: viewport.width / scale, heightPts: viewport.height / scale };
+}
+
+export function releaseCanvas(canvas: OffscreenCanvas): void {
+  canvas.width = 0;
+  canvas.height = 0;
 }
 
 /**
@@ -56,6 +73,7 @@ export async function renderThumbnails(
   onProgress?: (done: number, total: number) => void,
 ): Promise<string[]> {
   const pdf = await openForRender(bytes);
+  const reader = new FileReaderSync();
   try {
     const thumbs: string[] = [];
     for (let i = 0; i < pdf.numPages; i++) {
@@ -64,25 +82,13 @@ export async function renderThumbnails(
       const scale = targetWidth / base.width;
       page.cleanup();
       const { canvas } = await renderPage(pdf, i, scale);
-      thumbs.push(canvas.toDataURL("image/jpeg", 0.8));
+      const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.8 });
+      releaseCanvas(canvas);
+      thumbs.push(reader.readAsDataURL(blob));
       onProgress?.(i + 1, pdf.numPages);
     }
     return thumbs;
   } finally {
     await pdf.destroy();
   }
-}
-
-export function canvasToBlob(
-  canvas: HTMLCanvasElement,
-  type: "image/png" | "image/jpeg",
-  quality?: number,
-): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error("Could not export image"))),
-      type,
-      quality,
-    );
-  });
 }
