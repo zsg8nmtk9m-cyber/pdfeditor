@@ -62,6 +62,19 @@ host (Netlify, Vercel, GitHub Pages, S3…). The only requirement is that the
 host rewrites unknown paths to `index.html` (SPA fallback), since routing is
 client-side.
 
+## Deployment
+
+Pushes to the default branch trigger `.github/workflows/deploy.yml`, which
+builds the site and publishes it to **GitHub Pages** (the workflow enables
+Pages on first run). Two details worth knowing:
+
+- The site is served under a subpath (`/<repo-name>/`), so the workflow sets
+  `BASE_PATH` at build time; Vite bakes it into asset URLs and the router
+  picks it up via `import.meta.env.BASE_URL`.
+- GitHub Pages has no SPA rewrites, so the workflow copies `index.html` to
+  `404.html` — deep links like `/merge` load the app through the 404 page and
+  the router takes over.
+
 ## Notes & known trade-offs
 
 - **Compress** re-renders pages to JPEG for maximum size reduction, so text in
