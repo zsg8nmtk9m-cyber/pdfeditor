@@ -8,6 +8,7 @@ import Split from "./pages/tools/Split";
 import Organize from "./pages/tools/Organize";
 import Rotate from "./pages/tools/Rotate";
 import Compress from "./pages/tools/Compress";
+import Batch from "./pages/tools/Batch";
 import PdfToImages from "./pages/tools/PdfToImages";
 import ImagesToPdf from "./pages/tools/ImagesToPdf";
 import Annotate from "./pages/tools/Annotate";
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/organize" element={<Organize />} />
           <Route path="/rotate" element={<Rotate />} />
           <Route path="/compress" element={<Compress />} />
+          <Route path="/batch" element={<Batch />} />
           <Route path="/pdf-to-images" element={<PdfToImages />} />
           <Route path="/images-to-pdf" element={<ImagesToPdf />} />
           <Route path="/annotate" element={<Annotate />} />

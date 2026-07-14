@@ -67,7 +67,7 @@ page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 console.log("home");
 await page.goto(BASE);
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("13 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 13);
+check("14 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 14);
 
 // ---------- merge ----------
 console.log("merge");
@@ -164,6 +164,29 @@ await page.getByRole("button", { name: "Compress PDF" }).click();
 await page.getByText("Done!").waitFor({ timeout: 60000 });
 out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "compressed.pdf");
 check("compressed keeps 5 pages", (await pageCount(out)) === 5);
+
+// ---------- batch (compress two files -> ZIP) ----------
+console.log("batch");
+await page.goto(BASE + "/batch");
+await page.locator("input[type=file]").setInputFiles([join(FIX, "a.pdf"), join(FIX, "b.pdf")]);
+await page.getByRole("button", { name: "Process 2 files" }).click();
+await page.getByText("Done!").waitFor({ timeout: 60000 });
+check("batch produced 2 output files", (await page.locator("li:has-text('.pdf')").count()) === 2);
+out = await grabDownload(page, page.getByRole("button", { name: /Download all/ }), "batch.zip");
+check("batch zip non-empty", readFileSync(out).length > 1000);
+
+// ---------- batch rotate applies to every page of every file ----------
+console.log("batch (rotate)");
+await page.goto(BASE + "/batch");
+await page.locator("input[type=file]").setInputFiles(join(FIX, "a.pdf"));
+await page.getByRole("button", { name: "Rotate", exact: true }).click();
+await page.getByRole("button", { name: "Process 1 file" }).click();
+await page.getByText("Done!").waitFor({ timeout: 30000 });
+out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "batch-rotated.pdf");
+{
+  const rot = await pageRotations(out);
+  check("batch rotate turned all 3 pages 90°", rot.length === 3 && rot.every((r) => r === 90));
+}
 
 // ---------- protect ----------
 console.log("protect");

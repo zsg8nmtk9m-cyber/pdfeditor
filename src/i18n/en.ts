@@ -56,6 +56,12 @@ export const en = {
       description:
         "Reduce file size by re-rendering pages at a lower resolution. Ideal for scans and image-heavy documents.",
     },
+    batch: {
+      name: "Batch Process",
+      tagline: "Compress, rotate or watermark many files",
+      description:
+        "Apply the same operation — compress, rotate or watermark — to a whole batch of PDFs at once, then download them all as a ZIP.",
+    },
     "pdf-to-images": {
       name: "PDF to Images",
       tagline: "Export pages as PNG or JPG",
@@ -211,6 +217,21 @@ export const en = {
       `${before} → ${after} (${saved}% smaller)`,
     noSavings: (before: string, after: string) =>
       `This file didn't get smaller (${before} → ${after}) — it's likely already well optimized.`,
+  },
+  batch: {
+    hint: "Select one or more PDF files",
+    operation: "Operation to apply to every file",
+    opCompress: "Compress",
+    opRotate: "Rotate",
+    opWatermark: "Watermark",
+    processing: (done: number, total: number) => `Processing ${done} of ${total}…`,
+    action: (n: number) => `Process ${n} file${n === 1 ? "" : "s"}`,
+    doneNote: (ok: number, skipped: number) =>
+      skipped > 0
+        ? `${ok} file${ok === 1 ? "" : "s"} processed, ${skipped} skipped (password-protected or unreadable).`
+        : `${ok} file${ok === 1 ? "" : "s"} processed.`,
+    allSkipped: "None of the files could be processed — they may be password-protected.",
+    failed: "Batch processing failed.",
   },
   pdfToImages: {
     format: "Image format",

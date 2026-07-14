@@ -53,6 +53,12 @@ export const tr: Dict = {
       description:
         "Sayfaları daha düşük çözünürlükte yeniden oluşturarak dosya boyutunu azaltın. Taramalar ve görsel ağırlıklı belgeler için idealdir.",
     },
+    batch: {
+      name: "Toplu İşlem",
+      tagline: "Birçok dosyayı sıkıştırın, döndürün, filigranlayın",
+      description:
+        "Aynı işlemi — sıkıştırma, döndürme veya filigran — bir grup PDF'e tek seferde uygulayın, ardından hepsini ZIP olarak indirin.",
+    },
     "pdf-to-images": {
       name: "PDF'ten Görsele",
       tagline: "Sayfaları PNG veya JPG olarak dışa aktarın",
@@ -210,6 +216,21 @@ export const tr: Dict = {
       `${before} → ${after} (%${saved} daha küçük)`,
     noSavings: (before: string, after: string) =>
       `Dosya küçülmedi (${before} → ${after}) — büyük olasılıkla zaten iyi optimize edilmiş.`,
+  },
+  batch: {
+    hint: "Bir veya daha fazla PDF dosyası seçin",
+    operation: "Her dosyaya uygulanacak işlem",
+    opCompress: "Sıkıştır",
+    opRotate: "Döndür",
+    opWatermark: "Filigran",
+    processing: (done: number, total: number) => `${total} dosyadan ${done}. işleniyor…`,
+    action: (n: number) => `${n} dosyayı işle`,
+    doneNote: (ok: number, skipped: number) =>
+      skipped > 0
+        ? `${ok} dosya işlendi, ${skipped} atlandı (parola korumalı veya okunamıyor).`
+        : `${ok} dosya işlendi.`,
+    allSkipped: "Dosyaların hiçbiri işlenemedi — parola korumalı olabilirler.",
+    failed: "Toplu işlem başarısız oldu.",
   },
   pdfToImages: {
     format: "Görsel biçimi",

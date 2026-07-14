@@ -12,7 +12,7 @@ no file-size limits to enforce, and nothing sensitive ever leaves the device.
 | Category | Tools |
 | -------- | ----- |
 | Organize | Merge · Split (ranges / extract / every page) · Organize (drag-reorder, rotate, delete pages) · Rotate |
-| Optimize | Compress (3 presets, re-renders pages as JPEG) |
+| Optimize | Compress (3 presets, re-renders pages as JPEG) · Batch (compress/rotate/watermark many files → ZIP) |
 | Convert  | PDF → PNG/JPG images · JPG/PNG/WebP/GIF/BMP images → PDF |
 | Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Text watermark · Page numbers · Metadata editor |
 | Security | Protect (AES password encryption) · Unlock (remove a known password) |

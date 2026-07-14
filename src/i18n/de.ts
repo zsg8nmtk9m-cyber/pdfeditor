@@ -53,6 +53,12 @@ export const de: Dict = {
       description:
         "Reduzieren Sie die Dateigröße, indem Seiten mit geringerer Auflösung neu gerendert werden. Ideal für Scans und bildlastige Dokumente.",
     },
+    batch: {
+      name: "Stapelverarbeitung",
+      tagline: "Viele Dateien komprimieren, drehen, wasserzeichnen",
+      description:
+        "Wenden Sie denselben Vorgang — Komprimieren, Drehen oder Wasserzeichen — auf einen ganzen Stapel PDFs auf einmal an und laden Sie sie alle als ZIP herunter.",
+    },
     "pdf-to-images": {
       name: "PDF in Bilder",
       tagline: "Seiten als PNG oder JPG exportieren",
@@ -210,6 +216,22 @@ export const de: Dict = {
       `${before} → ${after} (${saved} % kleiner)`,
     noSavings: (before: string, after: string) =>
       `Die Datei wurde nicht kleiner (${before} → ${after}) — sie ist vermutlich bereits gut optimiert.`,
+  },
+  batch: {
+    hint: "Eine oder mehrere PDF-Dateien auswählen",
+    operation: "Vorgang für jede Datei",
+    opCompress: "Komprimieren",
+    opRotate: "Drehen",
+    opWatermark: "Wasserzeichen",
+    processing: (done: number, total: number) => `Verarbeite ${done} von ${total}…`,
+    action: (n: number) => `${n} Datei${n === 1 ? "" : "en"} verarbeiten`,
+    doneNote: (ok: number, skipped: number) =>
+      skipped > 0
+        ? `${ok} Datei${ok === 1 ? "" : "en"} verarbeitet, ${skipped} übersprungen (passwortgeschützt oder unlesbar).`
+        : `${ok} Datei${ok === 1 ? "" : "en"} verarbeitet.`,
+    allSkipped:
+      "Keine der Dateien konnte verarbeitet werden — sie sind möglicherweise passwortgeschützt.",
+    failed: "Stapelverarbeitung fehlgeschlagen.",
   },
   pdfToImages: {
     format: "Bildformat",

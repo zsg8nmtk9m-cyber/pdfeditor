@@ -5,6 +5,7 @@ import {
   LayoutGrid,
   RotateCw,
   FileArchive,
+  Layers,
   Images,
   FileImage,
   PenLine,
@@ -23,6 +24,7 @@ export type ToolId =
   | "organize"
   | "rotate"
   | "compress"
+  | "batch"
   | "pdf-to-images"
   | "images-to-pdf"
   | "annotate"
@@ -51,6 +53,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "organize", path: "/organize", icon: LayoutGrid, category: "Organize", accent: "bg-sky-100 text-sky-600" },
   { id: "rotate", path: "/rotate", icon: RotateCw, category: "Organize", accent: "bg-cyan-100 text-cyan-600" },
   { id: "compress", path: "/compress", icon: FileArchive, category: "Optimize", accent: "bg-emerald-100 text-emerald-600" },
+  { id: "batch", path: "/batch", icon: Layers, category: "Optimize", accent: "bg-blue-100 text-blue-600" },
   { id: "pdf-to-images", path: "/pdf-to-images", icon: Images, category: "Convert", accent: "bg-amber-100 text-amber-600" },
   { id: "images-to-pdf", path: "/images-to-pdf", icon: FileImage, category: "Convert", accent: "bg-orange-100 text-orange-600" },
   { id: "annotate", path: "/annotate", icon: PenLine, category: "Edit", accent: "bg-lime-100 text-lime-600" },

@@ -53,6 +53,12 @@ export const es: Dict = {
       description:
         "Reduce el tamaño del archivo re-renderizando las páginas a menor resolución. Ideal para escaneos y documentos con muchas imágenes.",
     },
+    batch: {
+      name: "Procesar por lotes",
+      tagline: "Comprime, rota o marca muchos archivos",
+      description:
+        "Aplica la misma operación — comprimir, rotar o marca de agua — a un lote entero de PDFs a la vez y descárgalos todos como ZIP.",
+    },
     "pdf-to-images": {
       name: "PDF a imágenes",
       tagline: "Exporta páginas como PNG o JPG",
@@ -210,6 +216,22 @@ export const es: Dict = {
       `${before} → ${after} (${saved} % más pequeño)`,
     noSavings: (before: string, after: string) =>
       `El archivo no se redujo (${before} → ${after}) — probablemente ya está bien optimizado.`,
+  },
+  batch: {
+    hint: "Selecciona uno o más archivos PDF",
+    operation: "Operación para cada archivo",
+    opCompress: "Comprimir",
+    opRotate: "Rotar",
+    opWatermark: "Marca de agua",
+    processing: (done: number, total: number) => `Procesando ${done} de ${total}…`,
+    action: (n: number) => `Procesar ${n} archivo${n === 1 ? "" : "s"}`,
+    doneNote: (ok: number, skipped: number) =>
+      skipped > 0
+        ? `${ok} archivo${ok === 1 ? "" : "s"} procesado${ok === 1 ? "" : "s"}, ${skipped} omitido${skipped === 1 ? "" : "s"} (protegido con contraseña o ilegible).`
+        : `${ok} archivo${ok === 1 ? "" : "s"} procesado${ok === 1 ? "" : "s"}.`,
+    allSkipped:
+      "No se pudo procesar ningún archivo — pueden estar protegidos con contraseña.",
+    failed: "Error en el procesamiento por lotes.",
   },
   pdfToImages: {
     format: "Formato de imagen",

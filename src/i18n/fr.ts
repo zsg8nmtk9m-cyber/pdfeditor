@@ -53,6 +53,12 @@ export const fr: Dict = {
       description:
         "Réduisez la taille du fichier en recomposant les pages à une résolution inférieure. Idéal pour les scans et les documents riches en images.",
     },
+    batch: {
+      name: "Traitement par lot",
+      tagline: "Compressez, pivotez ou filigranez plusieurs fichiers",
+      description:
+        "Appliquez la même opération — compression, rotation ou filigrane — à tout un lot de PDF d'un coup, puis téléchargez-les tous en ZIP.",
+    },
     "pdf-to-images": {
       name: "PDF en images",
       tagline: "Exportez les pages en PNG ou JPG",
@@ -210,6 +216,22 @@ export const fr: Dict = {
       `${before} → ${after} (${saved} % plus petit)`,
     noSavings: (before: string, after: string) =>
       `Le fichier n'a pas rétréci (${before} → ${after}) — il est probablement déjà bien optimisé.`,
+  },
+  batch: {
+    hint: "Sélectionnez un ou plusieurs fichiers PDF",
+    operation: "Opération à appliquer à chaque fichier",
+    opCompress: "Compresser",
+    opRotate: "Pivoter",
+    opWatermark: "Filigrane",
+    processing: (done: number, total: number) => `Traitement de ${done} sur ${total}…`,
+    action: (n: number) => `Traiter ${n} fichier${n === 1 ? "" : "s"}`,
+    doneNote: (ok: number, skipped: number) =>
+      skipped > 0
+        ? `${ok} fichier${ok === 1 ? "" : "s"} traité${ok === 1 ? "" : "s"}, ${skipped} ignoré${skipped === 1 ? "" : "s"} (protégé par mot de passe ou illisible).`
+        : `${ok} fichier${ok === 1 ? "" : "s"} traité${ok === 1 ? "" : "s"}.`,
+    allSkipped:
+      "Aucun fichier n'a pu être traité — ils sont peut-être protégés par mot de passe.",
+    failed: "Échec du traitement par lot.",
   },
   pdfToImages: {
     format: "Format d'image",
