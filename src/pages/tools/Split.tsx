@@ -6,6 +6,7 @@ import type { PageBadge } from "../../components/PageGrid";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, inputClass } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { usePageSelection, usePageThumbnails } from "../../hooks/usePageThumbnails";
 import { extractPages } from "../../lib/api";
@@ -30,6 +31,7 @@ const RANGE_COLORS = [
 ];
 
 export default function Split() {
+  const t = useT();
   const pdf = useSinglePdf();
   const { thumbs, progress } = usePageThumbnails(pdf.bytes);
   const [mode, setMode] = useState<Mode>("ranges");
@@ -40,17 +42,9 @@ export default function Split() {
   const [results, setResults] = useState<OutputFile[] | null>(null);
 
   const modes: { id: Mode; title: string; hint: string }[] = [
-    {
-      id: "ranges",
-      title: "Split by ranges",
-      hint: "Each range becomes its own PDF, e.g. 1-3, 4-6",
-    },
-    {
-      id: "extract",
-      title: "Extract pages",
-      hint: "Click pages below to pick them — they become one PDF",
-    },
-    { id: "all", title: "Every page", hint: "Each page becomes its own PDF" },
+    { id: "ranges", title: t.split.modeRanges, hint: t.split.modeRangesHint },
+    { id: "extract", title: t.split.modeExtract, hint: t.split.modeExtractHint },
+    { id: "all", title: t.split.modeAll, hint: t.split.modeAllHint },
   ];
 
   function switchMode(next: Mode) {
@@ -81,14 +75,14 @@ export default function Split() {
       for (const page of range) {
         if (!map.has(page)) {
           map.set(page, {
-            label: `PDF ${r + 1}`,
+            label: t.split.badge(r + 1),
             className: RANGE_COLORS[r % RANGE_COLORS.length],
           });
         }
       }
     });
     return map;
-  }, [mode, rangeText, pdf.pageCount]);
+  }, [mode, rangeText, pdf.pageCount, t]);
 
   async function run() {
     if (!pdf.bytes || !pdf.file) return;
@@ -103,8 +97,7 @@ export default function Split() {
           out.push({ name: `${base}-page-${i + 1}.pdf`, blob: pdfBlob(bytes) });
         }
       } else if (mode === "extract") {
-        if (!rangeText.trim())
-          throw new Error("Click at least one page below (or type page numbers).");
+        if (!rangeText.trim()) throw new Error(t.split.needSelection);
         const indices = [...new Set(parsePageRanges(rangeText, pdf.pageCount).flat())].sort(
           (a, b) => a - b,
         );
@@ -122,7 +115,7 @@ export default function Split() {
       }
       setResults(out);
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Splitting failed.");
+      pdf.setError(errorText(err, t, t.split.failed));
     } finally {
       setBusy(false);
     }
@@ -154,7 +147,7 @@ export default function Split() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -164,10 +157,10 @@ export default function Split() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-slate-500">
                 <span className="font-semibold text-slate-800">{pdf.file.name}</span> —{" "}
-                {pdf.pageCount} page{pdf.pageCount === 1 ? "" : "s"}
+                {t.common.pages(pdf.pageCount)}
               </p>
               <Button variant="ghost" onClick={reset}>
-                Choose another file
+                {t.common.chooseAnotherFile}
               </Button>
             </div>
 
@@ -189,10 +182,10 @@ export default function Split() {
             </div>
 
             {mode === "ranges" && (
-              <Field label="Page ranges — each resulting PDF is highlighted below">
+              <Field label={t.split.rangesLabel}>
                 <input
                   className={inputClass}
-                  placeholder={`e.g. 1-3, 5, 8-${pdf.pageCount}`}
+                  placeholder={t.split.rangesPlaceholder(pdf.pageCount)}
                   value={rangeText}
                   onChange={(e) => onTextChange(e.target.value)}
                 />
@@ -202,10 +195,10 @@ export default function Split() {
             {mode === "extract" && (
               <div className="flex flex-wrap items-end gap-3">
                 <div className="min-w-56 flex-1">
-                  <Field label="Selected pages — click thumbnails or type">
+                  <Field label={t.split.extractLabel}>
                     <input
                       className={inputClass}
-                      placeholder="e.g. 1, 3-5"
+                      placeholder={t.common.rangePlaceholder}
                       value={rangeText}
                       onChange={(e) => onTextChange(e.target.value)}
                     />
@@ -216,10 +209,10 @@ export default function Split() {
                     variant="secondary"
                     onClick={() => selection.selectAll(pdf.pageCount)}
                   >
-                    Select all
+                    {t.common.selectAll}
                   </Button>
                   <Button variant="secondary" onClick={selection.clear}>
-                    Clear
+                    {t.common.clear}
                   </Button>
                 </div>
               </div>
@@ -227,7 +220,7 @@ export default function Split() {
 
             <ErrorBox>{pdf.error}</ErrorBox>
             <Button onClick={run} busy={busy}>
-              <Scissors className="h-4 w-4" /> Split PDF
+              <Scissors className="h-4 w-4" /> {t.split.action}
             </Button>
           </Card>
 
@@ -236,8 +229,8 @@ export default function Split() {
           ) : mode === "extract" ? (
             <>
               <p className="text-sm text-slate-500">
-                Click pages to select them — hold{" "}
-                <kbd className="rounded bg-slate-200 px-1">Shift</kbd> to select a range.
+                {t.split.clickHintA}{" "}
+                <kbd className="rounded bg-slate-200 px-1">Shift</kbd> {t.split.clickHintB}
               </p>
               <PageGrid thumbs={thumbs} selected={selection.selected} onToggle={selection.toggle} />
             </>

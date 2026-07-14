@@ -5,6 +5,7 @@ import FileSummary from "../../components/FileSummary";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { compressPdf } from "../../lib/api";
 import { COMPRESS_PRESETS } from "../../lib/types";
@@ -13,6 +14,7 @@ import { baseName, formatBytes, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
 export default function Compress() {
+  const t = useT();
   const pdf = useSinglePdf();
   const [preset, setPreset] = useState<CompressPreset>("recommended");
   const [busy, setBusy] = useState(false);
@@ -36,11 +38,11 @@ export default function Compress() {
         file: { name: `${baseName(pdf.file.name)}-compressed.pdf`, blob: pdfBlob(out) },
         note:
           after < before
-            ? `${formatBytes(before)} → ${formatBytes(after)} (${saved}% smaller)`
-            : `This file didn't get smaller (${formatBytes(before)} → ${formatBytes(after)}) — it's likely already well optimized.`,
+            ? t.compress.savings(formatBytes(before), formatBytes(after), saved)
+            : t.compress.noSavings(formatBytes(before), formatBytes(after)),
       });
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Compression failed.");
+      pdf.setError(errorText(err, t, t.compress.failed));
     } finally {
       setBusy(false);
     }
@@ -60,7 +62,7 @@ export default function Compress() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -74,41 +76,38 @@ export default function Compress() {
           />
 
           <div className="grid gap-3 sm:grid-cols-3">
-            {(Object.keys(COMPRESS_PRESETS) as CompressPreset[]).map((key) => {
-              const p = COMPRESS_PRESETS[key];
-              return (
-                <button
-                  key={key}
-                  onClick={() => setPreset(key)}
-                  className={`rounded-xl px-4 py-3 text-left ring-1 transition-colors ${
-                    preset === key
-                      ? "bg-indigo-50 ring-2 ring-indigo-500"
-                      : "bg-white ring-slate-200 hover:ring-indigo-300"
-                  }`}
-                >
-                  <span className="block text-sm font-semibold text-slate-800">
-                    {p.label}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-slate-500">{p.hint}</span>
-                </button>
-              );
-            })}
+            {(Object.keys(COMPRESS_PRESETS) as CompressPreset[]).map((key) => (
+              <button
+                key={key}
+                onClick={() => setPreset(key)}
+                className={`rounded-xl px-4 py-3 text-left ring-1 transition-colors ${
+                  preset === key
+                    ? "bg-indigo-50 ring-2 ring-indigo-500"
+                    : "bg-white ring-slate-200 hover:ring-indigo-300"
+                }`}
+              >
+                <span className="block text-sm font-semibold text-slate-800">
+                  {t.compress.presets[key].label}
+                </span>
+                <span className="mt-0.5 block text-xs text-slate-500">
+                  {t.compress.presets[key].hint}
+                </span>
+              </button>
+            ))}
           </div>
 
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-xs text-amber-800 ring-1 ring-amber-200">
-            Pages are re-rendered as images to achieve maximum compression, so text
-            will no longer be selectable in the output. Best for scans, presentations
-            and image-heavy documents.
+            {t.compress.note}
           </p>
 
           {busy && <ProgressBar value={progress} />}
           <ErrorBox>{pdf.error}</ErrorBox>
           <div className="flex gap-3">
             <Button onClick={run} busy={busy}>
-              <FileArchive className="h-4 w-4" /> Compress PDF
+              <FileArchive className="h-4 w-4" /> {t.compress.action}
             </Button>
             <Button variant="ghost" onClick={reset}>
-              Choose another file
+              {t.common.chooseAnotherFile}
             </Button>
           </div>
         </Card>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { FileText, History, Trash2, UploadCloud } from "lucide-react";
+import { useT } from "../i18n";
 import { clearRecents, listRecents, loadRecent } from "../lib/fileStore";
 import type { RecentFileMeta } from "../lib/fileStore";
 import { formatBytes } from "../lib/utils";
@@ -15,6 +16,7 @@ interface DropzoneProps {
 }
 
 export default function Dropzone({ accept, multiple, onFiles, hint, compact }: DropzoneProps) {
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const acceptsPdf = accept.includes("pdf");
@@ -53,7 +55,7 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
     <div
       role="button"
       tabIndex={0}
-      aria-label="Upload files"
+      aria-label={t.dropzone.ariaUpload}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
@@ -96,20 +98,18 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
       </span>
       <div>
         <p className="font-semibold text-slate-800">
-          {compact ? "Add more files" : "Choose files or drag them here"}
+          {compact ? t.dropzone.titleCompact : t.dropzone.title}
         </p>
         {hint && <p className="mt-1 text-sm text-slate-500">{hint}</p>}
       </div>
-      <p className="text-xs text-slate-400">
-        Your files are processed locally — they never leave this device.
-      </p>
+      <p className="text-xs text-slate-400">{t.dropzone.privacy}</p>
     </div>
 
     {acceptsPdf && recents.length > 0 && (
       <div>
         <div className="mb-2 flex items-center justify-between">
           <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            <History className="h-3.5 w-3.5" /> Recent files (stored on this device)
+            <History className="h-3.5 w-3.5" /> {t.dropzone.recents}
           </p>
           <button
             onClick={() => {
@@ -118,7 +118,7 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
             }}
             className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-slate-400 hover:bg-slate-100 hover:text-rose-600"
           >
-            <Trash2 className="h-3 w-3" /> Clear
+            <Trash2 className="h-3 w-3" /> {t.common.clear}
           </button>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1">

@@ -6,6 +6,7 @@ import SignatureModal from "../../components/SignatureModal";
 import type { SignatureResult } from "../../components/SignatureModal";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Select } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { annotatePdf, renderPageImage } from "../../lib/api";
 import type { AnnotationElement, PageImage } from "../../lib/types";
@@ -21,6 +22,7 @@ const FONT_SIZES = [12, 16, 20, 28, 36];
 const MAX_PAGE_WIDTH = 680;
 
 export default function Annotate() {
+  const t = useT();
   const pdf = useSinglePdf();
   const [pageIndex, setPageIndex] = useState(0);
   const [pageImage, setPageImage] = useState<PageImage | null>(null);
@@ -46,7 +48,7 @@ export default function Annotate() {
     setPageImage(null);
     renderPageImage(pdf.bytes, pageIndex, 2)
       .then((img) => alive && setPageImage(img))
-      .catch(() => alive && pdf.setError("Could not render this page."));
+      .catch(() => alive && pdf.setError(t.annotate.renderFailed));
     return () => {
       alive = false;
     };
@@ -110,7 +112,7 @@ export default function Annotate() {
       y: pageImage.heightPts / 2 - 10,
       w: 0,
       h: 0,
-      text: "Text",
+      text: t.annotate.defaultText,
       fontSize: 16,
       color: "#111827",
     };
@@ -195,7 +197,7 @@ export default function Annotate() {
       );
       setResult({ name: `${baseName(pdf.file.name)}-signed.pdf`, blob: pdfBlob(bytes) });
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Could not apply the changes.");
+      pdf.setError(errorText(err, t, t.annotate.failed));
     } finally {
       setBusy(false);
     }
@@ -225,7 +227,7 @@ export default function Annotate() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -234,16 +236,16 @@ export default function Annotate() {
           <Card className="!p-4">
             <div className="flex flex-wrap items-center gap-3">
               <Button variant="secondary" onClick={addText}>
-                <Type className="h-4 w-4" /> Add text
+                <Type className="h-4 w-4" /> {t.annotate.addText}
               </Button>
               <Button variant="secondary" onClick={() => setSigning(true)}>
-                <PenLine className="h-4 w-4" /> Add signature
+                <PenLine className="h-4 w-4" /> {t.annotate.addSignature}
               </Button>
 
               {selected?.kind === "text" && (
                 <>
                   <Select
-                    aria-label="Font size"
+                    aria-label={t.annotate.fontSizeAria}
                     className="!w-28"
                     value={selected.fontSize}
                     onChange={(e) => update(selected.id, { fontSize: Number(e.target.value) })}
@@ -256,7 +258,7 @@ export default function Annotate() {
                   </Select>
                   <input
                     type="color"
-                    aria-label="Text color"
+                    aria-label={t.annotate.colorAria}
                     value={selected.color}
                     onChange={(e) => update(selected.id, { color: e.target.value })}
                     className="h-9 w-11 cursor-pointer rounded-lg border border-slate-300 bg-white p-1"
@@ -271,16 +273,16 @@ export default function Annotate() {
                     setSelectedId(null);
                   }}
                 >
-                  <Trash2 className="h-4 w-4" /> Delete
+                  <Trash2 className="h-4 w-4" /> {t.common.delete}
                 </Button>
               )}
 
               <div className="ml-auto flex items-center gap-3">
                 <Button variant="ghost" onClick={reset}>
-                  Choose another file
+                  {t.common.chooseAnotherFile}
                 </Button>
                 <Button onClick={run} busy={busy} disabled={elements.length === 0}>
-                  Apply & download
+                  {t.annotate.apply}
                 </Button>
               </div>
             </div>
@@ -307,7 +309,7 @@ export default function Annotate() {
               >
                 <img
                   src={pageImage.dataUrl}
-                  alt={`Page ${pageIndex + 1}`}
+                  alt={t.pageGrid.pageAria(pageIndex + 1)}
                   draggable={false}
                   className="absolute inset-0 h-full w-full"
                 />
@@ -372,13 +374,13 @@ export default function Annotate() {
                       >
                         <img
                           src={el.imageDataUrl}
-                          alt="Signature"
+                          alt={t.annotate.signatureAlt}
                           draggable={false}
                           className="h-full w-full"
                         />
                         {selectedId === el.id && (
                           <span
-                            aria-label="Resize signature"
+                            aria-label={t.annotate.resizeAria}
                             onPointerDown={(e) => startResize(e, el)}
                             className="absolute -bottom-1.5 -right-1.5 h-3.5 w-3.5 cursor-nwse-resize rounded-full bg-indigo-600 ring-2 ring-white"
                           />
@@ -398,10 +400,10 @@ export default function Annotate() {
                 disabled={pageIndex === 0}
                 onClick={() => setPageIndex((p) => p - 1)}
               >
-                <ChevronLeft className="h-4 w-4" /> Prev
+                <ChevronLeft className="h-4 w-4" /> {t.annotate.prev}
               </Button>
               <span className="text-sm font-medium text-slate-600">
-                Page {pageIndex + 1} of {pdf.pageCount}
+                {t.annotate.pageOf(pageIndex + 1, pdf.pageCount)}
               </span>
               <Button
                 variant="secondary"
@@ -409,15 +411,12 @@ export default function Annotate() {
                 disabled={pageIndex === pdf.pageCount - 1}
                 onClick={() => setPageIndex((p) => p + 1)}
               >
-                Next <ChevronRight className="h-4 w-4" />
+                {t.annotate.next} <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           )}
 
-          <p className="text-center text-xs text-slate-400">
-            Drag elements to move them · double-click text to edit ·{" "}
-            {elements.length} element{elements.length === 1 ? "" : "s"} placed
-          </p>
+          <p className="text-center text-xs text-slate-400">{t.annotate.hint(elements.length)}</p>
 
           {signing && (
             <SignatureModal onDone={addSignature} onClose={() => setSigning(false)} />

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Download, FileText, RefreshCw } from "lucide-react";
 import { Button, Card, Select } from "./ui";
+import { useT } from "../i18n";
 import { getDocSummary } from "../lib/api";
 import { saveRecent } from "../lib/fileStore";
 import { setHandoff } from "../lib/handoff";
@@ -19,6 +20,7 @@ interface ResultPanelProps {
 }
 
 export default function ResultPanel({ files, zipName = "files.zip", onReset, note }: ResultPanelProps) {
+  const t = useT();
   const [zipping, setZipping] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -54,12 +56,9 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
       <div className="mb-5 flex items-center gap-3">
         <CheckCircle2 className="h-8 w-8 text-emerald-500" />
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Done!</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t.common.done}</h2>
           <p className="text-sm text-slate-500">
-            {note ??
-              (files.length === 1
-                ? "Your file is ready to download."
-                : `${files.length} files are ready to download.`)}
+            {note ?? (files.length === 1 ? t.result.oneReady : t.result.manyReady(files.length))}
           </p>
         </div>
       </div>
@@ -80,7 +79,7 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
               className="!px-3 !py-1.5"
               onClick={() => downloadBlob(f.blob, f.name)}
             >
-              <Download className="h-4 w-4" /> Download
+              <Download className="h-4 w-4" /> {t.common.download}
             </Button>
           </li>
         ))}
@@ -89,16 +88,16 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
       <div className="flex flex-wrap gap-3">
         {files.length > 1 && (
           <Button onClick={downloadAll} busy={zipping}>
-            <Download className="h-4 w-4" /> Download all (ZIP)
+            <Download className="h-4 w-4" /> {t.common.downloadAllZip}
           </Button>
         )}
         {files.length === 1 && (
           <Button onClick={() => downloadBlob(files[0].blob, files[0].name)}>
-            <Download className="h-4 w-4" /> Download
+            <Download className="h-4 w-4" /> {t.common.download}
           </Button>
         )}
         <Button variant="ghost" onClick={onReset}>
-          <RefreshCw className="h-4 w-4" /> Start over
+          <RefreshCw className="h-4 w-4" /> {t.common.startOver}
         </Button>
         {canHandOff && (
           <div className="flex items-center gap-2">
@@ -110,11 +109,11 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
               onChange={(e) => e.target.value && void continueIn(e.target.value)}
             >
               <option value="" disabled>
-                Continue in another tool…
+                {t.result.continueIn}
               </option>
-              {handoffTools.map((t) => (
-                <option key={t.id} value={t.path}>
-                  {t.name}
+              {handoffTools.map((tool) => (
+                <option key={tool.id} value={tool.path}>
+                  {t.tools[tool.id].name}
                 </option>
               ))}
             </Select>

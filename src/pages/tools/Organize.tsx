@@ -4,6 +4,7 @@ import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { rebuildPdf, renderThumbnails } from "../../lib/api";
 import { saveRecent } from "../../lib/fileStore";
 import { takeHandoff } from "../../lib/handoff";
@@ -18,6 +19,7 @@ interface PageItem {
 }
 
 export default function Organize() {
+  const t = useT();
   const [file, setFile] = useState<File | null>(null);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
   const [pages, setPages] = useState<PageItem[]>([]);
@@ -46,11 +48,7 @@ export default function Organize() {
       setBytes(data);
       void saveRecent(f.name, data, thumbs[0] ?? null);
     } catch (err) {
-      setError(
-        err instanceof Error && /password/i.test(err.message)
-          ? "This PDF is password-protected. Use the Unlock PDF tool first."
-          : "Could not read this PDF.",
-      );
+      setError(errorText(err, t, t.errors.couldNotRead));
     } finally {
       setLoading(false);
     }
@@ -94,7 +92,7 @@ export default function Organize() {
       );
       setResult({ name: `${baseName(file.name)}-organized.pdf`, blob: pdfBlob(out) });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not rebuild the PDF.");
+      setError(errorText(err, t, t.organize.failed));
     } finally {
       setBusy(false);
     }
@@ -123,12 +121,12 @@ export default function Organize() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           {loading && (
             <Card>
               <p className="mb-2 text-sm font-medium text-slate-600">
-                Rendering page previews…
+                {t.pageGrid.rendering}
               </p>
               <ProgressBar value={progress} />
             </Card>
@@ -140,10 +138,10 @@ export default function Organize() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-slate-500">
               <span className="font-semibold text-slate-800">{file.name}</span> —{" "}
-              {pages.length} page{pages.length === 1 ? "" : "s"} · drag to reorder
+              {t.common.pages(pages.length)} · {t.organize.dragToReorder}
             </p>
             <Button variant="ghost" onClick={reset}>
-              <Undo2 className="h-4 w-4" /> Choose another file
+              <Undo2 className="h-4 w-4" /> {t.common.chooseAnotherFile}
             </Button>
           </div>
 
@@ -167,7 +165,7 @@ export default function Organize() {
                 <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-lg bg-slate-100">
                   <img
                     src={page.thumb}
-                    alt={`Page ${i + 1}`}
+                    alt={t.pageGrid.pageAria(i + 1)}
                     draggable={false}
                     className="max-h-full max-w-full object-contain transition-transform"
                     style={{ transform: `rotate(${page.rotation}deg)` }}
@@ -182,7 +180,7 @@ export default function Organize() {
                 <div className="absolute inset-x-2 top-2 flex justify-between opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                   <div className="flex gap-1">
                     <button
-                      aria-label={`Move page ${i + 1} left`}
+                      aria-label={t.organize.moveLeft(i + 1)}
                       onClick={() => movePage(i, i - 1)}
                       disabled={i === 0}
                       className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600 disabled:opacity-40"
@@ -190,7 +188,7 @@ export default function Organize() {
                       <ArrowLeft className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      aria-label={`Move page ${i + 1} right`}
+                      aria-label={t.organize.moveRight(i + 1)}
                       onClick={() => movePage(i, i + 1)}
                       disabled={i === pages.length - 1}
                       className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600 disabled:opacity-40"
@@ -200,14 +198,14 @@ export default function Organize() {
                   </div>
                   <div className="flex gap-1">
                     <button
-                      aria-label={`Rotate page ${i + 1}`}
+                      aria-label={t.organize.rotatePage(i + 1)}
                       onClick={() => rotatePage(i)}
                       className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600"
                     >
                       <RotateCw className="h-3.5 w-3.5" />
                     </button>
                     <button
-                      aria-label={`Delete page ${i + 1}`}
+                      aria-label={t.organize.deletePage(i + 1)}
                       onClick={() => deletePage(i)}
                       className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-rose-600"
                     >
@@ -221,7 +219,7 @@ export default function Organize() {
 
           <ErrorBox>{error}</ErrorBox>
           <Button onClick={run} busy={busy} disabled={pages.length === 0}>
-            <Check className="h-4 w-4" /> Apply changes
+            <Check className="h-4 w-4" /> {t.organize.apply}
           </Button>
         </div>
       )}

@@ -21,7 +21,14 @@ import type {
 } from "./types";
 import { TEXT_BASELINE, TEXT_LINE_HEIGHT } from "./types";
 
+/**
+ * Stable error codes for failures the UI localizes. The message stays as an
+ * English fallback; the code survives the worker boundary.
+ */
+export type OpErrorCode = "encrypted" | "wrong-password";
+
 export class EncryptedPdfError extends Error {
+  code: OpErrorCode = "encrypted";
   constructor() {
     super(
       "This PDF is password-protected. Use the Unlock PDF tool first, then try again.",
@@ -478,7 +485,9 @@ export async function unlockPdf(
   try {
     doc = await PDFDocument.load(srcBytes, { password, updateMetadata: false });
   } catch {
-    throw new Error("Wrong password — could not decrypt this PDF.");
+    throw Object.assign(new Error("Wrong password — could not decrypt this PDF."), {
+      code: "wrong-password" satisfies OpErrorCode,
+    });
   }
   return doc.save();
 }

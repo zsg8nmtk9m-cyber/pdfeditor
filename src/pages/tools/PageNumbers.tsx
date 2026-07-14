@@ -5,6 +5,7 @@ import FileSummary from "../../components/FileSummary";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, Select, inputClass } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { addPageNumbers } from "../../lib/api";
 import type { NumberFormat, NumberPosition } from "../../lib/types";
@@ -12,6 +13,7 @@ import { baseName, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
 export default function PageNumbers() {
+  const t = useT();
   const pdf = useSinglePdf();
   const [position, setPosition] = useState<NumberPosition>("bottom-center");
   const [format, setFormat] = useState<NumberFormat>("n");
@@ -33,7 +35,7 @@ export default function PageNumbers() {
       });
       setResult({ name: `${baseName(pdf.file.name)}-numbered.pdf`, blob: pdfBlob(bytes) });
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Numbering failed.");
+      pdf.setError(errorText(err, t, t.pageNumbers.failed));
     } finally {
       setBusy(false);
     }
@@ -53,7 +55,7 @@ export default function PageNumbers() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -67,37 +69,37 @@ export default function PageNumbers() {
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Position">
+            <Field label={t.pageNumbers.position}>
               <Select
                 value={position}
                 onChange={(e) => setPosition(e.target.value as NumberPosition)}
               >
-                <option value="bottom-center">Bottom center</option>
-                <option value="bottom-left">Bottom left</option>
-                <option value="bottom-right">Bottom right</option>
-                <option value="top-center">Top center</option>
-                <option value="top-left">Top left</option>
-                <option value="top-right">Top right</option>
+                <option value="bottom-center">{t.pageNumbers.bottomCenter}</option>
+                <option value="bottom-left">{t.pageNumbers.bottomLeft}</option>
+                <option value="bottom-right">{t.pageNumbers.bottomRight}</option>
+                <option value="top-center">{t.pageNumbers.topCenter}</option>
+                <option value="top-left">{t.pageNumbers.topLeft}</option>
+                <option value="top-right">{t.pageNumbers.topRight}</option>
               </Select>
             </Field>
-            <Field label="Format">
+            <Field label={t.pageNumbers.format}>
               <Select
                 value={format}
                 onChange={(e) => setFormat(e.target.value as NumberFormat)}
               >
-                <option value="n">1, 2, 3…</option>
-                <option value="n-of-total">1 / 12</option>
-                <option value="page-n-of-total">Page 1 of 12</option>
+                <option value="n">{t.pageNumbers.formatN}</option>
+                <option value="n-of-total">{t.pageNumbers.formatNofTotal}</option>
+                <option value="page-n-of-total">{t.pageNumbers.formatPageNofTotal}</option>
               </Select>
             </Field>
-            <Field label="Font size">
+            <Field label={t.pageNumbers.fontSize}>
               <Select value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))}>
-                <option value={9}>Small (9 pt)</option>
-                <option value={11}>Normal (11 pt)</option>
-                <option value={14}>Large (14 pt)</option>
+                <option value={9}>{t.pageNumbers.sizeSmall}</option>
+                <option value={11}>{t.pageNumbers.sizeNormal}</option>
+                <option value={14}>{t.pageNumbers.sizeLarge}</option>
               </Select>
             </Field>
-            <Field label="Start counting at">
+            <Field label={t.pageNumbers.startAt}>
               <input
                 type="number"
                 min={1}
@@ -111,10 +113,10 @@ export default function PageNumbers() {
           <ErrorBox>{pdf.error}</ErrorBox>
           <div className="flex gap-3">
             <Button onClick={run} busy={busy}>
-              <ListOrdered className="h-4 w-4" /> Add page numbers
+              <ListOrdered className="h-4 w-4" /> {t.pageNumbers.action}
             </Button>
             <Button variant="ghost" onClick={reset}>
-              Choose another file
+              {t.common.chooseAnotherFile}
             </Button>
           </div>
         </Card>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Eraser, PenLine, Type, X } from "lucide-react";
+import { useT } from "../i18n";
 import { Button, inputClass } from "./ui";
 
 export interface SignatureResult {
@@ -47,6 +48,7 @@ function cropToInk(canvas: HTMLCanvasElement, padding = 8): HTMLCanvasElement | 
 }
 
 export default function SignatureModal({ onDone, onClose }: SignatureModalProps) {
+  const t = useT();
   const [tab, setTab] = useState<"draw" | "type">("draw");
   const [typed, setTyped] = useState("");
   const [hasInk, setHasInk] = useState(false);
@@ -118,9 +120,9 @@ export default function SignatureModal({ onDone, onClose }: SignatureModalProps)
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">Add your signature</h2>
+          <h2 className="text-lg font-bold text-slate-900">{t.signature.title}</h2>
           <button
-            aria-label="Close"
+            aria-label={t.common.close}
             onClick={onClose}
             className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
           >
@@ -137,7 +139,7 @@ export default function SignatureModal({ onDone, onClose }: SignatureModalProps)
                 : "text-slate-600 ring-1 ring-slate-200 hover:ring-indigo-300"
             }`}
           >
-            <PenLine className="h-4 w-4" /> Draw
+            <PenLine className="h-4 w-4" /> {t.signature.draw}
           </button>
           <button
             onClick={() => setTab("type")}
@@ -147,7 +149,7 @@ export default function SignatureModal({ onDone, onClose }: SignatureModalProps)
                 : "text-slate-600 ring-1 ring-slate-200 hover:ring-indigo-300"
             }`}
           >
-            <Type className="h-4 w-4" /> Type
+            <Type className="h-4 w-4" /> {t.signature.type}
           </button>
         </div>
 
@@ -186,10 +188,10 @@ export default function SignatureModal({ onDone, onClose }: SignatureModalProps)
                   setHasInk(false);
                 }}
               >
-                <Eraser className="h-4 w-4" /> Clear
+                <Eraser className="h-4 w-4" /> {t.common.clear}
               </Button>
               <Button onClick={useDrawn} disabled={!hasInk}>
-                Use signature
+                {t.signature.use}
               </Button>
             </div>
           </>
@@ -197,7 +199,7 @@ export default function SignatureModal({ onDone, onClose }: SignatureModalProps)
           <>
             <input
               className={inputClass}
-              placeholder="Type your name"
+              placeholder={t.signature.typePlaceholder}
               value={typed}
               onChange={(e) => setTyped(e.target.value)}
               autoFocus
@@ -207,12 +209,12 @@ export default function SignatureModal({ onDone, onClose }: SignatureModalProps)
                 className="whitespace-nowrap text-4xl text-slate-800"
                 style={{ fontFamily: '"Brush Script MT", "Segoe Script", "Comic Sans MS", cursive' }}
               >
-                {typed || "Signature preview"}
+                {typed || t.signature.previewFallback}
               </span>
             </div>
             <div className="mt-4 flex justify-end">
               <Button onClick={useTyped} disabled={!typed.trim()}>
-                Use signature
+                {t.signature.use}
               </Button>
             </div>
           </>

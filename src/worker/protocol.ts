@@ -8,5 +8,5 @@ export interface WorkerRequest {
 
 export type WorkerResponse =
   | { id: number; type: "result"; result: unknown }
-  | { id: number; type: "error"; message: string }
+  | { id: number; type: "error"; message: string; code?: string }
   | { id: number; type: "progress"; done: number; total: number };

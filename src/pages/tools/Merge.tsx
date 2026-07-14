@@ -4,6 +4,7 @@ import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { getDocSummary, mergePdfs } from "../../lib/api";
 import { saveRecent } from "../../lib/fileStore";
 import { takeHandoff } from "../../lib/handoff";
@@ -22,6 +23,7 @@ interface MergeItem {
 let nextItemId = 1;
 
 export default function Merge() {
+  const t = useT();
   const [items, setItems] = useState<MergeItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +49,7 @@ export default function Merge() {
         );
         void saveRecent(file.name, bytes, summary.thumbnail);
       } catch {
-        setError(`Could not read "${file.name}".`);
+        setError(t.merge.couldNotReadFile(file.name));
       }
     }
   }
@@ -76,7 +78,7 @@ export default function Merge() {
       const merged = await mergePdfs(items.map((it) => it.bytes));
       setResult({ name: "merged.pdf", blob: pdfBlob(merged) });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Merging failed.");
+      setError(errorText(err, t, t.merge.failed));
     } finally {
       setBusy(false);
     }
@@ -99,15 +101,12 @@ export default function Merge() {
             multiple
             compact={items.length > 0}
             onFiles={addFiles}
-            hint="Select two or more PDF files"
+            hint={t.merge.hint}
           />
 
           {items.length > 0 && (
             <>
-              <p className="text-sm text-slate-500">
-                Files are merged left to right — drag the cards (or use the arrows) to
-                reorder.
-              </p>
+              <p className="text-sm text-slate-500">{t.merge.reorder}</p>
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
                 {items.map((item, i) => (
                   <div
@@ -139,7 +138,7 @@ export default function Merge() {
                         <span className="flex flex-col items-center gap-1 px-2 text-center text-amber-600">
                           <FileWarning className="h-6 w-6" />
                           <span className="text-[10px] font-semibold leading-tight">
-                            Can't preview — file may be password-protected
+                            {t.merge.cannotPreview}
                           </span>
                         </span>
                       )}
@@ -149,7 +148,7 @@ export default function Merge() {
                     </p>
                     <p className="text-[11px] text-slate-400">
                       {item.pageCount !== null && item.pageCount > 0
-                        ? `${item.pageCount} page${item.pageCount === 1 ? "" : "s"} · `
+                        ? t.common.pagesDot(item.pageCount)
                         : ""}
                       {formatBytes(item.file.size)}
                     </p>
@@ -158,7 +157,7 @@ export default function Merge() {
                     </span>
                     <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <button
-                        aria-label={`Move ${item.file.name} earlier`}
+                        aria-label={t.merge.moveEarlier(item.file.name)}
                         disabled={i === 0}
                         onClick={() => move(i, i - 1)}
                         className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600 disabled:opacity-40"
@@ -166,7 +165,7 @@ export default function Merge() {
                         <ArrowLeft className="h-3.5 w-3.5" />
                       </button>
                       <button
-                        aria-label={`Move ${item.file.name} later`}
+                        aria-label={t.merge.moveLater(item.file.name)}
                         disabled={i === items.length - 1}
                         onClick={() => move(i, i + 1)}
                         className="rounded-lg bg-white/95 p-1.5 text-slate-600 shadow ring-1 ring-slate-200 hover:text-indigo-600 disabled:opacity-40"
@@ -174,7 +173,7 @@ export default function Merge() {
                         <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                       <button
-                        aria-label={`Remove ${item.file.name}`}
+                        aria-label={t.fileList.remove(item.file.name)}
                         onClick={() =>
                           setItems((prev) => prev.filter((it) => it.id !== item.id))
                         }
@@ -190,7 +189,7 @@ export default function Merge() {
               <ErrorBox>{error}</ErrorBox>
               <Button onClick={run} busy={busy} disabled={items.length < 2}>
                 <Combine className="h-4 w-4" />
-                Merge {items.length} PDF{items.length === 1 ? "" : "s"}
+                {t.merge.action(items.length)}
               </Button>
             </>
           )}

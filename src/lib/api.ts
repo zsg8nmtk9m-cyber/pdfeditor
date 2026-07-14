@@ -45,7 +45,9 @@ function getWorker(): Worker {
         entry.resolve(msg.result);
       } else {
         pending.delete(msg.id);
-        entry.reject(new Error(msg.message));
+        // Preserve the stable error code across the worker boundary so the
+        // UI can localize known failures.
+        entry.reject(Object.assign(new Error(msg.message), msg.code ? { code: msg.code } : {}));
       }
     };
     worker.onerror = (e) => {

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { errorText, useT } from "../i18n";
 import { getDocSummary, getPageCount } from "../lib/api";
 import { saveRecent } from "../lib/fileStore";
 import { takeHandoff } from "../lib/handoff";
@@ -11,6 +12,7 @@ import { readFileBytes } from "../lib/utils";
  * (unless the tool accepts encrypted files, which can't be probed).
  */
 export function useSinglePdf(options?: { probe?: boolean }) {
+  const t = useT();
   const probe = options?.probe ?? true;
   const [file, setFile] = useState<File | null>(null);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
@@ -40,12 +42,12 @@ export function useSinglePdf(options?: { probe?: boolean }) {
         setBytes(data);
         void saveRecent(f.name, data, thumb);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Could not read this PDF.");
+        setError(errorText(err, t, t.errors.couldNotRead));
       } finally {
         setLoading(false);
       }
     },
-    [probe],
+    [probe, t],
   );
 
   // Pick up a file handed off from another tool's result screen.

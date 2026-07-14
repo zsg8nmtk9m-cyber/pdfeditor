@@ -315,6 +315,31 @@ await page.getByText("Done!").waitFor({ timeout: 20000 });
 out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "organized.pdf");
 check("organize deleted a page", (await pageCount(out)) === 2);
 
+// ---------- i18n (run last: switches the UI language) ----------
+console.log("i18n");
+await page.goto(BASE + "/");
+await page.getByLabel("Language").selectOption("tr");
+check(
+  "hero switches to Turkish",
+  await page.getByText("doğrudan tarayıcınızda").isVisible(),
+);
+check("tool cards translate", await page.getByText("PDF Birleştir").isVisible());
+await page.goto(BASE + "/merge");
+check(
+  "tool pages translate after reload (persisted)",
+  await page.getByText("Dosya seçin veya buraya sürükleyin").isVisible(),
+);
+check(
+  "html lang attribute updates",
+  (await page.evaluate(() => document.documentElement.lang)) === "tr",
+);
+await page.goto(BASE + "/");
+await page.getByLabel("Language").selectOption("en");
+check(
+  "switching back to English works",
+  await page.getByText("right in your browser").isVisible(),
+);
+
 await browser.close();
 console.log(failures === 0 ? "\nALL CHECKS PASSED" : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures === 0 ? 0 : 1);

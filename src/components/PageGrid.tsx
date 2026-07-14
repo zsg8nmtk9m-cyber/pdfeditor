@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { useT } from "../i18n";
 import { Card, ProgressBar } from "./ui";
 
 export interface PageBadge {
@@ -20,6 +21,7 @@ interface PageGridProps {
 
 /** Read-only or selectable grid of page thumbnails. */
 export default function PageGrid({ thumbs, selected, onToggle, badge, rotation }: PageGridProps) {
+  const t = useT();
   const selectable = selected !== undefined && onToggle !== undefined;
   return (
     <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
@@ -32,7 +34,7 @@ export default function PageGrid({ thumbs, selected, onToggle, badge, rotation }
             <div className="relative flex aspect-[3/4] items-center justify-center overflow-hidden rounded-lg bg-slate-100">
               <img
                 src={thumb}
-                alt={`Page ${i + 1}`}
+                alt={t.pageGrid.pageAria(i + 1)}
                 draggable={false}
                 className="max-h-full max-w-full object-contain transition-transform duration-200"
                 style={deg ? { transform: `rotate(${deg}deg)` } : undefined}
@@ -71,7 +73,7 @@ export default function PageGrid({ thumbs, selected, onToggle, badge, rotation }
             key={i}
             type="button"
             aria-pressed={isSelected}
-            aria-label={`Page ${i + 1}`}
+            aria-label={t.pageGrid.pageAria(i + 1)}
             onClick={(e) => onToggle(i, e.shiftKey)}
             className={`rounded-xl bg-white p-1.5 text-left ring-1 transition-all ${
               isSelected
@@ -93,9 +95,10 @@ export default function PageGrid({ thumbs, selected, onToggle, badge, rotation }
 
 /** Shown while thumbnails are rendering. */
 export function ThumbnailsLoading({ progress }: { progress: number }) {
+  const t = useT();
   return (
     <Card>
-      <p className="mb-2 text-sm font-medium text-slate-600">Rendering page previews…</p>
+      <p className="mb-2 text-sm font-medium text-slate-600">{t.pageGrid.rendering}</p>
       <ProgressBar value={progress} />
     </Card>
   );

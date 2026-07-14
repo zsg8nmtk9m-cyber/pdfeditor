@@ -61,6 +61,7 @@ ctx.onmessage = async (e: MessageEvent<WorkerRequest>) => {
       id,
       type: "error",
       message: err instanceof Error ? err.message : "The operation failed.",
+      code: typeof (err as { code?: unknown }).code === "string" ? (err as { code: string }).code : undefined,
     });
   }
 };

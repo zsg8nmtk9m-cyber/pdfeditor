@@ -4,6 +4,7 @@ import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, inputClass } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { readMetadata, writeMetadata } from "../../lib/api";
 import { saveRecent } from "../../lib/fileStore";
 import { takeHandoff } from "../../lib/handoff";
@@ -11,16 +12,17 @@ import type { PdfMetadata } from "../../lib/types";
 import { baseName, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
-const FIELDS: { key: keyof PdfMetadata; label: string }[] = [
-  { key: "title", label: "Title" },
-  { key: "author", label: "Author" },
-  { key: "subject", label: "Subject" },
-  { key: "keywords", label: "Keywords (comma separated)" },
-  { key: "creator", label: "Creator application" },
-  { key: "producer", label: "Producer" },
+const FIELD_KEYS: (keyof PdfMetadata)[] = [
+  "title",
+  "author",
+  "subject",
+  "keywords",
+  "creator",
+  "producer",
 ];
 
 export default function Metadata() {
+  const t = useT();
   const [file, setFile] = useState<File | null>(null);
   const [bytes, setBytes] = useState<Uint8Array | null>(null);
   const [meta, setMeta] = useState<PdfMetadata | null>(null);
@@ -39,7 +41,7 @@ export default function Metadata() {
       setBytes(data);
       void saveRecent(f.name, data, null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not read this PDF.");
+      setError(errorText(err, t, t.errors.couldNotRead));
     }
   }
 
@@ -58,7 +60,7 @@ export default function Metadata() {
       const out = await writeMetadata(bytes, meta);
       setResult({ name: `${baseName(file.name)}-metadata.pdf`, blob: pdfBlob(out) });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not update metadata.");
+      setError(errorText(err, t, t.metadata.failed));
     } finally {
       setBusy(false);
     }
@@ -81,19 +83,16 @@ export default function Metadata() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{error}</ErrorBox>
         </div>
       ) : (
         <Card className="space-y-5">
-          <p className="text-sm text-slate-500">
-            Editing metadata of{" "}
-            <span className="font-semibold text-slate-800">{file.name}</span>
-          </p>
+          <p className="text-sm text-slate-500">{t.metadata.editing(file.name)}</p>
           <div className="grid gap-4 sm:grid-cols-2">
-            {FIELDS.map(({ key, label }) => (
-              <Field key={key} label={label}>
+            {FIELD_KEYS.map((key) => (
+              <Field key={key} label={t.metadata[key]}>
                 <input
                   className={inputClass}
                   value={meta[key]}
@@ -105,10 +104,10 @@ export default function Metadata() {
           <ErrorBox>{error}</ErrorBox>
           <div className="flex gap-3">
             <Button onClick={run} busy={busy}>
-              <FileCog className="h-4 w-4" /> Save metadata
+              <FileCog className="h-4 w-4" /> {t.metadata.action}
             </Button>
             <Button variant="ghost" onClick={reset}>
-              Choose another file
+              {t.common.chooseAnotherFile}
             </Button>
           </div>
         </Card>

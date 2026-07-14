@@ -5,12 +5,14 @@ import FileSummary from "../../components/FileSummary";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, Select, inputClass } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { addWatermark } from "../../lib/api";
 import { baseName, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
 export default function Watermark() {
+  const t = useT();
   const pdf = useSinglePdf();
   const [text, setText] = useState("CONFIDENTIAL");
   const [fontSize, setFontSize] = useState(48);
@@ -23,7 +25,7 @@ export default function Watermark() {
   async function run() {
     if (!pdf.bytes || !pdf.file) return;
     if (!text.trim()) {
-      pdf.setError("Enter the watermark text.");
+      pdf.setError(t.watermark.emptyText);
       return;
     }
     setBusy(true);
@@ -41,7 +43,7 @@ export default function Watermark() {
         blob: pdfBlob(bytes),
       });
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Watermarking failed.");
+      pdf.setError(errorText(err, t, t.watermark.failed));
     } finally {
       setBusy(false);
     }
@@ -61,7 +63,7 @@ export default function Watermark() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -74,17 +76,17 @@ export default function Watermark() {
             thumbnail={pdf.summary?.thumbnail ?? null}
           />
 
-          <Field label="Watermark text">
+          <Field label={t.watermark.textLabel}>
             <input
               className={inputClass}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="e.g. CONFIDENTIAL"
+              placeholder={t.watermark.placeholder}
             />
           </Field>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={`Font size — ${fontSize} pt`}>
+            <Field label={t.watermark.fontSize(fontSize)}>
               <input
                 type="range"
                 min={16}
@@ -94,7 +96,7 @@ export default function Watermark() {
                 className="w-full accent-indigo-600"
               />
             </Field>
-            <Field label={`Opacity — ${opacity}%`}>
+            <Field label={t.watermark.opacity(opacity)}>
               <input
                 type="range"
                 min={5}
@@ -104,7 +106,7 @@ export default function Watermark() {
                 className="w-full accent-indigo-600"
               />
             </Field>
-            <Field label="Color">
+            <Field label={t.watermark.color}>
               <div className="flex items-center gap-3">
                 <input
                   type="color"
@@ -115,13 +117,13 @@ export default function Watermark() {
                 <span className="text-sm text-slate-500">{color}</span>
               </div>
             </Field>
-            <Field label="Direction">
+            <Field label={t.watermark.direction}>
               <Select
                 value={diagonal ? "diagonal" : "horizontal"}
                 onChange={(e) => setDiagonal(e.target.value === "diagonal")}
               >
-                <option value="diagonal">Diagonal</option>
-                <option value="horizontal">Horizontal</option>
+                <option value="diagonal">{t.watermark.diagonal}</option>
+                <option value="horizontal">{t.watermark.horizontal}</option>
               </Select>
             </Field>
           </div>
@@ -134,7 +136,7 @@ export default function Watermark() {
               <div className="relative h-full">
                 <img
                   src={pdf.summary.thumbnail}
-                  alt="First page"
+                  alt={t.pageGrid.firstPage}
                   className="h-full w-auto shadow-sm"
                 />
                 <span
@@ -156,7 +158,7 @@ export default function Watermark() {
                     }deg)`,
                   }}
                 >
-                  {text || "Preview"}
+                  {text || t.common.preview}
                 </span>
               </div>
             ) : (
@@ -169,21 +171,21 @@ export default function Watermark() {
                   transform: diagonal ? "rotate(-45deg)" : undefined,
                 }}
               >
-                {text || "Preview"}
+                {text || t.common.preview}
               </span>
             )}
             <span className="absolute bottom-2 right-3 text-[10px] uppercase tracking-wider text-slate-400">
-              Preview
+              {t.common.preview}
             </span>
           </div>
 
           <ErrorBox>{pdf.error}</ErrorBox>
           <div className="flex gap-3">
             <Button onClick={run} busy={busy}>
-              <Stamp className="h-4 w-4" /> Add watermark
+              <Stamp className="h-4 w-4" /> {t.watermark.action}
             </Button>
             <Button variant="ghost" onClick={reset}>
-              Choose another file
+              {t.common.chooseAnotherFile}
             </Button>
           </div>
         </Card>

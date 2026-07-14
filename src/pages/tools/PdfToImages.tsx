@@ -5,12 +5,14 @@ import FileSummary from "../../components/FileSummary";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, ProgressBar, Select } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { pdfToImages } from "../../lib/api";
 import { baseName } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
 export default function PdfToImages() {
+  const t = useT();
   const pdf = useSinglePdf();
   const [format, setFormat] = useState<"png" | "jpeg">("png");
   const [scale, setScale] = useState(2);
@@ -35,7 +37,7 @@ export default function PdfToImages() {
         blobs.map((blob, i) => ({ name: `${base}-page-${i + 1}.${ext}`, blob })),
       );
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Conversion failed.");
+      pdf.setError(errorText(err, t, t.pdfToImages.failed));
     } finally {
       setBusy(false);
     }
@@ -65,7 +67,7 @@ export default function PdfToImages() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -79,17 +81,17 @@ export default function PdfToImages() {
           />
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Image format">
+            <Field label={t.pdfToImages.format}>
               <Select value={format} onChange={(e) => setFormat(e.target.value as "png" | "jpeg")}>
-                <option value="png">PNG (lossless)</option>
-                <option value="jpeg">JPG (smaller files)</option>
+                <option value="png">{t.pdfToImages.formatPng}</option>
+                <option value="jpeg">{t.pdfToImages.formatJpg}</option>
               </Select>
             </Field>
-            <Field label="Resolution">
+            <Field label={t.pdfToImages.resolution}>
               <Select value={scale} onChange={(e) => setScale(Number(e.target.value))}>
-                <option value={1}>Standard (72 dpi)</option>
-                <option value={2}>High (144 dpi)</option>
-                <option value={3}>Very high (216 dpi)</option>
+                <option value={1}>{t.pdfToImages.resStandard}</option>
+                <option value={2}>{t.pdfToImages.resHigh}</option>
+                <option value={3}>{t.pdfToImages.resVeryHigh}</option>
               </Select>
             </Field>
           </div>
@@ -98,10 +100,10 @@ export default function PdfToImages() {
           <ErrorBox>{pdf.error}</ErrorBox>
           <div className="flex gap-3">
             <Button onClick={run} busy={busy}>
-              <Images className="h-4 w-4" /> Convert to images
+              <Images className="h-4 w-4" /> {t.pdfToImages.action}
             </Button>
             <Button variant="ghost" onClick={reset}>
-              Choose another file
+              {t.common.chooseAnotherFile}
             </Button>
           </div>
         </Card>

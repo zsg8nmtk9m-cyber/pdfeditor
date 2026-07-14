@@ -5,6 +5,7 @@ import PageGrid, { ThumbnailsLoading } from "../../components/PageGrid";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, inputClass } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { usePageSelection, usePageThumbnails } from "../../hooks/usePageThumbnails";
 import { rotatePdf } from "../../lib/api";
@@ -17,13 +18,13 @@ import {
 } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
-const ANGLES = [
-  { value: 90, label: "90° right" },
-  { value: 180, label: "180°" },
-  { value: 270, label: "90° left" },
-] as const;
-
 export default function Rotate() {
+  const t = useT();
+  const ANGLES = [
+    { value: 90, label: t.rotate.right90 },
+    { value: 180, label: t.rotate.deg180 },
+    { value: 270, label: t.rotate.left90 },
+  ] as const;
   const pdf = useSinglePdf();
   const { thumbs, progress } = usePageThumbnails(pdf.bytes);
   const [angle, setAngle] = useState<90 | 180 | 270>(90);
@@ -57,7 +58,7 @@ export default function Rotate() {
       const bytes = await rotatePdf(pdf.bytes, angle, pages);
       setResult({ name: `${baseName(pdf.file.name)}-rotated.pdf`, blob: pdfBlob(bytes) });
     } catch (err) {
-      pdf.setError(err instanceof Error ? err.message : "Rotation failed.");
+      pdf.setError(errorText(err, t, t.rotate.failed));
     } finally {
       setBusy(false);
     }
@@ -80,7 +81,7 @@ export default function Rotate() {
           <Dropzone
             accept="application/pdf,.pdf"
             onFiles={pdf.onFiles}
-            hint="Select one PDF file"
+            hint={t.common.selectOnePdf}
           />
           <ErrorBox>{pdf.error}</ErrorBox>
         </div>
@@ -90,14 +91,14 @@ export default function Rotate() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-slate-500">
                 <span className="font-semibold text-slate-800">{pdf.file.name}</span> —{" "}
-                {pdf.pageCount} page{pdf.pageCount === 1 ? "" : "s"}
+                {t.common.pages(pdf.pageCount)}
               </p>
               <Button variant="ghost" onClick={reset}>
-                Choose another file
+                {t.common.chooseAnotherFile}
               </Button>
             </div>
 
-            <Field label="Rotation">
+            <Field label={t.rotate.rotationLabel}>
               <div className="flex flex-wrap gap-3">
                 {ANGLES.map((a) => (
                   <button
@@ -115,7 +116,7 @@ export default function Rotate() {
               </div>
             </Field>
 
-            <Field label="Apply to">
+            <Field label={t.rotate.applyTo}>
               <div className="flex flex-wrap items-center gap-3">
                 <label className="flex items-center gap-2 text-sm text-slate-700">
                   <input
@@ -124,7 +125,7 @@ export default function Rotate() {
                     onChange={() => setScope("all")}
                     className="accent-indigo-600"
                   />
-                  All pages
+                  {t.rotate.allPages}
                 </label>
                 <label className="flex items-center gap-2 text-sm text-slate-700">
                   <input
@@ -133,12 +134,12 @@ export default function Rotate() {
                     onChange={() => setScope("range")}
                     className="accent-indigo-600"
                   />
-                  Specific pages
+                  {t.rotate.specificPages}
                 </label>
                 {scope === "range" && (
                   <input
                     className={`${inputClass} max-w-48`}
-                    placeholder="e.g. 1, 3-5"
+                    placeholder={t.common.rangePlaceholder}
                     value={rangeText}
                     onChange={(e) => onTextChange(e.target.value)}
                   />
@@ -148,7 +149,7 @@ export default function Rotate() {
 
             <ErrorBox>{pdf.error}</ErrorBox>
             <Button onClick={run} busy={busy}>
-              <RotateCw className="h-4 w-4" /> Rotate PDF
+              <RotateCw className="h-4 w-4" /> {t.rotate.action}
             </Button>
           </Card>
 
@@ -157,9 +158,7 @@ export default function Rotate() {
           ) : (
             <>
               <p className="text-sm text-slate-500">
-                {scope === "range"
-                  ? "Click the pages to rotate — the preview updates live."
-                  : "Preview of the rotation applied to every page."}
+                {scope === "range" ? t.rotate.hintSelected : t.rotate.hintAll}
               </p>
               <PageGrid
                 thumbs={thumbs}

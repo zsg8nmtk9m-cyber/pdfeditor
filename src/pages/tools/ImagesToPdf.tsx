@@ -5,12 +5,14 @@ import FileList from "../../components/FileList";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox, Field, ProgressBar, Select } from "../../components/ui";
+import { errorText, useT } from "../../i18n";
 import { imagesToPdf } from "../../lib/api";
 import type { PageSizeMode } from "../../lib/types";
 import { pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
 export default function ImagesToPdf() {
+  const t = useT();
   const [files, setFiles] = useState<File[]>([]);
   const [pageSize, setPageSize] = useState<PageSizeMode>("a4");
   const [busy, setBusy] = useState(false);
@@ -36,7 +38,7 @@ export default function ImagesToPdf() {
       );
       setResult({ name: "images.pdf", blob: pdfBlob(bytes) });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Conversion failed.");
+      setError(errorText(err, t, t.imagesToPdf.failed));
     } finally {
       setBusy(false);
     }
@@ -59,7 +61,7 @@ export default function ImagesToPdf() {
             multiple
             compact={files.length > 0}
             onFiles={(f) => setFiles((prev) => [...prev, ...f])}
-            hint="JPG, PNG, WebP, GIF or BMP images"
+            hint={t.imagesToPdf.hint}
           />
           {files.length > 0 && (
             <>
@@ -70,22 +72,21 @@ export default function ImagesToPdf() {
                 onMove={move}
               />
               <div className="max-w-xs">
-                <Field label="Page size">
+                <Field label={t.imagesToPdf.pageSize}>
                   <Select
                     value={pageSize}
                     onChange={(e) => setPageSize(e.target.value as PageSizeMode)}
                   >
-                    <option value="a4">A4 (auto orientation)</option>
-                    <option value="letter">US Letter (auto orientation)</option>
-                    <option value="fit">Same as image</option>
+                    <option value="a4">{t.imagesToPdf.sizeA4}</option>
+                    <option value="letter">{t.imagesToPdf.sizeLetter}</option>
+                    <option value="fit">{t.imagesToPdf.sizeFit}</option>
                   </Select>
                 </Field>
               </div>
               {busy && <ProgressBar value={progress} />}
               <ErrorBox>{error}</ErrorBox>
               <Button onClick={run} busy={busy}>
-                <FileImage className="h-4 w-4" /> Create PDF from {files.length} image
-                {files.length === 1 ? "" : "s"}
+                <FileImage className="h-4 w-4" /> {t.imagesToPdf.action(files.length)}
               </Button>
             </>
           )}
