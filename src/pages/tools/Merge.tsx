@@ -1,10 +1,12 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Combine, FileWarning, Loader2, X } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox } from "../../components/ui";
 import { getDocSummary, mergePdfs } from "../../lib/api";
+import { saveRecent } from "../../lib/fileStore";
+import { takeHandoff } from "../../lib/handoff";
 import { formatBytes, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
@@ -43,11 +45,19 @@ export default function Merge() {
               : it,
           ),
         );
+        void saveRecent(file.name, bytes, summary.thumbnail);
       } catch {
         setError(`Could not read "${file.name}".`);
       }
     }
   }
+
+  // Pick up a file handed off from another tool's result screen.
+  useEffect(() => {
+    const file = takeHandoff();
+    if (file) void addFiles([file]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function move(index: number, to: number) {
     if (to < 0 || to >= items.length || to === index) return;

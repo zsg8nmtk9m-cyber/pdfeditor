@@ -1,6 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { UploadCloud } from "lucide-react";
+import { FileText, History, Trash2, UploadCloud } from "lucide-react";
+import { clearRecents, listRecents, loadRecent } from "../lib/fileStore";
+import type { RecentFileMeta } from "../lib/fileStore";
+import { formatBytes } from "../lib/utils";
 
 interface DropzoneProps {
   /** e.g. "application/pdf" or "image/*" */
@@ -14,6 +17,17 @@ interface DropzoneProps {
 export default function Dropzone({ accept, multiple, onFiles, hint, compact }: DropzoneProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const acceptsPdf = accept.includes("pdf");
+  const [recents, setRecents] = useState<RecentFileMeta[]>([]);
+
+  useEffect(() => {
+    if (acceptsPdf) void listRecents().then(setRecents);
+  }, [acceptsPdf]);
+
+  async function pickRecent(id: string) {
+    const file = await loadRecent(id);
+    if (file) onFiles([file]);
+  }
 
   function accepts(file: File): boolean {
     return accept
@@ -35,6 +49,7 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
   }
 
   return (
+    <div className="space-y-3">
     <div
       role="button"
       tabIndex={0}
@@ -88,6 +103,49 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
       <p className="text-xs text-slate-400">
         Your files are processed locally — they never leave this device.
       </p>
+    </div>
+
+    {acceptsPdf && recents.length > 0 && (
+      <div>
+        <div className="mb-2 flex items-center justify-between">
+          <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <History className="h-3.5 w-3.5" /> Recent files (stored on this device)
+          </p>
+          <button
+            onClick={() => {
+              void clearRecents();
+              setRecents([]);
+            }}
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-slate-400 hover:bg-slate-100 hover:text-rose-600"
+          >
+            <Trash2 className="h-3 w-3" /> Clear
+          </button>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {recents.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => void pickRecent(r.id)}
+              className="flex shrink-0 items-center gap-2.5 rounded-xl bg-white py-2 pl-2 pr-4 text-left shadow-sm ring-1 ring-slate-200 transition-all hover:ring-indigo-400"
+            >
+              <span className="flex h-11 w-9 items-center justify-center overflow-hidden rounded-md bg-slate-100">
+                {r.thumbnail ? (
+                  <img src={r.thumbnail} alt="" className="max-h-full max-w-full object-contain" />
+                ) : (
+                  <FileText className="h-4 w-4 text-slate-300" />
+                )}
+              </span>
+              <span>
+                <span className="block max-w-36 truncate text-xs font-semibold text-slate-700">
+                  {r.name}
+                </span>
+                <span className="text-[11px] text-slate-400">{formatBytes(r.size)}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
     </div>
   );
 }

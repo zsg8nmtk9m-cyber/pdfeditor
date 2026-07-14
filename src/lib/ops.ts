@@ -4,6 +4,7 @@
  * calls these through src/lib/api.ts.
  */
 import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
+import type { PDFFont } from "pdf-lib";
 import { openForRender, releaseCanvas, renderPage } from "./render";
 import type {
   AnnotationElement,
@@ -43,6 +44,51 @@ export async function loadPdf(bytes: Uint8Array, password?: string): Promise<PDF
 export async function getPageCount(bytes: Uint8Array): Promise<number> {
   const doc = await loadPdf(bytes);
   return doc.getPageCount();
+}
+
+// ---------------------------------------------------------------- Fonts
+
+// The 14 standard PDF fonts only encode WinAnsi (roughly Latin-1 plus a few
+// typographic marks). Anything beyond that — Turkish ğışİ, Cyrillic, Greek,
+// Polish łż… — needs an embedded Unicode font.
+// eslint-disable-next-line no-control-regex
+const WINANSI_SAFE =
+  /^[\x00-\x7F -ÿŒœŠšŸŽžƒˆ˜–—‘’‚“”„†‡•…‰‹›€™]*$/;
+
+const UNICODE_FONTS = {
+  regular: new URL("../assets/DejaVuSans.ttf", import.meta.url).href,
+  bold: new URL("../assets/DejaVuSans-Bold.ttf", import.meta.url).href,
+};
+const unicodeFontCache = new Map<string, Promise<ArrayBuffer>>();
+
+function unicodeFontBytes(variant: keyof typeof UNICODE_FONTS): Promise<ArrayBuffer> {
+  let cached = unicodeFontCache.get(variant);
+  if (!cached) {
+    cached = fetch(UNICODE_FONTS[variant]).then((r) => r.arrayBuffer());
+    unicodeFontCache.set(variant, cached);
+  }
+  return cached;
+}
+
+/**
+ * Pick a font that can encode `text`: a standard font when possible (keeps
+ * files tiny), otherwise an embedded, subsetted DejaVu Sans.
+ */
+async function embedTextFont(
+  doc: PDFDocument,
+  text: string,
+  variant: "regular" | "bold" = "regular",
+): Promise<PDFFont> {
+  if (WINANSI_SAFE.test(text)) {
+    return doc.embedFont(
+      variant === "bold" ? StandardFonts.HelveticaBold : StandardFonts.Helvetica,
+    );
+  }
+  // fontkit is only needed for non-WinAnsi text; load it on demand so it
+  // stays out of the main worker chunk.
+  const fontkit = (await import("@pdf-lib/fontkit")).default;
+  doc.registerFontkit(fontkit);
+  return doc.embedFont(await unicodeFontBytes(variant), { subset: true });
 }
 
 // ---------------------------------------------------------------- Merge
@@ -128,7 +174,7 @@ export async function addWatermark(
   opts: WatermarkOptions,
 ): Promise<Uint8Array> {
   const doc = await loadPdf(srcBytes);
-  const font = await doc.embedFont(StandardFonts.HelveticaBold);
+  const font = await embedTextFont(doc, opts.text, "bold");
   const color = hexToRgb(opts.color);
   const textWidth = font.widthOfTextAtSize(opts.text, opts.fontSize);
 
@@ -176,7 +222,7 @@ export async function addPageNumbers(
   opts: PageNumberOptions,
 ): Promise<Uint8Array> {
   const doc = await loadPdf(srcBytes);
-  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const font = await embedTextFont(doc, numberLabel(opts.format, 1, 1));
   const pages = doc.getPages();
   const margin = 28;
   const total = pages.length + opts.startAt - 1;
@@ -360,7 +406,8 @@ export async function annotatePdf(
   elements: AnnotationElement[],
 ): Promise<Uint8Array> {
   const doc = await loadPdf(srcBytes);
-  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const allText = elements.map((el) => el.text ?? "").join("");
+  const font = await embedTextFont(doc, allText);
   const imageCache = new Map<string, Awaited<ReturnType<typeof doc.embedPng>>>();
 
   for (const el of elements) {

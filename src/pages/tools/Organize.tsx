@@ -1,10 +1,12 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, RotateCw, Trash2, Undo2 } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
 import { rebuildPdf, renderThumbnails } from "../../lib/api";
+import { saveRecent } from "../../lib/fileStore";
+import { takeHandoff } from "../../lib/handoff";
 import { baseName, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
@@ -42,6 +44,7 @@ export default function Organize() {
       );
       setFile(f);
       setBytes(data);
+      void saveRecent(f.name, data, thumbs[0] ?? null);
     } catch (err) {
       setError(
         err instanceof Error && /password/i.test(err.message)
@@ -52,6 +55,13 @@ export default function Organize() {
       setLoading(false);
     }
   }
+
+  // Pick up a file handed off from another tool's result screen.
+  useEffect(() => {
+    const handed = takeHandoff();
+    if (handed) void onFiles([handed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function movePage(from: number, to: number) {
     if (to < 0 || to >= pages.length || from === to) return;

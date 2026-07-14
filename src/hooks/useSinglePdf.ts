@@ -1,5 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getDocSummary, getPageCount } from "../lib/api";
+import { saveRecent } from "../lib/fileStore";
+import { takeHandoff } from "../lib/handoff";
 import type { DocSummary } from "../lib/types";
 import { readFileBytes } from "../lib/utils";
 
@@ -25,14 +27,18 @@ export function useSinglePdf(options?: { probe?: boolean }) {
       setError("");
       try {
         const data = await readFileBytes(f);
+        let thumb: string | null = null;
         if (probe) {
           // getPageCount validates the file (and gives the friendly
           // encrypted-PDF error); the summary preview is best-effort.
           setPageCount(await getPageCount(data));
-          setSummary(await getDocSummary(data));
+          const s = await getDocSummary(data);
+          setSummary(s);
+          thumb = s.thumbnail;
         }
         setFile(f);
         setBytes(data);
+        void saveRecent(f.name, data, thumb);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Could not read this PDF.");
       } finally {
@@ -41,6 +47,12 @@ export function useSinglePdf(options?: { probe?: boolean }) {
     },
     [probe],
   );
+
+  // Pick up a file handed off from another tool's result screen.
+  useEffect(() => {
+    const file = takeHandoff();
+    if (file) void onFiles([file]);
+  }, [onFiles]);
 
   const reset = useCallback(() => {
     setFile(null);

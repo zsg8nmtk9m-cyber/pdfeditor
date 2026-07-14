@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileCog } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Field, inputClass } from "../../components/ui";
 import { readMetadata, writeMetadata } from "../../lib/api";
+import { saveRecent } from "../../lib/fileStore";
+import { takeHandoff } from "../../lib/handoff";
 import type { PdfMetadata } from "../../lib/types";
 import { baseName, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
@@ -35,10 +37,18 @@ export default function Metadata() {
       setMeta(await readMetadata(data));
       setFile(f);
       setBytes(data);
+      void saveRecent(f.name, data, null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not read this PDF.");
     }
   }
+
+  // Pick up a file handed off from another tool's result screen.
+  useEffect(() => {
+    const handed = takeHandoff();
+    if (handed) void onFiles([handed]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function run() {
     if (!bytes || !file || !meta) return;

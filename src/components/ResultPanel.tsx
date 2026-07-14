@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { CheckCircle2, Download, FileText, RefreshCw } from "lucide-react";
-import { Button, Card } from "./ui";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowRight, CheckCircle2, Download, FileText, RefreshCw } from "lucide-react";
+import { Button, Card, Select } from "./ui";
+import { getDocSummary } from "../lib/api";
+import { saveRecent } from "../lib/fileStore";
+import { setHandoff } from "../lib/handoff";
+import { TOOLS } from "../tools";
 import { downloadBlob, formatBytes, makeZip } from "../lib/utils";
 import type { OutputFile } from "../lib/utils";
 
@@ -15,6 +20,12 @@ interface ResultPanelProps {
 
 export default function ResultPanel({ files, zipName = "files.zip", onReset, note }: ResultPanelProps) {
   const [zipping, setZipping] = useState(false);
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // "Continue in another tool" applies to single-PDF results only.
+  const canHandOff = files.length === 1 && files[0].name.toLowerCase().endsWith(".pdf");
+  const handoffTools = TOOLS.filter((t) => t.id !== "images-to-pdf" && t.path !== pathname);
 
   async function downloadAll() {
     setZipping(true);
@@ -24,6 +35,18 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
     } finally {
       setZipping(false);
     }
+  }
+
+  async function continueIn(path: string) {
+    const bytes = new Uint8Array(await files[0].blob.arrayBuffer());
+    setHandoff(files[0].name, bytes);
+    try {
+      const summary = await getDocSummary(bytes);
+      await saveRecent(files[0].name, bytes, summary.thumbnail);
+    } catch {
+      // best-effort; handoff works regardless
+    }
+    navigate(path);
   }
 
   return (
@@ -77,6 +100,26 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
         <Button variant="ghost" onClick={onReset}>
           <RefreshCw className="h-4 w-4" /> Start over
         </Button>
+        {canHandOff && (
+          <div className="flex items-center gap-2">
+            <ArrowRight className="h-4 w-4 shrink-0 text-slate-400" />
+            <Select
+              aria-label="Continue in another tool"
+              className="!w-auto"
+              value=""
+              onChange={(e) => e.target.value && void continueIn(e.target.value)}
+            >
+              <option value="" disabled>
+                Continue in another tool…
+              </option>
+              {handoffTools.map((t) => (
+                <option key={t.id} value={t.path}>
+                  {t.name}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
       </div>
     </Card>
   );
