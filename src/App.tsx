@@ -15,6 +15,7 @@ import Annotate from "./pages/tools/Annotate";
 import Watermark from "./pages/tools/Watermark";
 import PageNumbers from "./pages/tools/PageNumbers";
 import Metadata from "./pages/tools/Metadata";
+import Redact from "./pages/tools/Redact";
 import Protect from "./pages/tools/Protect";
 import Unlock from "./pages/tools/Unlock";
 
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/watermark" element={<Watermark />} />
           <Route path="/page-numbers" element={<PageNumbers />} />
           <Route path="/metadata" element={<Metadata />} />
+          <Route path="/redact" element={<Redact />} />
           <Route path="/protect" element={<Protect />} />
           <Route path="/unlock" element={<Unlock />} />
           <Route path="*" element={<Home />} />

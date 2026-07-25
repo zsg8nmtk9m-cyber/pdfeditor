@@ -105,6 +105,12 @@ export const de: Dict = {
       description:
         "Fügen Sie AES-Passwortschutz hinzu, damit nur Personen mit Passwort das PDF öffnen können.",
     },
+    redact: {
+      name: "PDF schwärzen",
+      tagline: "Sensible Inhalte dauerhaft schwärzen",
+      description:
+        "Übermalen Sie alles, was nicht geteilt werden darf. Der Inhalt darunter wird zerstört, nicht nur verdeckt — anders als ein aufgemaltes schwarzes Rechteck lässt er sich nicht aus der Datei kopieren.",
+    },
     unlock: {
       name: "PDF entsperren",
       tagline: "Bekanntes Passwort entfernen",
@@ -335,6 +341,15 @@ export const de: Dict = {
     mismatch: "Die Passwörter stimmen nicht überein.",
     resultNote: "Ihr PDF ist jetzt verschlüsselt. Zum Öffnen wird das Passwort benötigt.",
     failed: "Verschlüsselung fehlgeschlagen.",
+  },
+  redact: {
+    instruction: "Ziehen Sie über alles, was entfernt werden soll.",
+    clearAll: "Alle entfernen",
+    removeBox: "Diesen Bereich entfernen",
+    action: (n: number) => `${n} Bereich${n === 1 ? "" : "e"} schwärzen`,
+    note: "Seiten mit einer Schwärzung werden zu einem Bild zusammengeführt, damit der verborgene Inhalt dauerhaft zerstört wird — Text auf diesen Seiten ist danach nicht mehr auswählbar. Andere Seiten bleiben unverändert.",
+    resultNote: "Die geschwärzten Inhalte wurden dauerhaft aus der Datei entfernt.",
+    failed: "Schwärzen fehlgeschlagen.",
   },
   unlock: {
     hint: "Ein passwortgeschütztes PDF auswählen",

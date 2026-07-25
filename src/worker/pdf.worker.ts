@@ -36,6 +36,7 @@ const handlers: Record<string, (...args: any[]) => Promise<unknown>> = {
   docSummary: renderDocSummary,
   pageImage: renderPageImage,
   annotate: ops.annotatePdf,
+  redact: ops.redactPdf,
 };
 
 /** Output buffers are transferred (not copied) back to the UI thread. */

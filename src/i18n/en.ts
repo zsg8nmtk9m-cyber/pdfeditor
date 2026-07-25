@@ -108,6 +108,12 @@ export const en = {
       description:
         "Add AES password protection so the PDF can only be opened by people who know the password.",
     },
+    redact: {
+      name: "Redact PDF",
+      tagline: "Permanently black out sensitive content",
+      description:
+        "Draw over anything that must not be shared. The content underneath is destroyed, not just covered — unlike a black box drawn on top, it cannot be copied out of the file.",
+    },
     unlock: {
       name: "Unlock PDF",
       tagline: "Remove a known password",
@@ -335,6 +341,15 @@ export const en = {
     mismatch: "Passwords don't match.",
     resultNote: "Your PDF is now encrypted. Anyone opening it will need the password.",
     failed: "Encryption failed.",
+  },
+  redact: {
+    instruction: "Drag over anything you want removed.",
+    clearAll: "Clear all",
+    removeBox: "Remove this area",
+    action: (n: number) => `Redact ${n} area${n === 1 ? "" : "s"}`,
+    note: "Pages containing a redaction are flattened to an image so the hidden content is permanently destroyed — text on those pages will no longer be selectable. Other pages are left untouched.",
+    resultNote: "The redacted content has been permanently removed from the file.",
+    failed: "Redaction failed.",
   },
   unlock: {
     hint: "Select a password-protected PDF",

@@ -16,6 +16,7 @@ import type {
   PdfMetadata,
   PdfToImagesOptions,
   ProgressCallback,
+  RedactionRect,
   WatermarkOptions,
 } from "./types";
 
@@ -138,3 +139,10 @@ export const renderPageImage = (bytes: Uint8Array, pageIndex: number, scale?: nu
 
 export const annotatePdf = (bytes: Uint8Array, elements: AnnotationElement[]) =>
   call<Uint8Array>("annotate", [bytes, elements]);
+
+export const redactPdf = (
+  bytes: Uint8Array,
+  rects: RedactionRect[],
+  dpi?: number,
+  onProgress?: ProgressCallback,
+) => call<Uint8Array>("redact", [bytes, rects, dpi], onProgress);

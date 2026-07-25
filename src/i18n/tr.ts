@@ -105,6 +105,12 @@ export const tr: Dict = {
       description:
         "AES parola koruması ekleyin; PDF'i yalnızca parolayı bilenler açabilsin.",
     },
+    redact: {
+      name: "PDF Karart",
+      tagline: "Hassas içeriği kalıcı olarak karartın",
+      description:
+        "Paylaşılmaması gereken her şeyin üzerini çizin. Alttaki içerik yalnızca örtülmez, yok edilir — üste çizilen siyah kutunun aksine dosyadan kopyalanamaz.",
+    },
     unlock: {
       name: "PDF Kilidini Aç",
       tagline: "Bilinen parolayı kaldırın",
@@ -334,6 +340,15 @@ export const tr: Dict = {
     mismatch: "Parolalar eşleşmiyor.",
     resultNote: "PDF'iniz artık şifreli. Açmak isteyen herkesin parolaya ihtiyacı olacak.",
     failed: "Şifreleme başarısız oldu.",
+  },
+  redact: {
+    instruction: "Kaldırmak istediğiniz alanların üzerini sürükleyin.",
+    clearAll: "Tümünü temizle",
+    removeBox: "Bu alanı kaldır",
+    action: (n: number) => `${n} alanı karart`,
+    note: "Karartma içeren sayfalar görüntüye dönüştürülür, böylece gizlenen içerik kalıcı olarak yok edilir — bu sayfalardaki metin artık seçilemez. Diğer sayfalara dokunulmaz.",
+    resultNote: "Karartılan içerik dosyadan kalıcı olarak kaldırıldı.",
+    failed: "Karartma başarısız oldu.",
   },
   unlock: {
     hint: "Parola korumalı bir PDF seçin",

@@ -123,6 +123,20 @@ export interface AnnotationElement {
 export const TEXT_BASELINE = 0.9;
 export const TEXT_LINE_HEIGHT = 1.2;
 
+// ---------------------------------------------------------------- Redact
+
+/**
+ * An area to permanently remove, in the same DISPLAY space as
+ * AnnotationElement (page as pdf.js renders it, origin top-left, points).
+ */
+export interface RedactionRect {
+  pageIndex: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 /** A single page rendered for the editor. */
 export interface PageImage {
   dataUrl: string;

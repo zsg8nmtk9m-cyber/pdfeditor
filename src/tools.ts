@@ -9,6 +9,7 @@ import {
   Images,
   FileImage,
   PenLine,
+  EyeOff,
   Stamp,
   ListOrdered,
   Lock,
@@ -32,7 +33,8 @@ export type ToolId =
   | "page-numbers"
   | "metadata"
   | "protect"
-  | "unlock";
+  | "unlock"
+  | "redact";
 
 /**
  * Static tool registry. All user-facing copy (name, tagline, description)
@@ -64,6 +66,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "watermark", path: "/watermark", icon: Stamp, category: "Edit", accent: "bg-rose-100 text-rose-600", accepts: "pdf" },
   { id: "page-numbers", path: "/page-numbers", icon: ListOrdered, category: "Edit", accent: "bg-fuchsia-100 text-fuchsia-600", accepts: "pdf" },
   { id: "metadata", path: "/metadata", icon: FileCog, category: "Edit", accent: "bg-slate-200 text-slate-600", accepts: "pdf" },
+  { id: "redact", path: "/redact", icon: EyeOff, category: "Security", accent: "bg-slate-800 text-white", accepts: "pdf" },
   { id: "protect", path: "/protect", icon: Lock, category: "Security", accent: "bg-red-100 text-red-600", accepts: "pdf" },
   { id: "unlock", path: "/unlock", icon: Unlock, category: "Security", accent: "bg-teal-100 text-teal-600", accepts: "pdf" },
 ];

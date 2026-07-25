@@ -17,6 +17,7 @@ import type {
   PdfMetadata,
   PdfToImagesOptions,
   ProgressCallback,
+  RedactionRect,
   WatermarkOptions,
 } from "./types";
 import { TEXT_BASELINE, TEXT_LINE_HEIGHT } from "./types";
@@ -460,6 +461,64 @@ export async function annotatePdf(
     }
   }
   return doc.save();
+}
+
+// ---------------------------------------------------------------- Redact
+
+/**
+ * Permanently remove the content under the given areas.
+ *
+ * Drawing black boxes over text would leave the text extractable — the
+ * classic redaction failure. Instead every page carrying a redaction is
+ * rendered to pixels, the areas are painted out on that raster, and the page
+ * is rebuilt from the image, so the original glyphs no longer exist in the
+ * file. Pages without redactions are copied untouched and keep their real
+ * text.
+ */
+export async function redactPdf(
+  srcBytes: Uint8Array,
+  rects: RedactionRect[],
+  dpi = 150,
+  onProgress?: ProgressCallback,
+): Promise<Uint8Array> {
+  const byPage = new Map<number, RedactionRect[]>();
+  for (const r of rects) {
+    const list = byPage.get(r.pageIndex);
+    if (list) list.push(r);
+    else byPage.set(r.pageIndex, [r]);
+  }
+
+  const src = await loadPdf(srcBytes);
+  const pdf = await openForRender(srcBytes);
+  try {
+    const out = await PDFDocument.create();
+    const scale = dpi / 72;
+    const total = pdf.numPages;
+    for (let i = 0; i < total; i++) {
+      const pageRects = byPage.get(i);
+      if (!pageRects) {
+        const [copied] = await out.copyPages(src, [i]);
+        out.addPage(copied);
+      } else {
+        // Render at display orientation, paint the areas out, rebuild.
+        const { canvas, widthPts, heightPts } = await renderPage(pdf, i, scale);
+        const ctx = canvas.getContext("2d")!;
+        ctx.fillStyle = "#000000";
+        for (const r of pageRects) {
+          ctx.fillRect(r.x * scale, r.y * scale, r.w * scale, r.h * scale);
+        }
+        const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.92 });
+        releaseCanvas(canvas);
+        const img = await out.embedJpg(await blob.arrayBuffer());
+        const page = out.addPage([widthPts, heightPts]);
+        page.drawImage(img, { x: 0, y: 0, width: widthPts, height: heightPts });
+      }
+      onProgress?.(i + 1, total);
+    }
+    return out.save();
+  } finally {
+    await pdf.destroy();
+  }
 }
 
 // ---------------------------------------------------------------- Protect / unlock

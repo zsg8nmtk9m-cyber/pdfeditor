@@ -105,6 +105,12 @@ export const fr: Dict = {
       description:
         "Ajoutez une protection AES par mot de passe pour que seules les personnes le connaissant puissent ouvrir le PDF.",
     },
+    redact: {
+      name: "Caviarder PDF",
+      tagline: "Masquez définitivement le contenu sensible",
+      description:
+        "Recouvrez tout ce qui ne doit pas être partagé. Le contenu en dessous est détruit, pas seulement masqué — contrairement à un rectangle noir dessiné par-dessus, il ne peut pas être copié depuis le fichier.",
+    },
     unlock: {
       name: "Déverrouiller PDF",
       tagline: "Retirez un mot de passe connu",
@@ -335,6 +341,15 @@ export const fr: Dict = {
     mismatch: "Les mots de passe ne correspondent pas.",
     resultNote: "Votre PDF est maintenant chiffré. Le mot de passe sera nécessaire pour l'ouvrir.",
     failed: "Échec du chiffrement.",
+  },
+  redact: {
+    instruction: "Faites glisser sur tout ce que vous voulez supprimer.",
+    clearAll: "Tout effacer",
+    removeBox: "Retirer cette zone",
+    action: (n: number) => `Caviarder ${n} zone${n === 1 ? "" : "s"}`,
+    note: "Les pages contenant un caviardage sont aplaties en image afin que le contenu masqué soit définitivement détruit — le texte de ces pages ne sera plus sélectionnable. Les autres pages restent intactes.",
+    resultNote: "Le contenu caviardé a été définitivement retiré du fichier.",
+    failed: "Échec du caviardage.",
   },
   unlock: {
     hint: "Sélectionnez un PDF protégé par mot de passe",

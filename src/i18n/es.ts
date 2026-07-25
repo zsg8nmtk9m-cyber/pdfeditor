@@ -105,6 +105,12 @@ export const es: Dict = {
       description:
         "Añade protección AES con contraseña para que solo quien la conozca pueda abrir el PDF.",
     },
+    redact: {
+      name: "Censurar PDF",
+      tagline: "Tacha contenido sensible de forma permanente",
+      description:
+        "Marca todo lo que no deba compartirse. El contenido que hay debajo se destruye, no solo se tapa — a diferencia de un recuadro negro dibujado encima, no se puede copiar del archivo.",
+    },
     unlock: {
       name: "Desbloquear PDF",
       tagline: "Elimina una contraseña conocida",
@@ -335,6 +341,15 @@ export const es: Dict = {
     mismatch: "Las contraseñas no coinciden.",
     resultNote: "Tu PDF ya está cifrado. Quien lo abra necesitará la contraseña.",
     failed: "Error al cifrar.",
+  },
+  redact: {
+    instruction: "Arrastra sobre todo lo que quieras eliminar.",
+    clearAll: "Borrar todo",
+    removeBox: "Quitar esta zona",
+    action: (n: number) => `Censurar ${n} zona${n === 1 ? "" : "s"}`,
+    note: "Las páginas con censuras se aplanan a imagen para destruir permanentemente el contenido oculto — el texto de esas páginas dejará de ser seleccionable. El resto de páginas no se modifica.",
+    resultNote: "El contenido censurado se ha eliminado permanentemente del archivo.",
+    failed: "Error al censurar.",
   },
   unlock: {
     hint: "Selecciona un PDF protegido con contraseña",

@@ -67,7 +67,7 @@ page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 console.log("home");
 await page.goto(BASE);
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("14 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 14);
+check("15 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 15);
 
 // ---------- merge ----------
 console.log("merge");
@@ -370,6 +370,38 @@ out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).
     "rotated-page text lands at the expected PDF coordinates",
     !!hit && near(hit.transform[4], b) && near(hit.transform[5], u),
   );
+}
+
+// ---------- redact (content must be destroyed, not just covered) ----------
+console.log("redact");
+await page.goto(BASE + "/redact");
+await page.locator("input[type=file]").setInputFiles(join(FIX, "a.pdf"));
+const surface = page.getByTestId("redact-surface");
+await surface.waitFor({ timeout: 30000 });
+{
+  // Drag a box over the heading text near the top of page 1.
+  const box = await surface.boundingBox();
+  await page.mouse.move(box.x + 10, box.y + 10);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width - 10, box.y + 70, { steps: 10 });
+  await page.mouse.up();
+  await page.getByRole("button", { name: /Redact 1 area/ }).click();
+  await page.getByText("Done!").waitFor({ timeout: 60000 });
+  out = await grabDownload(
+    page,
+    page.getByRole("button", { name: /^Download$/ }).last(),
+    "redacted.pdf",
+  );
+  check("redacted PDF keeps 3 pages", (await pageCount(out)) === 3);
+
+  const doc = await pdfjsGetDocument({ data: new Uint8Array(readFileSync(out)) }).promise;
+  const p1 = (await (await doc.getPage(1)).getTextContent()).items.map((i) => i.str).join("");
+  const p2 = (await (await doc.getPage(2)).getTextContent()).items.map((i) => i.str).join("");
+  await doc.destroy();
+  // The security property: the covered text is no longer in the file at all.
+  check("redacted text is gone from the file, not just covered", !p1.includes("Document A"));
+  // ...and untouched pages keep their real text rather than being rasterized.
+  check("pages without redactions keep their text", p2.includes("Document A"));
 }
 
 // ---------- organize (reorder via buttons + delete) ----------
