@@ -67,7 +67,7 @@ page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 console.log("home");
 await page.goto(BASE);
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("15 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 15);
+check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
 
 // ---------- merge ----------
 console.log("merge");
@@ -370,6 +370,50 @@ out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).
     "rotated-page text lands at the expected PDF coordinates",
     !!hit && near(hit.transform[4], b) && near(hit.transform[5], u),
   );
+}
+
+// ---------- compare ----------
+console.log("compare");
+await page.goto(BASE + "/compare");
+{
+  // Filling a slot collapses it into a card and removes its input, so load
+  // one at a time and wait for the collapse before targeting the other.
+  await page.locator("input[type=file]").first().setInputFiles(join(FIX, "a.pdf"));
+  // The filled slot loses its input, so wait for exactly one to remain
+  // (text like "a.pdf" also appears in the recents strip, so it is ambiguous).
+  await page.waitForFunction(
+    () => document.querySelectorAll('input[type=file]').length === 1,
+    null,
+    { timeout: 20000 },
+  );
+  await page.locator("input[type=file]").setInputFiles(join(FIX, "a-revised.pdf"));
+  await page.getByRole("button", { name: "Compare documents" }).click();
+  // Only page 2 differs between the two fixtures.
+  await page.getByText("1 of 3 pages changed").waitFor({ timeout: 60000 });
+  check("compare reports exactly the one changed page", true);
+  check(
+    "only the differing page is shown",
+    (await page.locator("img[alt^='Page ']").count()) === 1,
+  );
+  check("the diff shown is page 2", await page.getByText("Page 2").isVisible());
+}
+
+// ---------- compare: identical files ----------
+console.log("compare (identical)");
+await page.goto(BASE + "/compare");
+{
+  await page.locator("input[type=file]").first().setInputFiles(join(FIX, "a.pdf"));
+  // The filled slot loses its input, so wait for exactly one to remain
+  // (text like "a.pdf" also appears in the recents strip, so it is ambiguous).
+  await page.waitForFunction(
+    () => document.querySelectorAll('input[type=file]').length === 1,
+    null,
+    { timeout: 20000 },
+  );
+  await page.locator("input[type=file]").setInputFiles(join(FIX, "a.pdf"));
+  await page.getByRole("button", { name: "Compare documents" }).click();
+  await page.getByText("No visual differences found.").waitFor({ timeout: 60000 });
+  check("identical files report no differences", true);
 }
 
 // ---------- redact (content must be destroyed, not just covered) ----------

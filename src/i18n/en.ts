@@ -66,6 +66,12 @@ export const en = {
       description:
         "Apply the same operation — compress, rotate or watermark — to a whole batch of PDFs at once, then download them all as a ZIP.",
     },
+    compare: {
+      name: "Compare PDFs",
+      tagline: "See what changed between two files",
+      description:
+        "Put two versions side by side and get every visual difference highlighted, page by page — useful for contracts, drafts and anything you need to diff."
+    },
     "pdf-to-images": {
       name: "PDF to Images",
       tagline: "Export pages as PNG or JPG",
@@ -242,6 +248,19 @@ export const en = {
         : `${ok} file${ok === 1 ? "" : "s"} processed.`,
     allSkipped: "None of the files could be processed — they may be password-protected.",
     failed: "Batch processing failed.",
+  },
+  compare: {
+    original: "Original",
+    revised: "Revised",
+    action: "Compare documents",
+    identical: "No visual differences found.",
+    summary: (n: number, total: number) => `${n} of ${total} page${total === 1 ? "" : "s"} changed`,
+    legend: "Red marks what changed; grey is unchanged context.",
+    percentChanged: (pct: string) => `${pct}% changed`,
+    onlyInOriginal: "Only in original",
+    onlyInRevised: "Only in revised",
+    exportReport: "Download comparison",
+    failed: "Comparison failed.",
   },
   pdfToImages: {
     format: "Image format",

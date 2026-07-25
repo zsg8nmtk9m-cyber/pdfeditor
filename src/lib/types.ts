@@ -123,6 +123,19 @@ export interface AnnotationElement {
 export const TEXT_BASELINE = 0.9;
 export const TEXT_LINE_HEIGHT = 1.2;
 
+// ---------------------------------------------------------------- Compare
+
+/** One page of a visual comparison between two documents. */
+export interface ComparePage {
+  pageIndex: number;
+  /** Rendered diff: changes in red over a faded copy of the second file. */
+  diffDataUrl: string;
+  /** Fraction of pixels that differ, 0–1. */
+  changedRatio: number;
+  /** Set when the page exists in only one of the two files. */
+  onlyIn: "a" | "b" | null;
+}
+
 // ---------------------------------------------------------------- Redact
 
 /**

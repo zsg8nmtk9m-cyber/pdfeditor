@@ -22,6 +22,19 @@ await makePdf("a.pdf", "Document A", 3);
 await makePdf("b.pdf", "Document B", 2);
 await makePdf("big.pdf", "Big Doc", 5);
 
+// A copy of a.pdf whose page 2 differs — used by the compare tool's checks.
+{
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  for (let i = 1; i <= 3; i++) {
+    const page = doc.addPage([595, 842]);
+    const label = i === 2 ? "Document A — page 2 REVISED" : `Document A — page ${i}`;
+    page.drawText(label, { x: 60, y: 760, size: 24, font });
+    page.drawRectangle({ x: 60, y: 400, width: 300, height: 200, color: rgb(0.2, 0.4, 0.9) });
+  }
+  writeFileSync(join(FIX, "a-revised.pdf"), await doc.save());
+}
+
 // A single-page document whose page carries /Rotate 90.
 {
   const doc = await PDFDocument.create();

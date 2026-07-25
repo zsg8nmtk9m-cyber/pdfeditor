@@ -5,9 +5,10 @@
  */
 import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
 import type { PDFFont } from "pdf-lib";
-import { openForRender, releaseCanvas, renderPage } from "./render";
+import { blobToDataUrl, openForRender, releaseCanvas, renderPage } from "./render";
 import type {
   AnnotationElement,
+  ComparePage,
   CompressOptions,
   ImagesToPdfOptions,
   NumberFormat,
@@ -461,6 +462,115 @@ export async function annotatePdf(
     }
   }
   return doc.save();
+}
+
+// ---------------------------------------------------------------- Compare
+
+/** Per-channel difference above which a pixel counts as changed. */
+const DIFF_THRESHOLD = 32;
+
+/**
+ * Visually compare two documents page by page.
+ *
+ * Both pages are rendered at the same scale onto identically sized canvases
+ * (so differing page sizes still line up at the top-left) and compared pixel
+ * by pixel. The result image shows the second file faded to grey with every
+ * changed pixel painted red, which reads far better than a side-by-side at
+ * thumbnail size.
+ */
+export async function comparePdfs(
+  aBytes: Uint8Array,
+  bBytes: Uint8Array,
+  dpi = 100,
+  onProgress?: ProgressCallback,
+): Promise<ComparePage[]> {
+  const pdfA = await openForRender(aBytes);
+  const pdfB = await openForRender(bBytes);
+  try {
+    const total = Math.max(pdfA.numPages, pdfB.numPages);
+    const scale = dpi / 72;
+    const results: ComparePage[] = [];
+
+    for (let i = 0; i < total; i++) {
+      const inA = i < pdfA.numPages;
+      const inB = i < pdfB.numPages;
+
+      if (!inA || !inB) {
+        // Page added or removed — show it whole rather than diffing.
+        const { canvas } = await renderPage(inA ? pdfA : pdfB, i, scale);
+        const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.8 });
+        releaseCanvas(canvas);
+        results.push({
+          pageIndex: i,
+          diffDataUrl: blobToDataUrl(blob),
+          changedRatio: 1,
+          onlyIn: inA ? "a" : "b",
+        });
+      } else {
+        const ra = await renderPage(pdfA, i, scale);
+        const rb = await renderPage(pdfB, i, scale);
+        const w = Math.max(ra.canvas.width, rb.canvas.width);
+        const h = Math.max(ra.canvas.height, rb.canvas.height);
+
+        const ca = new OffscreenCanvas(w, h);
+        const cxa = ca.getContext("2d")!;
+        cxa.fillStyle = "#ffffff";
+        cxa.fillRect(0, 0, w, h);
+        cxa.drawImage(ra.canvas, 0, 0);
+
+        const cb = new OffscreenCanvas(w, h);
+        const cxb = cb.getContext("2d")!;
+        cxb.fillStyle = "#ffffff";
+        cxb.fillRect(0, 0, w, h);
+        cxb.drawImage(rb.canvas, 0, 0);
+
+        releaseCanvas(ra.canvas);
+        releaseCanvas(rb.canvas);
+
+        const da = cxa.getImageData(0, 0, w, h).data;
+        const db = cxb.getImageData(0, 0, w, h).data;
+        const diff = cxb.createImageData(w, h);
+        let changed = 0;
+
+        for (let p = 0; p < da.length; p += 4) {
+          const differs =
+            Math.abs(da[p] - db[p]) > DIFF_THRESHOLD ||
+            Math.abs(da[p + 1] - db[p + 1]) > DIFF_THRESHOLD ||
+            Math.abs(da[p + 2] - db[p + 2]) > DIFF_THRESHOLD;
+          if (differs) {
+            changed++;
+            diff.data[p] = 220;
+            diff.data[p + 1] = 38;
+            diff.data[p + 2] = 38;
+          } else {
+            // Unchanged content stays as a light grey ghost for context.
+            const grey = db[p] * 0.299 + db[p + 1] * 0.587 + db[p + 2] * 0.114;
+            const faded = 255 - (255 - grey) * 0.3;
+            diff.data[p] = faded;
+            diff.data[p + 1] = faded;
+            diff.data[p + 2] = faded;
+          }
+          diff.data[p + 3] = 255;
+        }
+
+        cxb.putImageData(diff, 0, 0);
+        const blob = await cb.convertToBlob({ type: "image/png" });
+        releaseCanvas(ca);
+        releaseCanvas(cb);
+        results.push({
+          pageIndex: i,
+          diffDataUrl: blobToDataUrl(blob),
+          changedRatio: changed / (w * h),
+          onlyIn: null,
+        });
+      }
+      onProgress?.(i + 1, total);
+    }
+    return results;
+  } finally {
+    await pdfA.destroy();
+    await pdfB.destroy();
+  }
 }
 
 // ---------------------------------------------------------------- Redact

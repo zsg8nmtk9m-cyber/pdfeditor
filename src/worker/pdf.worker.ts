@@ -37,6 +37,7 @@ const handlers: Record<string, (...args: any[]) => Promise<unknown>> = {
   pageImage: renderPageImage,
   annotate: ops.annotatePdf,
   redact: ops.redactPdf,
+  compare: ops.comparePdfs,
 };
 
 /** Output buffers are transferred (not copied) back to the UI thread. */

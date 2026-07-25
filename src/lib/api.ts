@@ -7,6 +7,7 @@
 import type { WorkerRequest, WorkerResponse } from "../worker/protocol";
 import type {
   AnnotationElement,
+  ComparePage,
   CompressOptions,
   DocSummary,
   ImagesToPdfOptions,
@@ -139,6 +140,13 @@ export const renderPageImage = (bytes: Uint8Array, pageIndex: number, scale?: nu
 
 export const annotatePdf = (bytes: Uint8Array, elements: AnnotationElement[]) =>
   call<Uint8Array>("annotate", [bytes, elements]);
+
+export const comparePdfs = (
+  a: Uint8Array,
+  b: Uint8Array,
+  dpi?: number,
+  onProgress?: ProgressCallback,
+) => call<ComparePage[]>("compare", [a, b, dpi], onProgress);
 
 export const redactPdf = (
   bytes: Uint8Array,

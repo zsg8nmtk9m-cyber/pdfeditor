@@ -63,6 +63,12 @@ export const tr: Dict = {
       description:
         "Aynı işlemi — sıkıştırma, döndürme veya filigran — bir grup PDF'e tek seferde uygulayın, ardından hepsini ZIP olarak indirin.",
     },
+    compare: {
+      name: "PDF Karşılaştır",
+      tagline: "İki dosya arasındaki değişiklikleri görün",
+      description:
+        "İki sürümü karşılaştırın; tüm görsel farklar sayfa sayfa vurgulanır — sözleşmeler, taslaklar ve karşılaştırmanız gereken her şey için."
+    },
     "pdf-to-images": {
       name: "PDF'ten Görsele",
       tagline: "Sayfaları PNG veya JPG olarak dışa aktarın",
@@ -241,6 +247,19 @@ export const tr: Dict = {
         : `${ok} dosya işlendi.`,
     allSkipped: "Dosyaların hiçbiri işlenemedi — parola korumalı olabilirler.",
     failed: "Toplu işlem başarısız oldu.",
+  },
+  compare: {
+    original: "Özgün",
+    revised: "Düzeltilmiş",
+    action: "Belgeleri karşılaştır",
+    identical: "Görsel fark bulunamadı.",
+    summary: (n: number, total: number) => `${total} sayfadan ${n} tanesi değişti`,
+    legend: "Kırmızı değişenleri, gri değişmeyen içeriği gösterir.",
+    percentChanged: (pct: string) => `%${pct} değişti`,
+    onlyInOriginal: "Yalnızca özgün dosyada",
+    onlyInRevised: "Yalnızca düzeltilmiş dosyada",
+    exportReport: "Karşılaştırmayı indir",
+    failed: "Karşılaştırma başarısız oldu.",
   },
   pdfToImages: {
     format: "Görsel biçimi",

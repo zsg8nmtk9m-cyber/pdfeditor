@@ -63,6 +63,12 @@ export const de: Dict = {
       description:
         "Wenden Sie denselben Vorgang — Komprimieren, Drehen oder Wasserzeichen — auf einen ganzen Stapel PDFs auf einmal an und laden Sie sie alle als ZIP herunter.",
     },
+    compare: {
+      name: "PDFs vergleichen",
+      tagline: "Sehen, was sich zwischen zwei Dateien geändert hat",
+      description:
+        "Stellen Sie zwei Fassungen gegenüber und lassen Sie jeden sichtbaren Unterschied Seite für Seite hervorheben — ideal für Verträge, Entwürfe und alles, was verglichen werden muss."
+    },
     "pdf-to-images": {
       name: "PDF in Bilder",
       tagline: "Seiten als PNG oder JPG exportieren",
@@ -242,6 +248,19 @@ export const de: Dict = {
     allSkipped:
       "Keine der Dateien konnte verarbeitet werden — sie sind möglicherweise passwortgeschützt.",
     failed: "Stapelverarbeitung fehlgeschlagen.",
+  },
+  compare: {
+    original: "Original",
+    revised: "Überarbeitet",
+    action: "Dokumente vergleichen",
+    identical: "Keine sichtbaren Unterschiede gefunden.",
+    summary: (n: number, total: number) => `${n} von ${total} Seite${total === 1 ? "" : "n"} geändert`,
+    legend: "Rot zeigt Änderungen, Grau unveränderten Kontext.",
+    percentChanged: (pct: string) => `${pct} % geändert`,
+    onlyInOriginal: "Nur im Original",
+    onlyInRevised: "Nur in der Überarbeitung",
+    exportReport: "Vergleich herunterladen",
+    failed: "Vergleich fehlgeschlagen.",
   },
   pdfToImages: {
     format: "Bildformat",

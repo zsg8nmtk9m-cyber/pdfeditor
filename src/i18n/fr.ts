@@ -63,6 +63,12 @@ export const fr: Dict = {
       description:
         "Appliquez la même opération — compression, rotation ou filigrane — à tout un lot de PDF d'un coup, puis téléchargez-les tous en ZIP.",
     },
+    compare: {
+      name: "Comparer des PDF",
+      tagline: "Voyez ce qui a changé entre deux fichiers",
+      description:
+        "Confrontez deux versions et obtenez chaque différence visuelle mise en évidence, page par page — pratique pour les contrats, les brouillons et tout ce qu'il faut comparer."
+    },
     "pdf-to-images": {
       name: "PDF en images",
       tagline: "Exportez les pages en PNG ou JPG",
@@ -242,6 +248,19 @@ export const fr: Dict = {
     allSkipped:
       "Aucun fichier n'a pu être traité — ils sont peut-être protégés par mot de passe.",
     failed: "Échec du traitement par lot.",
+  },
+  compare: {
+    original: "Original",
+    revised: "Révisé",
+    action: "Comparer les documents",
+    identical: "Aucune différence visuelle trouvée.",
+    summary: (n: number, total: number) => `${n} page${n === 1 ? "" : "s"} modifiée${n === 1 ? "" : "s"} sur ${total}`,
+    legend: "Le rouge indique les changements, le gris le contexte inchangé.",
+    percentChanged: (pct: string) => `${pct} % modifié`,
+    onlyInOriginal: "Uniquement dans l'original",
+    onlyInRevised: "Uniquement dans le révisé",
+    exportReport: "Télécharger la comparaison",
+    failed: "Échec de la comparaison.",
   },
   pdfToImages: {
     format: "Format d'image",

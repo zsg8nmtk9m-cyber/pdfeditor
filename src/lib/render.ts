@@ -19,6 +19,11 @@ declare class FileReaderSync {
   readAsDataURL(blob: Blob): string;
 }
 
+/** Synchronous blob → data URL, worker-only (see FileReaderSync above). */
+export function blobToDataUrl(blob: Blob): string {
+  return new FileReaderSync().readAsDataURL(blob);
+}
+
 /**
  * Open a document with pdf.js. pdf.js transfers the buffer to its worker
  * (detaching it), so we always hand it a copy.

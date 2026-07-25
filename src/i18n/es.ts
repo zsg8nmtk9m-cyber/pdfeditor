@@ -63,6 +63,12 @@ export const es: Dict = {
       description:
         "Aplica la misma operación — comprimir, rotar o marca de agua — a un lote entero de PDFs a la vez y descárgalos todos como ZIP.",
     },
+    compare: {
+      name: "Comparar PDFs",
+      tagline: "Ve qué cambió entre dos archivos",
+      description:
+        "Enfrenta dos versiones y obtén todas las diferencias visuales resaltadas, página por página — útil para contratos, borradores y cualquier cosa que necesites comparar."
+    },
     "pdf-to-images": {
       name: "PDF a imágenes",
       tagline: "Exporta páginas como PNG o JPG",
@@ -242,6 +248,19 @@ export const es: Dict = {
     allSkipped:
       "No se pudo procesar ningún archivo — pueden estar protegidos con contraseña.",
     failed: "Error en el procesamiento por lotes.",
+  },
+  compare: {
+    original: "Original",
+    revised: "Revisado",
+    action: "Comparar documentos",
+    identical: "No se encontraron diferencias visuales.",
+    summary: (n: number, total: number) => `${n} de ${total} página${total === 1 ? "" : "s"} con cambios`,
+    legend: "El rojo marca lo que cambió; el gris es contexto sin cambios.",
+    percentChanged: (pct: string) => `${pct} % modificado`,
+    onlyInOriginal: "Solo en el original",
+    onlyInRevised: "Solo en el revisado",
+    exportReport: "Descargar comparación",
+    failed: "Error al comparar.",
   },
   pdfToImages: {
     format: "Formato de imagen",

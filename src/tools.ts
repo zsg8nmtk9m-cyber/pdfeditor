@@ -10,6 +10,7 @@ import {
   FileImage,
   PenLine,
   EyeOff,
+  GitCompare,
   Stamp,
   ListOrdered,
   Lock,
@@ -34,7 +35,8 @@ export type ToolId =
   | "metadata"
   | "protect"
   | "unlock"
-  | "redact";
+  | "redact"
+  | "compare";
 
 /**
  * Static tool registry. All user-facing copy (name, tagline, description)
@@ -60,6 +62,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "rotate", path: "/rotate", icon: RotateCw, category: "Organize", accent: "bg-cyan-100 text-cyan-600", accepts: "pdf" },
   { id: "compress", path: "/compress", icon: FileArchive, category: "Optimize", accent: "bg-emerald-100 text-emerald-600", accepts: "pdf" },
   { id: "batch", path: "/batch", icon: Layers, category: "Optimize", accent: "bg-blue-100 text-blue-600", accepts: "pdf", multi: true },
+  { id: "compare", path: "/compare", icon: GitCompare, category: "Optimize", accent: "bg-teal-100 text-teal-700", accepts: "pdf", multi: true },
   { id: "pdf-to-images", path: "/pdf-to-images", icon: Images, category: "Convert", accent: "bg-amber-100 text-amber-600", accepts: "pdf" },
   { id: "images-to-pdf", path: "/images-to-pdf", icon: FileImage, category: "Convert", accent: "bg-orange-100 text-orange-600", accepts: "image", multi: true },
   { id: "annotate", path: "/annotate", icon: PenLine, category: "Edit", accent: "bg-lime-100 text-lime-600", accepts: "pdf" },
