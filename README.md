@@ -12,10 +12,18 @@ no file-size limits to enforce, and nothing sensitive ever leaves the device.
 | Category | Tools |
 | -------- | ----- |
 | Organize | Merge · Split (ranges / extract / every page) · Organize (drag-reorder, rotate, delete pages) · Rotate |
-| Optimize | Compress (3 presets, re-renders pages as JPEG) · Batch (compress/rotate/watermark many files → ZIP) |
+| Optimize | Compress (3 presets, re-renders pages as JPEG) · Batch (compress/rotate/watermark many files → ZIP) · Compare (visual page-by-page diff) |
 | Convert  | PDF → PNG/JPG images · JPG/PNG/WebP/GIF/BMP images → PDF |
-| Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Text watermark · Page numbers · Metadata editor |
-| Security | Protect (AES password encryption) · Unlock (remove a known password) |
+| Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Text watermark · Page numbers (live position preview) · Metadata editor |
+| Security | Redact (destroys the content, not just covers it) · Protect (AES password encryption) · Unlock (remove a known password) |
+
+Available in English, Türkçe, Deutsch, Español and Français. Files you open are
+remembered locally (IndexedDB, clearable), results can be passed straight into
+another tool, and you can drag a file onto any tool card on the home page to
+open it there.
+
+Working on the code? See [CLAUDE.md](./CLAUDE.md) for architecture, conventions
+and the gotchas worth knowing before changing anything.
 
 Multiple output files (split parts, page images) can be downloaded
 individually or as a single ZIP.
