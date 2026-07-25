@@ -7,6 +7,9 @@ product's whole differentiator — protect it in every decision.
 - Live: https://zsg8nmtk9m-cyber.github.io/pdfeditor/
 - Branch: `claude/pdf-tools-web-app-yyx410` (this is the default branch)
 - 17 tools, 5 languages, 57 e2e checks green in CI.
+- **Business strategy, revenue plan and the cross-session operating loop
+  live in [BUSINESS.md](./BUSINESS.md) — read it first; the owner has
+  delegated prioritization to Claude and that file is the standing brief.**
 
 ## Commands
 
