@@ -311,7 +311,9 @@ await page.getByRole("button", { name: "Add text" }).click();
 await page.waitForTimeout(300);
 await page.keyboard.press("ControlOrMeta+a");
 await page.keyboard.type("APPROVED BY QA");
-await page.locator("img[alt='Page 1']").click({ position: { x: 10, y: 10 } });
+// Escape commits the edit — layout-independent, unlike clicking the page
+// (whose corner can sit under the sticky header after scroll-into-view).
+await page.keyboard.press("Escape");
 check(
   "text element shows typed content",
   (await page.locator("[data-annot='text']").textContent()) === "APPROVED BY QA",
@@ -353,7 +355,9 @@ await page.getByRole("button", { name: "Add text" }).click();
 await page.waitForTimeout(300);
 await page.keyboard.press("ControlOrMeta+a");
 await page.keyboard.type("ROTATED OK");
-await page.locator("img[alt='Page 1']").click({ position: { x: 10, y: 10 } });
+// Escape commits the edit — layout-independent, unlike clicking the page
+// (whose corner can sit under the sticky header after scroll-into-view).
+await page.keyboard.press("Escape");
 await page.getByRole("button", { name: "Apply & download" }).click();
 await page.getByText("Done!").waitFor({ timeout: 30000 });
 out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "signed-rotated.pdf");
