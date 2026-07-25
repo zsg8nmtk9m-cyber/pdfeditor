@@ -15,6 +15,10 @@ export const de: Dict = {
     chipPrivate: "Privat per Design",
     chipNoUploads: "Keine Uploads, keine Server",
     chipNoLimits: "Keine Dateigrößen-Limits",
+    dropHint: "Tipp: Ziehen Sie eine Datei direkt auf eines der Werkzeuge unten.",
+    dropHere: (tool: string) => `Ablegen, um in ${tool} zu öffnen`,
+    dropNeedsPdf: "Dieses Werkzeug benötigt ein PDF",
+    dropNeedsImage: "Dieses Werkzeug benötigt Bilder",
   },
   categories: {
     Organize: "Organisieren",

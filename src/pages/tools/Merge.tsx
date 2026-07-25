@@ -7,7 +7,7 @@ import { Button, ErrorBox } from "../../components/ui";
 import { errorText, useT } from "../../i18n";
 import { getDocSummary, mergePdfs } from "../../lib/api";
 import { saveRecent } from "../../lib/fileStore";
-import { takeHandoff } from "../../lib/handoff";
+import { takeHandoffFiles } from "../../lib/handoff";
 import { formatBytes, pdfBlob, readFileBytes } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
@@ -54,10 +54,10 @@ export default function Merge() {
     }
   }
 
-  // Pick up a file handed off from another tool's result screen.
+  // Pick up files handed off from a result screen or dropped on a home card.
   useEffect(() => {
-    const file = takeHandoff();
-    if (file) void addFiles([file]);
+    const handed = takeHandoffFiles();
+    if (handed) void addFiles(handed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

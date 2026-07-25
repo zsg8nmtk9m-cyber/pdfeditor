@@ -15,6 +15,10 @@ export const tr: Dict = {
     chipPrivate: "Tasarım gereği gizli",
     chipNoUploads: "Yükleme yok, sunucu yok",
     chipNoLimits: "Dosya boyutu sınırı yok",
+    dropHint: "İpucu: başlamak için bir dosyayı doğrudan aşağıdaki araçlardan birine sürükleyin.",
+    dropHere: (tool: string) => `${tool} aracında açmak için bırakın`,
+    dropNeedsPdf: "Bu araç PDF gerektiriyor",
+    dropNeedsImage: "Bu araç görsel gerektiriyor",
   },
   categories: {
     Organize: "Sayfa Düzeni",

@@ -101,6 +101,47 @@ await recentChip.click();
 await page.getByText(/5 pages/).waitFor({ timeout: 20000 });
 check("clicking a recent file loads it", true);
 
+// ---------- drag-and-drop a file onto a home tool card ----------
+console.log("drag-and-drop");
+await page.goto(BASE + "/");
+{
+  // Synthesize a file drop: build a DataTransfer in the page from the
+  // fixture's bytes and dispatch dragover+drop on the Compress card.
+  const bytes = Array.from(new Uint8Array(readFileSync(join(FIX, "big.pdf"))));
+  await page.evaluate((data) => {
+    const dt = new DataTransfer();
+    dt.items.add(new File([new Uint8Array(data)], "dropped.pdf", { type: "application/pdf" }));
+    const card = document.querySelector('[data-tool="compress"]');
+    card.dispatchEvent(new DragEvent("dragover", { dataTransfer: dt, bubbles: true }));
+    card.dispatchEvent(new DragEvent("drop", { dataTransfer: dt, bubbles: true }));
+  }, bytes);
+  await page.waitForURL("**/compress");
+  await page.getByText("dropped.pdf").waitFor({ timeout: 20000 });
+  check("dropping a PDF on a card opens that tool with the file", true);
+  check("dropped file is loaded and probed", await page.getByText("5 pages ·").isVisible());
+}
+
+// ---------- dropping multiple files on a multi-file tool ----------
+console.log("drag-and-drop (multi-file)");
+await page.goto(BASE + "/");
+{
+  const a = Array.from(new Uint8Array(readFileSync(join(FIX, "a.pdf"))));
+  const b = Array.from(new Uint8Array(readFileSync(join(FIX, "b.pdf"))));
+  await page.evaluate(([d1, d2]) => {
+    const dt = new DataTransfer();
+    dt.items.add(new File([new Uint8Array(d1)], "one.pdf", { type: "application/pdf" }));
+    dt.items.add(new File([new Uint8Array(d2)], "two.pdf", { type: "application/pdf" }));
+    const card = document.querySelector('[data-tool="merge"]');
+    card.dispatchEvent(new DragEvent("drop", { dataTransfer: dt, bubbles: true }));
+  }, [a, b]);
+  await page.waitForURL("**/merge");
+  // Files are added one at a time (each waits on its preview), so wait for
+  // the second rather than asserting on it immediately.
+  await page.getByText("one.pdf").waitFor({ timeout: 20000 });
+  await page.getByText("two.pdf").waitFor({ timeout: 20000 });
+  check("dropping two PDFs on Merge loads both", true);
+}
+
 // ---------- split by ranges ----------
 console.log("split");
 await page.goto(BASE + "/split");

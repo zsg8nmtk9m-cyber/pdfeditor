@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Layers } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import FileList from "../../components/FileList";
@@ -15,6 +15,7 @@ import {
 } from "../../components/ui";
 import { errorText, useT } from "../../i18n";
 import { addWatermark, compressPdf, rotatePdf } from "../../lib/api";
+import { takeHandoffFiles } from "../../lib/handoff";
 import { COMPRESS_PRESETS } from "../../lib/types";
 import type { CompressPreset } from "../../lib/types";
 import { baseName, pdfBlob, readFileBytes } from "../../lib/utils";
@@ -40,6 +41,12 @@ export default function Batch() {
   const [current, setCurrent] = useState(0);
   const [error, setError] = useState("");
   const [result, setResult] = useState<{ files: OutputFile[]; note: string } | null>(null);
+
+  // Pick up files dropped onto this tool's card on the home page.
+  useEffect(() => {
+    const handed = takeHandoffFiles();
+    if (handed) setFiles(handed);
+  }, []);
 
   const operations: { id: Operation; label: string }[] = [
     { id: "compress", label: t.batch.opCompress },

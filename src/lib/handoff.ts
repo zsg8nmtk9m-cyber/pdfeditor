@@ -1,17 +1,32 @@
 /**
- * In-memory handoff slot for "continue in another tool": the source tool
- * stores the produced file here, navigates, and the destination tool picks
- * it up on mount as if the user had dropped it.
+ * In-memory handoff slot for moving files between tools without a
+ * download/upload round trip. Used in two ways:
+ *  - a source tool stores its produced file, navigates, and the destination
+ *    picks it up on mount ("Continue in another tool");
+ *  - the home page stores files dropped onto a tool card, then navigates.
+ * The destination tool picks them up as if the user had dropped them there.
  */
 
-let pending: File | null = null;
+let pending: File[] | null = null;
 
-export function setHandoff(name: string, bytes: Uint8Array): void {
-  pending = new File([bytes], name, { type: "application/pdf" });
+/** Hand off an arbitrary set of files (e.g. dropped onto a tool card). */
+export function setHandoffFiles(files: File[]): void {
+  pending = files.length ? files : null;
 }
 
-export function takeHandoff(): File | null {
-  const file = pending;
+/** Convenience for handing off a single produced PDF (result → next tool). */
+export function setHandoff(name: string, bytes: Uint8Array): void {
+  pending = [new File([bytes], name, { type: "application/pdf" })];
+}
+
+/** Take every handed-off file (multi-file tools: merge, batch, images→pdf). */
+export function takeHandoffFiles(): File[] | null {
+  const files = pending;
   pending = null;
-  return file;
+  return files;
+}
+
+/** Take just the first handed-off file (single-PDF tools). */
+export function takeHandoff(): File | null {
+  return takeHandoffFiles()?.[0] ?? null;
 }

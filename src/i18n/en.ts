@@ -18,6 +18,10 @@ export const en = {
     chipPrivate: "Private by design",
     chipNoUploads: "No uploads, no servers",
     chipNoLimits: "No file-size limits",
+    dropHint: "Tip: drag a file straight onto any tool below to get started.",
+    dropHere: (tool: string) => `Drop to open in ${tool}`,
+    dropNeedsPdf: "This tool needs a PDF",
+    dropNeedsImage: "This tool needs images",
   },
   categories: {
     Organize: "Organize",

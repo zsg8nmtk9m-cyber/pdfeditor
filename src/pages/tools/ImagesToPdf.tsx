@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileImage } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import FileList from "../../components/FileList";
@@ -7,6 +7,7 @@ import ToolPage from "../../components/ToolPage";
 import { Button, ErrorBox, Field, ProgressBar, Select } from "../../components/ui";
 import { errorText, useT } from "../../i18n";
 import { imagesToPdf } from "../../lib/api";
+import { takeHandoffFiles } from "../../lib/handoff";
 import type { PageSizeMode } from "../../lib/types";
 import { pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
@@ -19,6 +20,12 @@ export default function ImagesToPdf() {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [result, setResult] = useState<OutputFile | null>(null);
+
+  // Pick up images dropped onto this tool's card on the home page.
+  useEffect(() => {
+    const handed = takeHandoffFiles();
+    if (handed) setFiles(handed);
+  }, []);
 
   function move(i: number, dir: -1 | 1) {
     setFiles((prev) => {
