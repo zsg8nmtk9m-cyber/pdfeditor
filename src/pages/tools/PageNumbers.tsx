@@ -12,6 +12,16 @@ import type { NumberFormat, NumberPosition } from "../../lib/types";
 import { baseName, pdfBlob } from "../../lib/utils";
 import type { OutputFile } from "../../lib/utils";
 
+/** Must match the margin used by addPageNumbers in lib/ops.ts. */
+const MARGIN_PTS = 28;
+const PREVIEW_HEIGHT_PX = 380;
+/**
+ * At true scale an 11 pt number on an A4 page is only ~5 px in the preview —
+ * accurate but unreadable. Positions stay exact; the glyphs are floored to a
+ * legible size so the user can actually see what they're placing.
+ */
+const MIN_LABEL_PX = 8;
+
 export default function PageNumbers() {
   const t = useT();
   const pdf = useSinglePdf();
@@ -21,6 +31,14 @@ export default function PageNumbers() {
   const [startAt, setStartAt] = useState(1);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<OutputFile | null>(null);
+
+  /** The label the first page will carry, mirroring numberLabel() in ops. */
+  function previewLabel(): string {
+    const total = pdf.pageCount + startAt - 1;
+    if (format === "n") return String(startAt);
+    if (format === "n-of-total") return `${startAt} / ${total}`;
+    return `Page ${startAt} of ${total}`;
+  }
 
   async function run() {
     if (!pdf.bytes || !pdf.file) return;
@@ -109,6 +127,61 @@ export default function PageNumbers() {
               />
             </Field>
           </div>
+
+          {/* Live preview: the number is placed on the real first page at the
+              same margin the export uses, with the safe-area guides shown. */}
+          {pdf.summary?.thumbnail && pdf.summary.heightPts > 0 && (
+            <div className="relative flex justify-center rounded-xl bg-slate-100 py-4 ring-1 ring-slate-200">
+              <div
+                className="relative shadow-sm"
+                style={{
+                  height: PREVIEW_HEIGHT_PX,
+                  aspectRatio: `${pdf.summary.widthPts} / ${pdf.summary.heightPts}`,
+                }}
+              >
+                <img
+                  src={pdf.summary.thumbnail}
+                  alt={t.pageGrid.firstPage}
+                  className="h-full w-full"
+                />
+                {/* Margin guides */}
+                <span
+                  className="pointer-events-none absolute inset-0 border border-dashed border-indigo-300"
+                  style={{
+                    margin: `${(MARGIN_PTS / pdf.summary.heightPts) * PREVIEW_HEIGHT_PX}px ${
+                      (MARGIN_PTS / pdf.summary.widthPts) *
+                      PREVIEW_HEIGHT_PX *
+                      (pdf.summary.widthPts / pdf.summary.heightPts)
+                    }px`,
+                  }}
+                />
+                <span
+                  className="absolute whitespace-nowrap font-sans leading-none text-slate-700"
+                  style={{
+                    fontSize: Math.max(
+                      MIN_LABEL_PX,
+                      (fontSize / pdf.summary.heightPts) * PREVIEW_HEIGHT_PX,
+                    ),
+                    // Horizontal: left/right sit at the margin, center is centered.
+                    ...(position.endsWith("left")
+                      ? { left: `${(MARGIN_PTS / pdf.summary.widthPts) * 100}%` }
+                      : position.endsWith("right")
+                        ? { right: `${(MARGIN_PTS / pdf.summary.widthPts) * 100}%` }
+                        : { left: "50%", transform: "translateX(-50%)" }),
+                    // Vertical: distance of the text baseline from the page bottom.
+                    bottom: position.startsWith("top")
+                      ? `${((pdf.summary.heightPts - MARGIN_PTS) / pdf.summary.heightPts) * 100}%`
+                      : `${((MARGIN_PTS - fontSize * 0.3) / pdf.summary.heightPts) * 100}%`,
+                  }}
+                >
+                  {previewLabel()}
+                </span>
+              </div>
+              <span className="absolute bottom-2 right-3 text-[10px] uppercase tracking-wider text-slate-400">
+                {t.common.preview}
+              </span>
+            </div>
+          )}
 
           <ErrorBox>{pdf.error}</ErrorBox>
           <div className="flex gap-3">
