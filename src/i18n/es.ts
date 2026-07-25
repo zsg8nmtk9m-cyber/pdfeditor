@@ -87,6 +87,12 @@ export const es: Dict = {
       description:
         "Dibuja o escribe tu firma, colócala donde quieras y añade notas de texto en cualquier página. Todo queda integrado en el PDF — no hace falta ningún lector especial.",
     },
+    "fill-forms": {
+      name: "Rellenar formularios",
+      tagline: "Rellena formularios sin imprimir",
+      description:
+        "Detecta todos los campos rellenables de un formulario PDF, escribe tus respuestas y descarga el documento relleno — opcionalmente aplanado para que las entradas no puedan modificarse.",
+    },
     watermark: {
       name: "Marca de agua",
       tagline: "Estampa texto en cada página",
@@ -331,6 +337,19 @@ export const es: Dict = {
     resizeAria: "Redimensionar firma",
     renderFailed: "No se pudo mostrar esta página.",
     failed: "No se pudieron aplicar los cambios.",
+  },
+  fillForms: {
+    fieldsFound: (n: number, name: string) =>
+      `${n} campo${n === 1 ? "" : "s"} rellenable${n === 1 ? "" : "s"} en ${name}`,
+    noFields:
+      "Este PDF no tiene campos de formulario rellenables. Si es un formulario escaneado o plano, puedes escribir encima con Firmar y anotar.",
+    goAnnotate: "Abrir en Firmar y anotar",
+    noSelection: "— sin selección —",
+    flattenLabel: "Aplanar el formulario",
+    flattenHint:
+      "Fija los valores rellenados en la página: se imprimen en todas partes y no se pueden editar después.",
+    action: "Rellenar formulario",
+    failed: "No se pudo rellenar este formulario.",
   },
   signature: {
     title: "Añade tu firma",

@@ -67,7 +67,44 @@ page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 console.log("home");
 await page.goto(BASE);
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
+check("17 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 17);
+
+// ---------- prerendered SEO pages ----------
+console.log("seo");
+{
+  const hrefs = await page.$$eval("a[href^='/']", (as) =>
+    as.filter((a) => a.querySelector("h3")).map((a) => a.getAttribute("href")),
+  );
+  const homeTitle = await page.title();
+  const titles = new Set();
+  let allServed = true;
+  let allDistinct = true;
+  for (const href of hrefs) {
+    const res = await fetch(BASE + href + "/");
+    if (!res.ok) {
+      allServed = false;
+      continue;
+    }
+    const title = (await res.text()).match(/<title>(.*?)<\/title>/)?.[1] ?? "";
+    titles.add(title);
+    if (!title || title === homeTitle) allDistinct = false;
+  }
+  check("every tool page is prerendered (HTTP 200)", allServed);
+  check(
+    "every tool page has its own unique title",
+    allDistinct && titles.size === hrefs.length,
+  );
+  // No check for the slash-less form (/merge): vite preview's static server
+  // falls back to the SPA shell there, but GitHub Pages 301s to /merge/,
+  // which is also the form used in the sitemap and canonical tags.
+  const sitemap = await (await fetch(BASE + "/sitemap.xml")).text();
+  check(
+    "sitemap lists every tool URL",
+    hrefs.every((h) => sitemap.includes(`${h.slice(1)}/</loc>`)),
+  );
+  const robots = await (await fetch(BASE + "/robots.txt")).text();
+  check("robots.txt points at the sitemap", robots.includes("sitemap.xml"));
+}
 
 // ---------- merge ----------
 console.log("merge");
@@ -458,6 +495,54 @@ await page.getByRole("button", { name: "Apply changes" }).click();
 await page.getByText("Done!").waitFor({ timeout: 20000 });
 out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "organized.pdf");
 check("organize deleted a page", (await pageCount(out)) === 2);
+
+// ---------- fill forms (values must land in the AcroForm) ----------
+console.log("fill-forms");
+await page.goto(BASE + "/fill-forms");
+await page.locator("input[type=file]").setInputFiles(join(FIX, "form.pdf"));
+await page.getByLabel("Full Name").waitFor({ timeout: 20000 });
+// Turkish text exercises the embedded-Unicode-font appearance path.
+await page.getByLabel("Full Name").fill("Ayşe Yılmaz");
+await page.getByLabel("Agree").check();
+await page.getByRole("radio", { name: "Blue" }).check();
+await page.getByLabel("Country").selectOption("Türkiye");
+await page.getByRole("button", { name: "Fill form" }).click();
+await page.getByText("Done!").waitFor({ timeout: 30000 });
+out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "filled.pdf");
+{
+  const doc = await PDFDocument.load(readFileSync(out));
+  const form = doc.getForm();
+  check(
+    "text field value (Unicode) written to the form",
+    form.getTextField("Full Name").getText() === "Ayşe Yılmaz",
+  );
+  check("checkbox is checked in the output", form.getCheckBox("Agree").isChecked());
+  check("radio selection saved", form.getRadioGroup("Color").getSelected() === "Blue");
+  check(
+    "dropdown selection saved",
+    form.getDropdown("Country").getSelected().includes("Türkiye"),
+  );
+}
+
+// ---------- fill forms + flatten (fields destroyed, text baked in) ----------
+console.log("fill-forms (flatten)");
+await page.goto(BASE + "/fill-forms");
+await page.locator("input[type=file]").setInputFiles(join(FIX, "form.pdf"));
+await page.getByLabel("Full Name").waitFor({ timeout: 20000 });
+await page.getByLabel("Full Name").fill("FLAT TEST");
+await page.getByLabel("Flatten the form").check();
+await page.getByRole("button", { name: "Fill form" }).click();
+await page.getByText("Done!").waitFor({ timeout: 30000 });
+out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "filled-flat.pdf");
+{
+  const doc = await PDFDocument.load(readFileSync(out));
+  check("flattened output has no form fields left", doc.getForm().getFields().length === 0);
+  const items = await firstPageText(out);
+  check(
+    "flattened value is page content (extractable text)",
+    items.some((it) => it.str.includes("FLAT TEST")),
+  );
+}
 
 // ---------- i18n (run last: switches the UI language) ----------
 console.log("i18n");

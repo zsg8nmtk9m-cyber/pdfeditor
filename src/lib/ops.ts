@@ -3,13 +3,25 @@
  * AES encryption support). This module runs INSIDE the PDF worker — UI code
  * calls these through src/lib/api.ts.
  */
-import { PDFDocument, StandardFonts, degrees, rgb } from "pdf-lib";
+import {
+  PDFCheckBox,
+  PDFDocument,
+  PDFDropdown,
+  PDFOptionList,
+  PDFRadioGroup,
+  PDFTextField,
+  StandardFonts,
+  degrees,
+  rgb,
+} from "pdf-lib";
 import type { PDFFont } from "pdf-lib";
 import { blobToDataUrl, openForRender, releaseCanvas, renderPage } from "./render";
 import type {
   AnnotationElement,
   ComparePage,
   CompressOptions,
+  FormFieldInfo,
+  FormValues,
   ImagesToPdfOptions,
   NumberFormat,
   PageEdit,
@@ -671,6 +683,91 @@ export async function isEncrypted(bytes: Uint8Array): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+// ---------------------------------------------------------------- Forms
+
+/** List every fillable AcroForm field with its current value and options. */
+export async function readFormFields(bytes: Uint8Array): Promise<FormFieldInfo[]> {
+  const doc = await loadPdf(bytes);
+  const infos: FormFieldInfo[] = [];
+  for (const field of doc.getForm().getFields()) {
+    const base = { name: field.getName(), readOnly: field.isReadOnly() };
+    if (field instanceof PDFTextField) {
+      infos.push({
+        ...base,
+        kind: "text",
+        value: field.getText() ?? "",
+        multiline: field.isMultiline(),
+      });
+    } else if (field instanceof PDFCheckBox) {
+      infos.push({ ...base, kind: "checkbox", value: field.isChecked() });
+    } else if (field instanceof PDFRadioGroup) {
+      infos.push({
+        ...base,
+        kind: "radio",
+        value: field.getSelected() ?? "",
+        options: field.getOptions(),
+      });
+    } else if (field instanceof PDFDropdown) {
+      infos.push({
+        ...base,
+        kind: "dropdown",
+        value: field.getSelected()[0] ?? "",
+        options: field.getOptions(),
+      });
+    } else if (field instanceof PDFOptionList) {
+      infos.push({
+        ...base,
+        kind: "optionlist",
+        value: field.getSelected()[0] ?? "",
+        options: field.getOptions(),
+      });
+    }
+    // Buttons and signature fields aren't fillable — skipped.
+  }
+  return infos;
+}
+
+/**
+ * Write values into the form. With `flatten` the fields are stamped into the
+ * page content and removed, so the result prints exactly as filled and can't
+ * be edited (or have its values quietly changed) afterwards.
+ */
+export async function fillForm(
+  bytes: Uint8Array,
+  values: FormValues,
+  flatten: boolean,
+): Promise<Uint8Array> {
+  const doc = await loadPdf(bytes);
+  const form = doc.getForm();
+  // Appearance streams need a font that can encode every typed value.
+  const typed = Object.values(values).filter((v): v is string => typeof v === "string");
+  const font = await embedTextFont(doc, typed.join(""));
+
+  for (const [name, value] of Object.entries(values)) {
+    const field = form.getField(name);
+    if (field.isReadOnly()) continue;
+    if (field instanceof PDFTextField) {
+      field.setText(typeof value === "string" ? value : "");
+    } else if (field instanceof PDFCheckBox) {
+      if (value) field.check();
+      else field.uncheck();
+    } else if (
+      field instanceof PDFRadioGroup ||
+      field instanceof PDFDropdown ||
+      field instanceof PDFOptionList
+    ) {
+      // Selecting "" throws; an unset choice simply stays unset.
+      if (typeof value === "string" && value) field.select(value);
+    }
+  }
+
+  form.updateFieldAppearances(font);
+  // flatten() would regenerate appearances with the default (WinAnsi-only)
+  // font and throw on Unicode values — ours are already up to date.
+  if (flatten) form.flatten({ updateFieldAppearances: false });
+  return doc.save();
 }
 
 // ---------------------------------------------------------------- Metadata

@@ -45,4 +45,24 @@ await makePdf("big.pdf", "Big Doc", 5);
   writeFileSync(join(FIX, "rotated.pdf"), await doc.save());
 }
 
+// A form with one field of each fillable kind, for the Fill Forms tool.
+{
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([595, 842]);
+  page.drawText("Application form", { x: 60, y: 770, size: 24, font });
+  const form = doc.getForm();
+  const name = form.createTextField("Full Name");
+  name.addToPage(page, { x: 60, y: 700, width: 220, height: 24 });
+  const agree = form.createCheckBox("Agree");
+  agree.addToPage(page, { x: 60, y: 650, width: 18, height: 18 });
+  const color = form.createRadioGroup("Color");
+  color.addOptionToPage("Red", page, { x: 60, y: 600, width: 18, height: 18 });
+  color.addOptionToPage("Blue", page, { x: 120, y: 600, width: 18, height: 18 });
+  const country = form.createDropdown("Country");
+  country.addOptions(["Türkiye", "Germany", "Spain"]);
+  country.addToPage(page, { x: 60, y: 550, width: 160, height: 22 });
+  writeFileSync(join(FIX, "form.pdf"), await doc.save());
+}
+
 console.log("fixtures written to", FIX);

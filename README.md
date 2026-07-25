@@ -14,7 +14,7 @@ no file-size limits to enforce, and nothing sensitive ever leaves the device.
 | Organize | Merge · Split (ranges / extract / every page) · Organize (drag-reorder, rotate, delete pages) · Rotate |
 | Optimize | Compress (3 presets, re-renders pages as JPEG) · Batch (compress/rotate/watermark many files → ZIP) · Compare (visual page-by-page diff) |
 | Convert  | PDF → PNG/JPG images · JPG/PNG/WebP/GIF/BMP images → PDF |
-| Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Text watermark · Page numbers (live position preview) · Metadata editor |
+| Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Fill Forms (AcroForm fields, optional flattening) · Text watermark · Page numbers (live position preview) · Metadata editor |
 | Security | Redact (destroys the content, not just covers it) · Protect (AES password encryption) · Unlock (remove a known password) |
 
 Available in English, Türkçe, Deutsch, Español and Français. Files you open are
@@ -93,8 +93,12 @@ Pages on first run). Two details worth knowing:
 - The site is served under a subpath (`/<repo-name>/`), so the workflow sets
   `BASE_PATH` at build time; Vite bakes it into asset URLs and the router
   picks it up via `import.meta.env.BASE_URL`.
-- GitHub Pages has no SPA rewrites, so the workflow copies `index.html` to
-  `404.html` — deep links like `/merge` load the app through the 404 page and
+- The build prerenders one real HTML file per tool (`scripts/prerender.mjs`):
+  `/merge/`, `/compress/` etc. are directly servable URLs with their own
+  title, meta description, canonical and Open Graph tags, listed in a
+  generated `sitemap.xml` — so tool pages are indexable, not soft-404s.
+- GitHub Pages has no SPA rewrites, so the workflow also copies `index.html`
+  to `404.html` — remaining deep links load the app through the 404 page and
   the router takes over.
 
 ## Notes & known trade-offs

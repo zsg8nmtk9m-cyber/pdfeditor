@@ -87,6 +87,12 @@ export const fr: Dict = {
       description:
         "Dessinez ou tapez votre signature, placez-la où vous voulez et ajoutez des notes de texte sur n'importe quelle page. Tout est intégré au PDF — aucun lecteur spécial requis.",
     },
+    "fill-forms": {
+      name: "Remplir un formulaire",
+      tagline: "Remplissez vos formulaires sans imprimer",
+      description:
+        "Détecte tous les champs remplissables d'un formulaire PDF : saisissez vos réponses et téléchargez le document rempli — aplati si vous le souhaitez, pour que les entrées ne puissent plus être modifiées.",
+    },
     watermark: {
       name: "Filigrane",
       tagline: "Apposez un texte sur chaque page",
@@ -331,6 +337,19 @@ export const fr: Dict = {
     resizeAria: "Redimensionner la signature",
     renderFailed: "Impossible d'afficher cette page.",
     failed: "Impossible d'appliquer les modifications.",
+  },
+  fillForms: {
+    fieldsFound: (n: number, name: string) =>
+      `${n} champ${n === 1 ? "" : "s"} remplissable${n === 1 ? "" : "s"} dans ${name}`,
+    noFields:
+      "Ce PDF ne contient aucun champ de formulaire remplissable. S'il s'agit d'un formulaire scanné ou plat, vous pouvez écrire dessus avec Signer et annoter.",
+    goAnnotate: "Ouvrir dans Signer et annoter",
+    noSelection: "— aucune sélection —",
+    flattenLabel: "Aplatir le formulaire",
+    flattenHint:
+      "Fige les valeurs saisies dans la page : elles s'impriment partout et ne peuvent plus être modifiées ensuite.",
+    action: "Remplir le formulaire",
+    failed: "Impossible de remplir ce formulaire.",
   },
   signature: {
     title: "Ajoutez votre signature",

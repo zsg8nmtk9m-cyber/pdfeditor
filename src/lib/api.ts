@@ -10,6 +10,8 @@ import type {
   ComparePage,
   CompressOptions,
   DocSummary,
+  FormFieldInfo,
+  FormValues,
   ImagesToPdfOptions,
   PageEdit,
   PageImage,
@@ -107,6 +109,12 @@ export const readMetadata = (bytes: Uint8Array) => call<PdfMetadata>("metadataRe
 
 export const writeMetadata = (bytes: Uint8Array, meta: PdfMetadata) =>
   call<Uint8Array>("metadataWrite", [bytes, meta]);
+
+export const readFormFields = (bytes: Uint8Array) =>
+  call<FormFieldInfo[]>("formFields", [bytes]);
+
+export const fillForm = (bytes: Uint8Array, values: FormValues, flatten: boolean) =>
+  call<Uint8Array>("formFill", [bytes, values, flatten]);
 
 export const imagesToPdf = (
   files: File[],

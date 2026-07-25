@@ -6,7 +6,7 @@ product's whole differentiator — protect it in every decision.
 
 - Live: https://zsg8nmtk9m-cyber.github.io/pdfeditor/
 - Branch: `claude/pdf-tools-web-app-yyx410` (this is the default branch)
-- 16 tools, 5 languages, 47 e2e checks green in CI.
+- 17 tools, 5 languages, 57 e2e checks green in CI.
 
 ## Commands
 
@@ -43,6 +43,7 @@ src/
   tools.ts              # registry: id, path, icon, category, accepts, multi
   components/           # Dropzone, PageGrid, ResultPanel, FileSummary, ui kit
   pages/tools/          # one thin page per tool
+scripts/prerender.mjs   # post-build SEO: per-tool HTML + sitemap + robots
 tests/e2e.mjs           # the suite
 ```
 
@@ -62,6 +63,8 @@ libraries into the main bundle; that is why the main chunk is ~100 KB gzipped.
 6. `pages/tools/<Name>.tsx` + a route in `App.tsx`.
 7. Add an e2e check that verifies the **output**, not just the UI.
 8. Update the tool count assertion in `tests/e2e.mjs` ("N tool cards").
+9. `scripts/prerender.mjs` — add SEO title/description to `TOOL_META`. The
+   build fails if the registry and `TOOL_META` drift apart.
 
 ## Hard-won details (do not regress these)
 
@@ -106,12 +109,14 @@ hooks or DOM-state waits (`waitForFunction`) over ambiguous text.
 2. **PDF → Word/Office** — the one thing that is genuinely hard client-side.
    Don't ship a bad fake; this is the natural first *paid*, server-side feature.
 3. **PWA / offline install** — the logical endpoint of "never leaves your device".
-4. **SEO** — deep links currently 404 (GitHub Pages serves `404.html` as the SPA
-   fallback), so tool pages can't rank. Prerender one real HTML file per tool
-   with its own title/meta, or move to a host with SPA rewrites (Cloudflare
-   Pages also allows a private repo).
-5. Form filling (pdf-lib has AcroForm support), crop, dark mode, mobile touch
-   drag for Organize/Annotate, undo in editors.
+4. **SEO follow-ups** — per-tool prerender + sitemap shipped
+   (`scripts/prerender.mjs`); still open: localized pages/hreflang, and real
+   on-page content (FAQ/how-to per tool) so the pages rank for more than the
+   title tag.
+5. Crop, dark mode, mobile touch drag for Organize/Annotate, undo in editors.
+
+Shipped from earlier roadmaps: form filling (Fill Forms tool, AcroForm via
+pdf-lib), per-tool SEO prerender.
 
 ## Product notes
 

@@ -28,6 +28,8 @@ const handlers: Record<string, (...args: any[]) => Promise<unknown>> = {
   isEncrypted: ops.isEncrypted,
   metadataRead: ops.readMetadata,
   metadataWrite: ops.writeMetadata,
+  formFields: ops.readFormFields,
+  formFill: ops.fillForm,
   // Progress-aware operations (callback arrives as the trailing argument).
   imagesToPdf: ops.imagesToPdf,
   compress: ops.compressPdf,

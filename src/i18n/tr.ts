@@ -87,6 +87,12 @@ export const tr: Dict = {
       description:
         "İmzanızı çizin veya yazın, istediğiniz yere yerleştirin ve sayfalara metin notları ekleyin. Her şey PDF'in içine işlenir — özel bir okuyucu gerekmez.",
     },
+    "fill-forms": {
+      name: "PDF Formu Doldur",
+      tagline: "Formları yazdırmadan doldurun",
+      description:
+        "PDF formundaki doldurulabilir alanları algılayın, yanıtlarınızı yazın ve doldurulmuş belgeyi indirin — isterseniz girişler değiştirilemesin diye düzleştirilmiş olarak.",
+    },
     watermark: {
       name: "Filigran",
       tagline: "Her sayfaya metin damgası vurun",
@@ -330,6 +336,19 @@ export const tr: Dict = {
     resizeAria: "İmzayı yeniden boyutlandır",
     renderFailed: "Bu sayfa görüntülenemedi.",
     failed: "Değişiklikler uygulanamadı.",
+  },
+  fillForms: {
+    fieldsFound: (n: number, name: string) =>
+      `${name} içinde ${n} doldurulabilir alan bulundu`,
+    noFields:
+      "Bu PDF'te doldurulabilir form alanı yok. Taranmış veya düz bir formsa, İmzala ve Not Ekle ile üzerine yazabilirsiniz.",
+    goAnnotate: "İmzala ve Not Ekle'de aç",
+    noSelection: "— seçim yok —",
+    flattenLabel: "Formu düzleştir",
+    flattenHint:
+      "Doldurulan değerleri sayfaya sabitler; her yerde aynı görünür ve sonradan değiştirilemez.",
+    action: "Formu doldur",
+    failed: "Bu form doldurulamadı.",
   },
   signature: {
     title: "İmzanızı ekleyin",

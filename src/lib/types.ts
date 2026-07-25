@@ -158,6 +158,26 @@ export interface PageImage {
   heightPts: number;
 }
 
+// ---------------------------------------------------------------- Forms
+
+export type FormFieldKind = "text" | "checkbox" | "radio" | "dropdown" | "optionlist";
+
+/** A fillable AcroForm field, described for the UI. */
+export interface FormFieldInfo {
+  /** Fully qualified field name — the key used when filling. */
+  name: string;
+  kind: FormFieldKind;
+  /** Current value: text for text/choice fields, checked state for checkboxes. */
+  value: string | boolean;
+  /** Selectable options (radio groups, dropdowns, option lists). */
+  options?: string[];
+  multiline?: boolean;
+  readOnly?: boolean;
+}
+
+/** Values to write back, keyed by field name. */
+export type FormValues = Record<string, string | boolean>;
+
 // ---------------------------------------------------------------- Metadata
 
 export interface PdfMetadata {

@@ -90,6 +90,12 @@ export const en = {
       description:
         "Draw or type your signature, place it anywhere, and add text notes to any page. Everything is flattened into the PDF — no special reader needed.",
     },
+    "fill-forms": {
+      name: "Fill PDF Forms",
+      tagline: "Fill out forms without printing",
+      description:
+        "Detect every fillable field in a PDF form, type your answers, and download the filled document — optionally flattened so the entries can't be changed.",
+    },
     watermark: {
       name: "Watermark",
       tagline: "Stamp text over every page",
@@ -331,6 +337,19 @@ export const en = {
     resizeAria: "Resize signature",
     renderFailed: "Could not render this page.",
     failed: "Could not apply the changes.",
+  },
+  fillForms: {
+    fieldsFound: (n: number, name: string) =>
+      `${n} fillable field${n === 1 ? "" : "s"} found in ${name}`,
+    noFields:
+      "This PDF has no fillable form fields. If it's a scanned or flat form, you can still type over it with Sign & Annotate.",
+    goAnnotate: "Open in Sign & Annotate",
+    noSelection: "— no selection —",
+    flattenLabel: "Flatten the form",
+    flattenHint:
+      "Locks the filled values into the page so they print everywhere and can't be edited afterwards.",
+    action: "Fill form",
+    failed: "Could not fill this form.",
   },
   signature: {
     title: "Add your signature",

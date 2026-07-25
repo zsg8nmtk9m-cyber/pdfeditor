@@ -87,6 +87,12 @@ export const de: Dict = {
       description:
         "Zeichnen oder tippen Sie Ihre Unterschrift, platzieren Sie sie beliebig und fügen Sie Textnotizen hinzu. Alles wird fest ins PDF eingebettet — kein spezieller Reader nötig.",
     },
+    "fill-forms": {
+      name: "PDF-Formular ausfüllen",
+      tagline: "Formulare ausfüllen ohne Drucken",
+      description:
+        "Erkennt jedes ausfüllbare Feld eines PDF-Formulars. Tippen Sie Ihre Angaben ein und laden Sie das ausgefüllte Dokument herunter — auf Wunsch geglättet, damit die Einträge nicht mehr geändert werden können.",
+    },
     watermark: {
       name: "Wasserzeichen",
       tagline: "Text über jede Seite stempeln",
@@ -331,6 +337,21 @@ export const de: Dict = {
     resizeAria: "Unterschrift skalieren",
     renderFailed: "Diese Seite konnte nicht gerendert werden.",
     failed: "Die Änderungen konnten nicht angewendet werden.",
+  },
+  fillForms: {
+    fieldsFound: (n: number, name: string) =>
+      n === 1
+        ? `1 ausfüllbares Feld in ${name} gefunden`
+        : `${n} ausfüllbare Felder in ${name} gefunden`,
+    noFields:
+      "Dieses PDF enthält keine ausfüllbaren Formularfelder. Bei einem gescannten oder flachen Formular können Sie stattdessen mit Signieren & Kommentieren darüber schreiben.",
+    goAnnotate: "In Signieren & Kommentieren öffnen",
+    noSelection: "— keine Auswahl —",
+    flattenLabel: "Formular glätten",
+    flattenHint:
+      "Fixiert die eingetragenen Werte auf der Seite — sie werden überall gedruckt und lassen sich nachträglich nicht mehr ändern.",
+    action: "Formular ausfüllen",
+    failed: "Dieses Formular konnte nicht ausgefüllt werden.",
   },
   signature: {
     title: "Ihre Unterschrift",
