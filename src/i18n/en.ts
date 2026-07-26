@@ -96,6 +96,12 @@ export const en = {
       description:
         "Detect every fillable field in a PDF form, type your answers, and download the filled document — optionally flattened so the entries can't be changed.",
     },
+    crop: {
+      name: "Crop PDF",
+      tagline: "Trim margins or keep an area",
+      description:
+        "Draw the area you want to keep and trim everything outside it — on every page or just one. Great for cutting margins off scans and slides.",
+    },
     watermark: {
       name: "Watermark",
       tagline: "Stamp text over every page",
@@ -145,6 +151,8 @@ export const en = {
     clear: "Clear",
     close: "Close",
     delete: "Delete",
+    undo: "Undo",
+    redo: "Redo",
     preview: "Preview",
     pages: (n: number) => `${n} page${n === 1 ? "" : "s"}`,
     pagesDot: (n: number) => `${n} page${n === 1 ? "" : "s"} · `,
@@ -337,6 +345,16 @@ export const en = {
     resizeAria: "Resize signature",
     renderFailed: "Could not render this page.",
     failed: "Could not apply the changes.",
+  },
+  crop: {
+    instruction: "Drag on the page to choose the area to keep.",
+    selection: (w: number, h: number) => `Keeping ${w} × ${h} pt`,
+    allPages: "All pages",
+    thisPage: "Only this page",
+    clear: "Clear selection",
+    action: "Crop PDF",
+    note: "Cropping changes the visible page area — content outside it is hidden, not deleted. To permanently remove sensitive content, use Redact.",
+    failed: "Cropping failed.",
   },
   fillForms: {
     fieldsFound: (n: number, name: string) =>

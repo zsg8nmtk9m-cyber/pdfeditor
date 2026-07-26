@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Combine,
+  Crop,
   Scissors,
   LayoutGrid,
   RotateCw,
@@ -32,6 +33,7 @@ export type ToolId =
   | "images-to-pdf"
   | "annotate"
   | "fill-forms"
+  | "crop"
   | "watermark"
   | "page-numbers"
   | "metadata"
@@ -69,6 +71,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "images-to-pdf", path: "/images-to-pdf", icon: FileImage, category: "Convert", accent: "bg-orange-100 text-orange-600", accepts: "image", multi: true },
   { id: "annotate", path: "/annotate", icon: PenLine, category: "Edit", accent: "bg-lime-100 text-lime-600", accepts: "pdf" },
   { id: "fill-forms", path: "/fill-forms", icon: TextCursorInput, category: "Edit", accent: "bg-purple-100 text-purple-600", accepts: "pdf" },
+  { id: "crop", path: "/crop", icon: Crop, category: "Edit", accent: "bg-yellow-100 text-yellow-700", accepts: "pdf" },
   { id: "watermark", path: "/watermark", icon: Stamp, category: "Edit", accent: "bg-rose-100 text-rose-600", accepts: "pdf" },
   { id: "page-numbers", path: "/page-numbers", icon: ListOrdered, category: "Edit", accent: "bg-fuchsia-100 text-fuchsia-600", accepts: "pdf" },
   { id: "metadata", path: "/metadata", icon: FileCog, category: "Edit", accent: "bg-slate-200 text-slate-600", accepts: "pdf" },

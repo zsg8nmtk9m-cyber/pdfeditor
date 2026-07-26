@@ -9,6 +9,7 @@ import type {
   AnnotationElement,
   ComparePage,
   CompressOptions,
+  CropArea,
   DocSummary,
   FormFieldInfo,
   FormValues,
@@ -109,6 +110,9 @@ export const readMetadata = (bytes: Uint8Array) => call<PdfMetadata>("metadataRe
 
 export const writeMetadata = (bytes: Uint8Array, meta: PdfMetadata) =>
   call<Uint8Array>("metadataWrite", [bytes, meta]);
+
+export const cropPdf = (bytes: Uint8Array, area: CropArea, pageIndices?: number[]) =>
+  call<Uint8Array>("crop", [bytes, area, pageIndices]);
 
 export const readFormFields = (bytes: Uint8Array) =>
   call<FormFieldInfo[]>("formFields", [bytes]);

@@ -30,6 +30,7 @@ const handlers: Record<string, (...args: any[]) => Promise<unknown>> = {
   metadataWrite: ops.writeMetadata,
   formFields: ops.readFormFields,
   formFill: ops.fillForm,
+  crop: ops.cropPdf,
   // Progress-aware operations (callback arrives as the trailing argument).
   imagesToPdf: ops.imagesToPdf,
   compress: ops.compressPdf,

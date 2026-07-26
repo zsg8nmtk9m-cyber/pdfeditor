@@ -109,14 +109,24 @@ the loop."** That single line restores full context and authority.
 
 ## Backlog (priority order — Claude may reorder with a note in the log)
 
-1. Localized prerendered pages + hreflang + localized meta (traffic
-   multiplier on work already done; cheapest big win).
-2. Per-tool FAQ/how-to content blocks, EN + 4 languages.
-3. Privacy policy + terms pages (AdSense prerequisite; trust win now).
-4. OCR tool — tesseract.js in the worker, lazy WASM, e2e on real scan.
-5. PWA/offline install (retention; completes the privacy story).
-6. Fake-door waitlist for PDF→Word (Phase 2 demand test).
-7. Crop tool, dark mode, editor undo, mobile drag (UX depth).
+Product-quality phase (owner directive 2026-07-26: finish the product
+before launch; SEO/domain/monetization start in the next phase):
+
+1. ~~Crop tool~~ shipped 2026-07-26.
+2. ~~Undo/redo in the Annotate and Redact editors~~ shipped 2026-07-26.
+3. Dark mode (full session — do it completely or not at all).
+4. Mobile touch drag for Organize/Annotate.
+5. PWA/offline install (completes the privacy story; mind SW cache
+   versioning so deploys never go stale).
+6. OCR tool — tesseract.js in the worker, lazy WASM (owner deprioritized;
+   revisit after the above).
+
+Launch phase (deferred until owner declares the product ready):
+
+7. Localized prerendered pages + hreflang + localized meta.
+8. Per-tool FAQ/how-to content blocks, EN + 4 languages.
+9. Privacy policy + terms pages (AdSense prerequisite).
+10. Fake-door waitlist for PDF→Word (Phase 2 demand test).
 
 ## Decision log
 
@@ -127,3 +137,11 @@ the loop."** That single line restores full context and authority.
 - 2026-07-25 — Reprioritized: localized SEO pages + content before OCR
   (better traffic-per-effort; OCR right after). Previous session shipped
   Fill Forms (tool #17) + per-tool SEO prerender/sitemap, 57 e2e checks.
+- 2026-07-26 — OWNER DIRECTIVE: product quality before launch. Domain/SEO/
+  monetization deferred to a later phase; OCR explicitly deprioritized.
+  Backlog restructured into product-quality phase vs. launch phase. The
+  owner will still buy the domain meanwhile (unblocks nothing until launch
+  phase, but locks the name).
+- 2026-07-26 — Shipped Crop (tool #18: display-space rect → CropBox+MediaBox,
+  all-pages or single-page) and undo/redo in Annotate + Redact
+  (hooks/useHistory.ts). Suite now 64 checks. Next per backlog: dark mode.

@@ -67,7 +67,7 @@ page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 console.log("home");
 await page.goto(BASE);
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("17 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 17);
+check("18 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 18);
 
 // ---------- prerendered SEO pages ----------
 console.log("seo");
@@ -365,6 +365,21 @@ await page.mouse.move(box.x + 380, box.y + 110, { steps: 10 });
 await page.mouse.up();
 await page.getByRole("button", { name: "Use signature" }).click();
 check("signature element placed", await page.locator("img[alt='Signature']").isVisible());
+// Undo removes the signature (one step per action), redo restores it.
+await page.keyboard.press("ControlOrMeta+z");
+await page.waitForFunction(
+  () => document.querySelectorAll("img[alt='Signature']").length === 0,
+  null,
+  { timeout: 5000 },
+);
+check("undo removes the signature", true);
+check(
+  "undo leaves the earlier text element alone",
+  (await page.locator("[data-annot='text']").textContent()) === "APPROVED BY QA",
+);
+await page.keyboard.press("ControlOrMeta+Shift+z");
+await page.locator("img[alt='Signature']").waitFor({ timeout: 5000 });
+check("redo restores the signature", true);
 await page.getByRole("button", { name: "Apply & download" }).click();
 await page.getByText("Done!").waitFor({ timeout: 30000 });
 out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "signed.pdf");
@@ -466,6 +481,13 @@ await surface.waitFor({ timeout: 30000 });
   await page.mouse.down();
   await page.mouse.move(box.x + box.width - 10, box.y + 70, { steps: 10 });
   await page.mouse.up();
+  // Undo removes the drawn box; redo (Ctrl+Y variant) restores it.
+  await page.keyboard.press("ControlOrMeta+z");
+  await page.getByRole("button", { name: "Redact 0 areas" }).waitFor({ timeout: 5000 });
+  check("undo removes the drawn redaction box", true);
+  await page.keyboard.press("ControlOrMeta+y");
+  await page.getByRole("button", { name: "Redact 1 area", exact: true }).waitFor({ timeout: 5000 });
+  check("redo restores the redaction box", true);
   await page.getByRole("button", { name: /Redact 1 area/ }).click();
   await page.getByText("Done!").waitFor({ timeout: 60000 });
   out = await grabDownload(
@@ -541,6 +563,64 @@ out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).
   check(
     "flattened value is page content (extractable text)",
     items.some((it) => it.str.includes("FLAT TEST")),
+  );
+}
+
+// ---------- crop (boxes must land at exact PDF coordinates) ----------
+console.log("crop");
+await page.goto(BASE + "/crop");
+await page.locator("input[type=file]").setInputFiles(join(FIX, "big.pdf"));
+{
+  const surface = page.getByTestId("crop-surface");
+  await surface.waitFor({ timeout: 30000 });
+  const box = await surface.boundingBox();
+  // big.pdf pages are 595x842 pts; the surface is scaled uniformly.
+  const s = box.width / 595;
+  // Keep x 50..400, y 100..500 (display pts, y down) -> PDF MediaBox
+  // [50, 842-500, 400, 842-100] = x 50, y 342, w 350, h 400.
+  await page.mouse.move(box.x + 50 * s, box.y + 100 * s);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 400 * s, box.y + 500 * s, { steps: 10 });
+  await page.mouse.up();
+  await page.getByRole("button", { name: "Crop PDF" }).click();
+  await page.getByText("Done!").waitFor({ timeout: 30000 });
+  out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "cropped.pdf");
+  const doc = await PDFDocument.load(readFileSync(out));
+  const boxesOk = doc.getPages().every((p) => {
+    const mb = p.getMediaBox();
+    const cb = p.getCropBox();
+    return (
+      near(mb.x, 50) && near(mb.y, 342) && near(mb.width, 350) && near(mb.height, 400) &&
+      near(cb.x, 50) && near(cb.y, 342) && near(cb.width, 350) && near(cb.height, 400)
+    );
+  });
+  check("all 5 pages cropped to the exact drawn area", doc.getPageCount() === 5 && boxesOk);
+}
+
+// ---------- crop: only the current page ----------
+console.log("crop (single page)");
+await page.getByRole("button", { name: "Start over" }).click();
+await page.locator("input[type=file]").setInputFiles(join(FIX, "big.pdf"));
+{
+  const surface = page.getByTestId("crop-surface");
+  await surface.waitFor({ timeout: 30000 });
+  const box = await surface.boundingBox();
+  const s = box.width / 595;
+  await page.mouse.move(box.x + 50 * s, box.y + 100 * s);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 400 * s, box.y + 500 * s, { steps: 10 });
+  await page.mouse.up();
+  await page.getByRole("radio", { name: "Only this page" }).check();
+  await page.getByRole("button", { name: "Crop PDF" }).click();
+  await page.getByText("Done!").waitFor({ timeout: 30000 });
+  out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "cropped-p1.pdf");
+  const doc = await PDFDocument.load(readFileSync(out));
+  const p1 = doc.getPage(0).getMediaBox();
+  const p2 = doc.getPage(1).getMediaBox();
+  check(
+    "single-page crop leaves the other pages untouched",
+    near(p1.width, 350) && near(p1.height, 400) &&
+      near(p2.width, 595) && near(p2.height, 842),
   );
 }
 

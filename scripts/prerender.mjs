@@ -88,6 +88,11 @@ const TOOL_META = {
     description:
       "Fill out PDF form fields in your browser and download the completed document, optionally flattened. Free and 100% private — no uploads.",
   },
+  crop: {
+    title: "Crop PDF Online Free — Trim Margins | PDF Toolbox",
+    description:
+      "Trim margins or crop any area of a PDF — on every page or just one — right in your browser. Free and private: files never leave your device.",
+  },
   watermark: {
     title: "Add Watermark to PDF Free | PDF Toolbox",
     description:

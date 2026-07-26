@@ -150,6 +150,19 @@ export interface RedactionRect {
   h: number;
 }
 
+// ---------------------------------------------------------------- Crop
+
+/**
+ * The area to KEEP, in the same DISPLAY space as RedactionRect (page as
+ * pdf.js renders it, origin top-left, y down, points).
+ */
+export interface CropArea {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
 /** A single page rendered for the editor. */
 export interface PageImage {
   dataUrl: string;

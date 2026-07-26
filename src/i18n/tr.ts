@@ -93,6 +93,12 @@ export const tr: Dict = {
       description:
         "PDF formundaki doldurulabilir alanları algılayın, yanıtlarınızı yazın ve doldurulmuş belgeyi indirin — isterseniz girişler değiştirilemesin diye düzleştirilmiş olarak.",
     },
+    crop: {
+      name: "PDF Kırp",
+      tagline: "Kenar boşluklarını kesin",
+      description:
+        "Tutmak istediğiniz alanı çizin, dışında kalan her şey kırpılsın — tüm sayfalarda veya yalnızca birinde. Taramaların ve slaytların kenar boşluklarını kesmek için idealdir.",
+    },
     watermark: {
       name: "Filigran",
       tagline: "Her sayfaya metin damgası vurun",
@@ -142,6 +148,8 @@ export const tr: Dict = {
     clear: "Temizle",
     close: "Kapat",
     delete: "Sil",
+    undo: "Geri al",
+    redo: "Yinele",
     preview: "Önizleme",
     pages: (n: number) => `${n} sayfa`,
     pagesDot: (n: number) => `${n} sayfa · `,
@@ -336,6 +344,16 @@ export const tr: Dict = {
     resizeAria: "İmzayı yeniden boyutlandır",
     renderFailed: "Bu sayfa görüntülenemedi.",
     failed: "Değişiklikler uygulanamadı.",
+  },
+  crop: {
+    instruction: "Tutulacak alanı seçmek için sayfa üzerinde sürükleyin.",
+    selection: (w: number, h: number) => `${w} × ${h} pt tutuluyor`,
+    allPages: "Tüm sayfalar",
+    thisPage: "Yalnızca bu sayfa",
+    clear: "Seçimi temizle",
+    action: "PDF'i Kırp",
+    note: "Kırpma yalnızca görünen sayfa alanını değiştirir — dışarıda kalan içerik silinmez, gizlenir. Hassas içeriği kalıcı olarak kaldırmak için PDF Karart aracını kullanın.",
+    failed: "Kırpma başarısız oldu.",
   },
   fillForms: {
     fieldsFound: (n: number, name: string) =>

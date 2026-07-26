@@ -20,6 +20,7 @@ import type {
   AnnotationElement,
   ComparePage,
   CompressOptions,
+  CropArea,
   FormFieldInfo,
   FormValues,
   ImagesToPdfOptions,
@@ -641,6 +642,43 @@ export async function redactPdf(
   } finally {
     await pdf.destroy();
   }
+}
+
+// ---------------------------------------------------------------- Crop
+
+/**
+ * Crop pages to the given display-space area by shrinking both the CropBox
+ * and the MediaBox, so every viewer shows only the kept region. The content
+ * outside is hidden, not deleted (the UI says so and points to Redact for
+ * removal). The same display rect is applied to each target page, clamped
+ * to that page's own bounds; `displayToPdf` handles /Rotate pages.
+ */
+export async function cropPdf(
+  srcBytes: Uint8Array,
+  area: CropArea,
+  pageIndices?: number[],
+): Promise<Uint8Array> {
+  const doc = await loadPdf(srcBytes);
+  const targets = pageIndices ?? doc.getPageIndices();
+  for (const i of targets) {
+    const page = doc.getPage(i);
+    const { width: W, height: H } = page.getSize();
+    const R = ((page.getRotation().angle % 360) + 360) % 360;
+    // Map two opposite corners and take the bounding box — rotation can
+    // swap which corner is "lower left" in PDF space.
+    const a = displayToPdf(R, W, H, area.x, area.y);
+    const b = displayToPdf(R, W, H, area.x + area.w, area.y + area.h);
+    const mb = page.getMediaBox();
+    const x0 = Math.max(Math.min(a.x, b.x), 0);
+    const y0 = Math.max(Math.min(a.y, b.y), 0);
+    const x1 = Math.min(Math.max(a.x, b.x), W);
+    const y1 = Math.min(Math.max(a.y, b.y), H);
+    // A selection entirely off this page (smaller/odd-sized page) is skipped.
+    if (x1 - x0 < 1 || y1 - y0 < 1) continue;
+    page.setMediaBox(mb.x + x0, mb.y + y0, x1 - x0, y1 - y0);
+    page.setCropBox(mb.x + x0, mb.y + y0, x1 - x0, y1 - y0);
+  }
+  return doc.save();
 }
 
 // ---------------------------------------------------------------- Protect / unlock

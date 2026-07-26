@@ -14,7 +14,7 @@ no file-size limits to enforce, and nothing sensitive ever leaves the device.
 | Organize | Merge · Split (ranges / extract / every page) · Organize (drag-reorder, rotate, delete pages) · Rotate |
 | Optimize | Compress (3 presets, re-renders pages as JPEG) · Batch (compress/rotate/watermark many files → ZIP) · Compare (visual page-by-page diff) |
 | Convert  | PDF → PNG/JPG images · JPG/PNG/WebP/GIF/BMP images → PDF |
-| Edit     | Sign & Annotate (drawn/typed signatures, text notes) · Fill Forms (AcroForm fields, optional flattening) · Text watermark · Page numbers (live position preview) · Metadata editor |
+| Edit     | Sign & Annotate (drawn/typed signatures, text notes, undo/redo) · Fill Forms (AcroForm fields, optional flattening) · Crop (trim margins, per page or all) · Text watermark · Page numbers (live position preview) · Metadata editor |
 | Security | Redact (destroys the content, not just covers it) · Protect (AES password encryption) · Unlock (remove a known password) |
 
 Available in English, Türkçe, Deutsch, Español and Français. Files you open are

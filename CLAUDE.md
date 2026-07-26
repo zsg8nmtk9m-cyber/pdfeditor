@@ -6,7 +6,7 @@ product's whole differentiator — protect it in every decision.
 
 - Live: https://zsg8nmtk9m-cyber.github.io/pdfeditor/
 - Branch: `claude/pdf-tools-web-app-yyx410` (this is the default branch)
-- 17 tools, 5 languages, 57 e2e checks green in CI.
+- 18 tools, 5 languages, 64 e2e checks green in CI.
 - **Business strategy, revenue plan and the cross-session operating loop
   live in [BUSINESS.md](./BUSINESS.md) — read it first; the owner has
   delegated prioritization to Claude and that file is the standing brief.**
@@ -116,10 +116,11 @@ hooks or DOM-state waits (`waitForFunction`) over ambiguous text.
    (`scripts/prerender.mjs`); still open: localized pages/hreflang, and real
    on-page content (FAQ/how-to per tool) so the pages rank for more than the
    title tag.
-5. Crop, dark mode, mobile touch drag for Organize/Annotate, undo in editors.
+5. Dark mode, mobile touch drag for Organize/Annotate.
 
 Shipped from earlier roadmaps: form filling (Fill Forms tool, AcroForm via
-pdf-lib), per-tool SEO prerender.
+pdf-lib), per-tool SEO prerender, Crop tool, undo/redo in Annotate/Redact
+(`hooks/useHistory.ts` — checkpoint-before-mutate pattern).
 
 ## Product notes
 

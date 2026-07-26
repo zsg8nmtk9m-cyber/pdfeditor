@@ -93,6 +93,12 @@ export const es: Dict = {
       description:
         "Detecta todos los campos rellenables de un formulario PDF, escribe tus respuestas y descarga el documento relleno — opcionalmente aplanado para que las entradas no puedan modificarse.",
     },
+    crop: {
+      name: "Recortar PDF",
+      tagline: "Recorta márgenes o conserva un área",
+      description:
+        "Dibuja el área que quieres conservar y recorta todo lo demás — en todas las páginas o solo en una. Ideal para quitar márgenes de escaneos y diapositivas.",
+    },
     watermark: {
       name: "Marca de agua",
       tagline: "Estampa texto en cada página",
@@ -142,6 +148,8 @@ export const es: Dict = {
     clear: "Limpiar",
     close: "Cerrar",
     delete: "Eliminar",
+    undo: "Deshacer",
+    redo: "Rehacer",
     preview: "Vista previa",
     pages: (n: number) => `${n} página${n === 1 ? "" : "s"}`,
     pagesDot: (n: number) => `${n} página${n === 1 ? "" : "s"} · `,
@@ -337,6 +345,16 @@ export const es: Dict = {
     resizeAria: "Redimensionar firma",
     renderFailed: "No se pudo mostrar esta página.",
     failed: "No se pudieron aplicar los cambios.",
+  },
+  crop: {
+    instruction: "Arrastra sobre la página para elegir el área a conservar.",
+    selection: (w: number, h: number) => `Conservando ${w} × ${h} pt`,
+    allPages: "Todas las páginas",
+    thisPage: "Solo esta página",
+    clear: "Borrar selección",
+    action: "Recortar PDF",
+    note: "El recorte cambia el área visible de la página — el contenido exterior se oculta, no se elimina. Para eliminar contenido sensible de forma permanente, usa Censurar PDF.",
+    failed: "No se pudo recortar.",
   },
   fillForms: {
     fieldsFound: (n: number, name: string) =>

@@ -93,6 +93,12 @@ export const fr: Dict = {
       description:
         "Détecte tous les champs remplissables d'un formulaire PDF : saisissez vos réponses et téléchargez le document rempli — aplati si vous le souhaitez, pour que les entrées ne puissent plus être modifiées.",
     },
+    crop: {
+      name: "Rogner un PDF",
+      tagline: "Coupez les marges ou gardez une zone",
+      description:
+        "Tracez la zone à conserver et coupez tout ce qui l'entoure — sur toutes les pages ou une seule. Idéal pour retirer les marges des scans et des diapositives.",
+    },
     watermark: {
       name: "Filigrane",
       tagline: "Apposez un texte sur chaque page",
@@ -142,6 +148,8 @@ export const fr: Dict = {
     clear: "Effacer",
     close: "Fermer",
     delete: "Supprimer",
+    undo: "Annuler",
+    redo: "Rétablir",
     preview: "Aperçu",
     pages: (n: number) => `${n} page${n === 1 ? "" : "s"}`,
     pagesDot: (n: number) => `${n} page${n === 1 ? "" : "s"} · `,
@@ -337,6 +345,16 @@ export const fr: Dict = {
     resizeAria: "Redimensionner la signature",
     renderFailed: "Impossible d'afficher cette page.",
     failed: "Impossible d'appliquer les modifications.",
+  },
+  crop: {
+    instruction: "Faites glisser sur la page pour choisir la zone à conserver.",
+    selection: (w: number, h: number) => `Zone conservée : ${w} × ${h} pt`,
+    allPages: "Toutes les pages",
+    thisPage: "Seulement cette page",
+    clear: "Effacer la sélection",
+    action: "Rogner le PDF",
+    note: "Le rognage ne change que la zone visible de la page — le contenu extérieur est masqué, pas supprimé. Pour supprimer définitivement un contenu sensible, utilisez Caviarder PDF.",
+    failed: "Le rognage a échoué.",
   },
   fillForms: {
     fieldsFound: (n: number, name: string) =>

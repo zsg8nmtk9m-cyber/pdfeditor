@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Loader2, PenLine, Trash2, Type } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, PenLine, Redo2, Trash2, Type, Undo2 } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import SignatureModal from "../../components/SignatureModal";
@@ -7,6 +7,7 @@ import type { SignatureResult } from "../../components/SignatureModal";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, Select } from "../../components/ui";
 import { errorText, useT } from "../../i18n";
+import { isRedoKey, isUndoKey, useHistory } from "../../hooks/useHistory";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { annotatePdf, renderPageImage } from "../../lib/api";
 import type { AnnotationElement, PageImage } from "../../lib/types";
@@ -26,7 +27,8 @@ export default function Annotate() {
   const pdf = useSinglePdf();
   const [pageIndex, setPageIndex] = useState(0);
   const [pageImage, setPageImage] = useState<PageImage | null>(null);
-  const [elements, setElements] = useState<EditorElement[]>([]);
+  const history = useHistory<EditorElement[]>([]);
+  const { value: elements, set: setElements, checkpoint } = history;
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [signing, setSigning] = useState(false);
@@ -69,19 +71,34 @@ export default function Annotate() {
     }
   }, [editingId]);
 
-  // Delete the selected element with the keyboard.
+  // Delete the selected element / undo / redo with the keyboard. While a
+  // text element is being edited the browser's own editing (and its native
+  // undo) owns the keys.
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (editingId !== null || selectedId === null) return;
+      if (editingId !== null) return;
+      if (isRedoKey(e)) {
+        e.preventDefault();
+        history.redo();
+        return;
+      }
+      if (isUndoKey(e)) {
+        e.preventDefault();
+        history.undo();
+        return;
+      }
+      if (selectedId === null) return;
       if (e.key === "Delete" || e.key === "Backspace") {
         e.preventDefault();
+        checkpoint();
         setElements((prev) => prev.filter((el) => el.id !== selectedId));
         setSelectedId(null);
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [selectedId, editingId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, editingId, history.undo, history.redo, checkpoint, setElements]);
 
   const scale = pageImage ? Math.min(MAX_PAGE_WIDTH / pageImage.widthPts, 1.4) : 1;
   const selected = elements.find((el) => el.id === selectedId) ?? null;
@@ -98,7 +115,11 @@ export default function Annotate() {
   /** Commit the in-progress text edit (if any) into React state. */
   function commitEdit() {
     if (editingId === null) return;
-    update(editingId, { text: editingText.current });
+    const el = elements.find((e) => e.id === editingId);
+    if (el && (el.text ?? "") !== editingText.current) {
+      checkpoint();
+      update(editingId, { text: editingText.current });
+    }
     setEditingId(null);
   }
 
@@ -116,6 +137,7 @@ export default function Annotate() {
       fontSize: 16,
       color: "#111827",
     };
+    checkpoint();
     setElements((prev) => [...prev, el]);
     setSelectedId(el.id);
     startEditing(el);
@@ -135,6 +157,7 @@ export default function Annotate() {
       h,
       imageDataUrl: sig.dataUrl,
     };
+    checkpoint();
     setElements((prev) => [...prev, el]);
     setSelectedId(el.id);
     setSigning(false);
@@ -150,7 +173,13 @@ export default function Annotate() {
     const startY = e.clientY;
     const orig = { x: el.x, y: el.y };
     target.setPointerCapture(e.pointerId);
+    // Record one undo step for the whole drag, and only if it actually moves.
+    let recorded = false;
     const onMove = (ev: PointerEvent) => {
+      if (!recorded) {
+        recorded = true;
+        checkpoint();
+      }
       update(el.id, {
         x: Math.min(Math.max(orig.x + (ev.clientX - startX) / scale, 0), pageImage.widthPts - 24),
         y: Math.min(Math.max(orig.y + (ev.clientY - startY) / scale, 0), pageImage.heightPts - 24),
@@ -168,7 +197,12 @@ export default function Annotate() {
     const startX = e.clientX;
     const orig = { w: el.w, h: el.h };
     target.setPointerCapture(e.pointerId);
+    let recorded = false;
     const onMove = (ev: PointerEvent) => {
+      if (!recorded) {
+        recorded = true;
+        checkpoint();
+      }
       const w = Math.max(24, orig.w + (ev.clientX - startX) / scale);
       update(el.id, { w, h: (w * orig.h) / orig.w });
     };
@@ -206,7 +240,7 @@ export default function Annotate() {
   function reset() {
     pdf.reset();
     setResult(null);
-    setElements([]);
+    history.reset([]);
     setSelectedId(null);
     setEditingId(null);
     setPageIndex(0);
@@ -241,6 +275,28 @@ export default function Annotate() {
               <Button variant="secondary" onClick={() => setSigning(true)}>
                 <PenLine className="h-4 w-4" /> {t.annotate.addSignature}
               </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  className="!px-2.5"
+                  aria-label={t.common.undo}
+                  title={t.common.undo}
+                  disabled={history.canUndo === false || editingId !== null}
+                  onClick={() => history.undo()}
+                >
+                  <Undo2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="!px-2.5"
+                  aria-label={t.common.redo}
+                  title={t.common.redo}
+                  disabled={history.canRedo === false || editingId !== null}
+                  onClick={() => history.redo()}
+                >
+                  <Redo2 className="h-4 w-4" />
+                </Button>
+              </div>
 
               {selected?.kind === "text" && (
                 <>
@@ -248,7 +304,10 @@ export default function Annotate() {
                     aria-label={t.annotate.fontSizeAria}
                     className="!w-28"
                     value={selected.fontSize}
-                    onChange={(e) => update(selected.id, { fontSize: Number(e.target.value) })}
+                    onChange={(e) => {
+                      checkpoint();
+                      update(selected.id, { fontSize: Number(e.target.value) });
+                    }}
                   >
                     {FONT_SIZES.map((s) => (
                       <option key={s} value={s}>
@@ -260,7 +319,10 @@ export default function Annotate() {
                     type="color"
                     aria-label={t.annotate.colorAria}
                     value={selected.color}
-                    onChange={(e) => update(selected.id, { color: e.target.value })}
+                    onChange={(e) => {
+                      checkpoint();
+                      update(selected.id, { color: e.target.value });
+                    }}
                     className="h-9 w-11 cursor-pointer rounded-lg border border-slate-300 bg-white p-1"
                   />
                 </>
@@ -269,6 +331,7 @@ export default function Annotate() {
                 <Button
                   variant="ghost"
                   onClick={() => {
+                    checkpoint();
                     setElements((prev) => prev.filter((el) => el.id !== selected.id));
                     setSelectedId(null);
                   }}

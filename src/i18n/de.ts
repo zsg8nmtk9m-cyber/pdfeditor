@@ -93,6 +93,12 @@ export const de: Dict = {
       description:
         "Erkennt jedes ausfüllbare Feld eines PDF-Formulars. Tippen Sie Ihre Angaben ein und laden Sie das ausgefüllte Dokument herunter — auf Wunsch geglättet, damit die Einträge nicht mehr geändert werden können.",
     },
+    crop: {
+      name: "PDF zuschneiden",
+      tagline: "Ränder kürzen oder Bereich behalten",
+      description:
+        "Ziehen Sie den Bereich auf, den Sie behalten möchten — alles außerhalb wird abgeschnitten, auf allen Seiten oder nur einer. Ideal, um Ränder von Scans und Folien zu entfernen.",
+    },
     watermark: {
       name: "Wasserzeichen",
       tagline: "Text über jede Seite stempeln",
@@ -142,6 +148,8 @@ export const de: Dict = {
     clear: "Leeren",
     close: "Schließen",
     delete: "Löschen",
+    undo: "Rückgängig",
+    redo: "Wiederholen",
     preview: "Vorschau",
     pages: (n: number) => `${n} Seite${n === 1 ? "" : "n"}`,
     pagesDot: (n: number) => `${n} Seite${n === 1 ? "" : "n"} · `,
@@ -337,6 +345,16 @@ export const de: Dict = {
     resizeAria: "Unterschrift skalieren",
     renderFailed: "Diese Seite konnte nicht gerendert werden.",
     failed: "Die Änderungen konnten nicht angewendet werden.",
+  },
+  crop: {
+    instruction: "Ziehen Sie auf der Seite den Bereich auf, der erhalten bleiben soll.",
+    selection: (w: number, h: number) => `${w} × ${h} pt bleiben erhalten`,
+    allPages: "Alle Seiten",
+    thisPage: "Nur diese Seite",
+    clear: "Auswahl aufheben",
+    action: "PDF zuschneiden",
+    note: "Zuschneiden ändert nur den sichtbaren Seitenbereich — Inhalte außerhalb werden verborgen, nicht gelöscht. Sensible Inhalte entfernen Sie dauerhaft mit PDF schwärzen.",
+    failed: "Zuschneiden fehlgeschlagen.",
   },
   fillForms: {
     fieldsFound: (n: number, name: string) =>

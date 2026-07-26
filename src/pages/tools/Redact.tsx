@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, EyeOff, Loader2, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, EyeOff, Loader2, Redo2, Trash2, Undo2 } from "lucide-react";
 import Dropzone from "../../components/Dropzone";
 import ResultPanel from "../../components/ResultPanel";
 import ToolPage from "../../components/ToolPage";
 import { Button, Card, ErrorBox, ProgressBar } from "../../components/ui";
 import { errorText, useT } from "../../i18n";
+import { isRedoKey, isUndoKey, useHistory } from "../../hooks/useHistory";
 import { useSinglePdf } from "../../hooks/useSinglePdf";
 import { redactPdf, renderPageImage } from "../../lib/api";
 import type { PageImage, RedactionRect } from "../../lib/types";
@@ -24,8 +25,13 @@ export default function Redact() {
   const pdf = useSinglePdf();
   const [pageIndex, setPageIndex] = useState(0);
   const [pageImage, setPageImage] = useState<PageImage | null>(null);
-  const [boxes, setBoxes] = useState<Box[]>([]);
+  const history = useHistory<Box[]>([]);
+  const { value: boxes, set: setBoxes, checkpoint } = history;
   const [draft, setDraft] = useState<Box | null>(null);
+  // Mirror of `draft` readable from pointer-event closures without going
+  // through a state updater (side effects in updaters break under
+  // StrictMode's double-invocation).
+  const draftRef = useRef<Box | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<OutputFile | null>(null);
@@ -70,23 +76,26 @@ export default function Redact() {
       const rect = surfaceRef.current!.getBoundingClientRect();
       const cx = Math.min(Math.max((ev.clientX - rect.left) / scale, 0), pageImage.widthPts);
       const cy = Math.min(Math.max((ev.clientY - rect.top) / scale, 0), pageImage.heightPts);
-      setDraft({
+      const d: Box = {
         id: -1,
         pageIndex,
         x: Math.min(origin.x, cx),
         y: Math.min(origin.y, cy),
         w: Math.abs(cx - origin.x),
         h: Math.abs(cy - origin.y),
-      });
+      };
+      draftRef.current = d;
+      setDraft(d);
     };
     const onUp = () => {
       surface.removeEventListener("pointermove", onMove);
-      setDraft((d) => {
-        if (d && d.w >= MIN_BOX_PTS && d.h >= MIN_BOX_PTS) {
-          setBoxes((prev) => [...prev, { ...d, id: nextId.current++ }]);
-        }
-        return null;
-      });
+      const d = draftRef.current;
+      draftRef.current = null;
+      setDraft(null);
+      if (d && d.w >= MIN_BOX_PTS && d.h >= MIN_BOX_PTS) {
+        checkpoint();
+        setBoxes((prev) => [...prev, { ...d, id: nextId.current++ }]);
+      }
     };
     surface.addEventListener("pointermove", onMove);
     surface.addEventListener("pointerup", onUp, { once: true });
@@ -112,11 +121,27 @@ export default function Redact() {
     }
   }
 
+  // Undo / redo with the keyboard.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (isRedoKey(e)) {
+        e.preventDefault();
+        history.redo();
+      } else if (isUndoKey(e)) {
+        e.preventDefault();
+        history.undo();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [history.undo, history.redo]);
+
   function reset() {
     pdf.reset();
     setResult(null);
-    setBoxes([]);
+    history.reset([]);
     setDraft(null);
+    draftRef.current = null;
     setPageIndex(0);
   }
 
@@ -147,8 +172,36 @@ export default function Redact() {
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-sm text-slate-600">{t.redact.instruction}</p>
               <div className="ml-auto flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    className="!px-2.5"
+                    aria-label={t.common.undo}
+                    title={t.common.undo}
+                    disabled={!history.canUndo}
+                    onClick={() => history.undo()}
+                  >
+                    <Undo2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="!px-2.5"
+                    aria-label={t.common.redo}
+                    title={t.common.redo}
+                    disabled={!history.canRedo}
+                    onClick={() => history.redo()}
+                  >
+                    <Redo2 className="h-4 w-4" />
+                  </Button>
+                </div>
                 {boxes.length > 0 && (
-                  <Button variant="ghost" onClick={() => setBoxes([])}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      checkpoint();
+                      setBoxes([]);
+                    }}
+                  >
                     <Trash2 className="h-4 w-4" /> {t.redact.clearAll}
                   </Button>
                 )}
@@ -208,7 +261,10 @@ export default function Redact() {
                       <button
                         aria-label={t.redact.removeBox}
                         onPointerDown={(e) => e.stopPropagation()}
-                        onClick={() => setBoxes((prev) => prev.filter((x) => x.id !== b.id))}
+                        onClick={() => {
+                          checkpoint();
+                          setBoxes((prev) => prev.filter((x) => x.id !== b.id));
+                        }}
                         className="absolute -right-2 -top-2 rounded-full bg-white p-0.5 text-slate-500 shadow ring-1 ring-slate-300 hover:text-rose-600"
                       >
                         <Trash2 className="h-3 w-3" />
