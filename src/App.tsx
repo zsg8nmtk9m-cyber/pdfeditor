@@ -21,13 +21,14 @@ import Redact from "./pages/tools/Redact";
 import Protect from "./pages/tools/Protect";
 import Unlock from "./pages/tools/Unlock";
 import { TOOLS } from "./tools";
+import { trackProductEvent } from "./lib/analytics";
 
 export default function App() {
   const { lang, t, setLang } = useI18n();
   const { pathname } = useLocation();
+  const tool = TOOLS.find((entry) => entry.path === pathname);
 
   useEffect(() => {
-    const tool = TOOLS.find((entry) => entry.path === pathname);
     const title = tool ? `${t.tools[tool.id].name} — PDF Toolbox` : "PDF Toolbox — Every PDF tool, 100% private";
     const description = tool ? t.tools[tool.id].description : t.home.subtitle;
     document.title = title;
@@ -35,6 +36,10 @@ export default function App() {
     document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
     document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
   }, [lang, pathname, t]);
+
+  useEffect(() => {
+    if (tool) trackProductEvent({ name: "tool_opened", tool: tool.id });
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen flex-col">

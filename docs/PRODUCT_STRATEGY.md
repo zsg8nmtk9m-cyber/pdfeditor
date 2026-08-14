@@ -62,11 +62,13 @@ Privacy guardrails: never collect filenames, file sizes precise enough to identi
 
 ### M0 — Launch-ready foundation (current)
 
-- Restore product/engineering documentation
-- Add tool discovery search and localized empty states
-- Add route-aware titles/descriptions and social metadata
-- Verify responsive UX, accessibility, build, and full e2e behavior
-- Configure repository description, topics, homepage, and stable default branch
+- [x] Restore product/engineering documentation
+- [x] Add tool discovery search and localized empty states
+- [x] Add route-aware titles/descriptions and social metadata
+- [x] Verify responsive UX, keyboard accessibility, build, and full e2e behavior
+- [x] Add required pull-request build and browser quality gates
+- [x] Implement a typed, privacy-safe activation event schema with no default network transport
+- [ ] Configure repository description, topics, homepage, and stable default branch
 
 Exit: the public app has a credible landing experience, reproducible build, green tests, and measurable activation events.
 
@@ -74,7 +76,8 @@ Exit: the public app has a credible landing experience, reproducible build, gree
 
 - Static, indexable landing output for each tool route
 - Sitemap, canonical URLs, social preview, and branded domain
-- Cookieless privacy-safe analytics with an explicit event schema
+- [x] Explicit privacy-safe activation event schema
+- [ ] Cookieless analytics transport after the owner creates a public site ID
 - Feedback/Founding Pro intent capture
 - Performance budget and Core Web Vitals monitoring
 

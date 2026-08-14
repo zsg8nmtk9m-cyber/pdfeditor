@@ -40,6 +40,10 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
+Pull requests and launch branches run the same locked install, production
+build, and browser suite in GitHub Actions. The suite also covers keyboard
+tool discovery, route metadata, mobile overflow, and semantic landmarks.
+
 ## Architecture
 
 - React 18, TypeScript, Vite, and Tailwind CSS
@@ -52,6 +56,10 @@ npm run test:e2e
 ## Privacy model
 
 No PDF bytes are sent to an application server. Files and passwords stay inside the browser context. Recent-file storage is local to the device and can be cleared by the user. Third-party analytics must remain cookieless and receive product events only—never filenames, document metadata, contents, or passwords.
+
+The vendor-neutral event allowlist and integration checklist live in
+[docs/ANALYTICS.md](docs/ANALYTICS.md). The application emits these events
+locally but sends no analytics traffic until an owner configures a provider.
 
 ## Contributing
 

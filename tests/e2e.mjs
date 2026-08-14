@@ -62,6 +62,12 @@ const browser = await chromium.launch({
 const ctx = await browser.newContext({ acceptDownloads: true });
 const page = await ctx.newPage();
 page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
+await page.addInitScript(() => {
+  window.__productEvents = [];
+  window.addEventListener("pdf-toolbox:metric", (event) => {
+    window.__productEvents.push(event.detail);
+  });
+});
 
 // ---------- home ----------
 console.log("home");
@@ -76,12 +82,47 @@ check("tool search filters cards", (await page.locator("a[data-tool]").count()) 
 check("tool search finds Protect PDF", await page.getByText("Protect PDF", { exact: true }).isVisible());
 await page.getByRole("button", { name: "Clear search" }).click();
 check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 16);
+await page.keyboard.press("/");
+check("slash shortcut focuses tool search", await toolSearch.evaluate((input) => input === document.activeElement));
+await toolSearch.fill("merge");
+await page.keyboard.press("Escape");
+check(
+  "escape clears and leaves tool search",
+  (await toolSearch.inputValue()) === "" &&
+    !(await toolSearch.evaluate((input) => input === document.activeElement)),
+);
+check("home exposes one main landmark", (await page.getByRole("main").count()) === 1);
+
+// Verify the launch surface at the narrowest supported phone width. This is
+// intentionally a browser assertion rather than a screenshot snapshot so it
+// catches horizontal overflow across fonts and browser versions.
+await page.setViewportSize({ width: 320, height: 720 });
+check(
+  "home has no mobile horizontal overflow",
+  await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+);
+check("mobile tool cards remain visible", await page.locator('a[data-tool="merge"]').isVisible());
+await page.setViewportSize({ width: 1280, height: 720 });
 
 // ---------- merge ----------
 console.log("merge");
 await page.goto(BASE + "/merge");
+check("tool route has specific metadata", (await page.title()) === "Merge PDF — PDF Toolbox");
+check(
+  "tool open emits an allowlisted activation event",
+  await page.evaluate(() =>
+    window.__productEvents.some((event) => event.name === "tool_opened" && event.tool === "merge"),
+  ),
+);
 await page.locator("input[type=file]").setInputFiles([join(FIX, "a.pdf"), join(FIX, "b.pdf")]);
 await page.getByText("3 pages ·").waitFor({ timeout: 20000 });
+check(
+  "file selection emits no document properties",
+  await page.evaluate(() => {
+    const event = window.__productEvents.find((item) => item.name === "file_selected");
+    return event?.tool === "merge" && Object.keys(event).sort().join(",") === "name,source,tool";
+  }),
+);
 check("merge cards show page counts", await page.getByText("2 pages ·").isVisible());
 check(
   "merge cards show thumbnails",
@@ -91,6 +132,14 @@ await page.getByRole("button", { name: /Merge 2 PDFs/ }).click();
 await page.getByText("Done!").waitFor({ timeout: 20000 });
 let out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "merged.pdf");
 check("merged has 5 pages", (await pageCount(out)) === 5);
+check(
+  "successful export emits a coarse activation event",
+  await page.evaluate(() =>
+    window.__productEvents.some(
+      (event) => event.name === "export_downloaded" && event.tool === "merge",
+    ),
+  ),
+);
 
 // ---------- cross-tool handoff (merge result -> compress) ----------
 console.log("handoff");
@@ -98,6 +147,15 @@ await page.getByLabel("Continue in another tool").selectOption({ label: "Compres
 await page.waitForURL("**/compress");
 await page.getByText("merged.pdf").waitFor({ timeout: 20000 });
 check("handed-off file loads in Compress", await page.getByText("5 pages ·").isVisible());
+check(
+  "cross-tool continuation emits an activation event",
+  await page.evaluate(() =>
+    window.__productEvents.some(
+      (event) =>
+        event.name === "workflow_continued" && event.from === "merge" && event.to === "compress",
+    ),
+  ),
+);
 
 // ---------- recent files picker ----------
 console.log("recents");

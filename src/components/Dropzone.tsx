@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
 import { FileText, History, Trash2, UploadCloud } from "lucide-react";
 import { useT } from "../i18n";
 import { clearRecents, listRecents, loadRecent } from "../lib/fileStore";
 import type { RecentFileMeta } from "../lib/fileStore";
 import { formatBytes } from "../lib/utils";
+import { trackProductEvent } from "../lib/analytics";
+import { TOOLS } from "../tools";
 
 interface DropzoneProps {
   /** e.g. "application/pdf" or "image/*" */
@@ -17,6 +20,8 @@ interface DropzoneProps {
 
 export default function Dropzone({ accept, multiple, onFiles, hint, compact }: DropzoneProps) {
   const t = useT();
+  const { pathname } = useLocation();
+  const tool = TOOLS.find((entry) => entry.path === pathname);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
   const acceptsPdf = accept.includes("pdf");
@@ -28,7 +33,10 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
 
   async function pickRecent(id: string) {
     const file = await loadRecent(id);
-    if (file) onFiles([file]);
+    if (file) {
+      if (tool) trackProductEvent({ name: "file_selected", tool: tool.id, source: "recent" });
+      onFiles([file]);
+    }
   }
 
   function accepts(file: File): boolean {
@@ -47,6 +55,7 @@ export default function Dropzone({ accept, multiple, onFiles, hint, compact }: D
     if (!list) return;
     const files = Array.from(list).filter(accepts);
     if (files.length === 0) return;
+    if (tool) trackProductEvent({ name: "file_selected", tool: tool.id, source: "device" });
     onFiles(multiple ? files : files.slice(0, 1));
   }
 
