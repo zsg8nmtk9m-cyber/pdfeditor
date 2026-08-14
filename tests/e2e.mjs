@@ -29,6 +29,19 @@ function check(name, cond) {
 }
 const near = (a, b, tol = 2.5) => Math.abs(a - b) <= tol;
 
+const staticMergeHtml = readFileSync(join(here, "..", "dist", "merge", "index.html"), "utf8");
+const sitemapXml = readFileSync(join(here, "..", "dist", "sitemap.xml"), "utf8");
+const expectedSiteRoot = (process.env.SITE_URL || "https://zsg8nmtk9m-cyber.github.io/pdfeditor").replace(
+  /\/$/,
+  "",
+);
+check("static tool page has indexable copy", staticMergeHtml.includes("Combine multiple PDF files"));
+check(
+  "static tool page has a canonical URL",
+  staticMergeHtml.includes(`rel="canonical" href="${expectedSiteRoot}/merge/"`),
+);
+check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 17);
+
 async function pageCount(path, password) {
   const doc = await PDFDocument.load(readFileSync(path), { password });
   return doc.getPageCount();

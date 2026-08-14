@@ -33,6 +33,10 @@ Production and type checks:
 npm run build
 ```
 
+The production build also writes crawlable HTML for every tool route plus
+`sitemap.xml` and `robots.txt`. Set `SITE_URL` to the deployment root when
+building for a custom domain; it defaults to the repository's GitHub Pages URL.
+
 The full browser suite creates its own fixtures, starts the production preview, exercises every tool in Chromium, downloads the results, and reopens them with `pdf-lib` or PDF.js:
 
 ```bash

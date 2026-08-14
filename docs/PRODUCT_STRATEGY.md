@@ -74,8 +74,9 @@ Exit: the public app has a credible landing experience, reproducible build, gree
 
 ### M1 — Acquisition and evidence
 
-- Static, indexable landing output for each tool route
-- Sitemap, canonical URLs, social preview, and branded domain
+- [x] Static, indexable landing output for each tool route
+- [x] Sitemap and canonical URLs
+- [ ] Branded domain and social preview image
 - [x] Explicit privacy-safe activation event schema
 - [ ] Cookieless analytics transport after the owner creates a public site ID
 - Feedback/Founding Pro intent capture
