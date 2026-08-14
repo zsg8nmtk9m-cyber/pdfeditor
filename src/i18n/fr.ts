@@ -12,6 +12,10 @@ export const fr: Dict = {
     heroB: "directement dans votre navigateur",
     subtitle:
       "Fusionnez, divisez, compressez, convertissez, filigranez et protégez vos PDF — gratuitement et sans limite. Vos fichiers sont traités sur votre appareil et ne sont jamais envoyés nulle part.",
+    searchLabel: "Trouver un outil PDF",
+    searchPlaceholder: "Que voulez-vous faire avec votre PDF ?",
+    clearSearch: "Effacer la recherche",
+    noSearchResults: "Aucun outil ne correspond à cette recherche.",
     chipPrivate: "Privé par conception",
     chipNoUploads: "Aucun envoi, aucun serveur",
     chipNoLimits: "Aucune limite de taille",

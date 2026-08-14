@@ -12,6 +12,10 @@ export const de: Dict = {
     heroB: "direkt in Ihrem Browser",
     subtitle:
       "PDFs zusammenfügen, teilen, komprimieren, konvertieren, mit Wasserzeichen versehen und schützen — kostenlos und unbegrenzt. Ihre Dateien werden auf Ihrem Gerät verarbeitet und nirgendwohin hochgeladen.",
+    searchLabel: "PDF-Werkzeug finden",
+    searchPlaceholder: "Was möchten Sie mit Ihrer PDF machen?",
+    clearSearch: "Suche löschen",
+    noSearchResults: "Keine Werkzeuge entsprechen dieser Suche.",
     chipPrivate: "Privat per Design",
     chipNoUploads: "Keine Uploads, keine Server",
     chipNoLimits: "Keine Dateigrößen-Limits",

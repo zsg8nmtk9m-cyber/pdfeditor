@@ -66,8 +66,16 @@ page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 // ---------- home ----------
 console.log("home");
 await page.goto(BASE);
+// Keep copy-based locators deterministic regardless of the host browser's locale.
+await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
 check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
+const toolSearch = page.getByRole("searchbox", { name: "Find a PDF tool" });
+await toolSearch.fill("password");
+check("tool search filters cards", (await page.locator("a[data-tool]").count()) === 2);
+check("tool search finds Protect PDF", await page.getByText("Protect PDF", { exact: true }).isVisible());
+await page.getByRole("button", { name: "Clear search" }).click();
+check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 16);
 
 // ---------- merge ----------
 console.log("merge");
