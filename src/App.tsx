@@ -79,7 +79,7 @@ export default function App() {
       </header>
 
       <main className="flex-1">
-        <Routes>
+        <Routes location={pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/merge" element={<Merge />} />
           <Route path="/split" element={<Split />} />
