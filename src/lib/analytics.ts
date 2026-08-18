@@ -13,7 +13,12 @@ export type ProductEvent =
   | { name: "tool_opened"; tool: ToolId }
   | { name: "file_selected"; tool: ToolId; source: "device" | "recent" }
   | { name: "export_downloaded"; tool: ToolId; output: "single" | "zip" }
-  | { name: "workflow_continued"; from: ToolId; to: ToolId };
+  | { name: "workflow_continued"; from: ToolId; to: ToolId }
+  | {
+      name: "pro_interest_opened";
+      placement: "home" | "result";
+      tool?: ToolId;
+    };
 
 export const PRODUCT_EVENT_NAME = "pdf-toolbox:metric";
 
