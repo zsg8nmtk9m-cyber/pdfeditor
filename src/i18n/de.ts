@@ -24,6 +24,15 @@ export const de: Dict = {
     dropNeedsPdf: "Dieses Werkzeug benötigt ein PDF",
     dropNeedsImage: "Dieses Werkzeug benötigt Bilder",
   },
+  pro: {
+    eyebrow: "Founding Pro · einmalig 39 $",
+    title: "Würden wiederverwendbare PDF-Abläufe Ihnen Zeit sparen?",
+    body:
+      "Wir testen wiederverwendbare Abläufe, gespeicherte Vorgaben und Offline-Nutzung, während alle heutigen Werkzeuge kostenlos bleiben.",
+    cta: "Arbeitsablauf teilen",
+    privacy:
+      "Öffnet ein öffentliches GitHub-Formular. Keine vertraulichen oder dokumentbezogenen Angaben eingeben.",
+  },
   categories: {
     Organize: "Organisieren",
     Optimize: "Optimieren",

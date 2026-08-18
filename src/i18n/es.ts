@@ -24,6 +24,15 @@ export const es: Dict = {
     dropNeedsPdf: "Esta herramienta necesita un PDF",
     dropNeedsImage: "Esta herramienta necesita imágenes",
   },
+  pro: {
+    eyebrow: "Founding Pro · 39 $ una vez",
+    title: "¿Te ahorrarían tiempo los flujos PDF reutilizables?",
+    body:
+      "Estamos probando flujos reutilizables, ajustes guardados y uso sin conexión, manteniendo gratis todas las herramientas actuales.",
+    cta: "Comparte tu flujo",
+    privacy:
+      "Abre un formulario público de GitHub. No incluyas información confidencial ni de documentos.",
+  },
   categories: {
     Organize: "Organizar",
     Optimize: "Optimizar",

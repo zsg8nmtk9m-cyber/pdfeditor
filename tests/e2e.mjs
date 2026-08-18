@@ -89,6 +89,14 @@ await page.goto(BASE + "/");
 await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
 check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
+const homePro = page.locator('[data-founding-pro="home"]');
+check("home shows the Founding Pro price hypothesis", await homePro.getByText("$39 one-time").isVisible());
+check(
+  "home interest link uses the public structured form",
+  (await homePro.getByRole("link", { name: "Share your workflow" }).getAttribute("href"))?.endsWith(
+    "issues/new?template=founding-pro.yml",
+  ),
+);
 const toolSearch = page.getByRole("searchbox", { name: "Find a PDF tool" });
 await toolSearch.fill("split");
 check(
@@ -160,6 +168,25 @@ check(
       (event) => event.name === "export_downloaded" && event.tool === "merge",
     ),
   ),
+);
+const resultProLink = page
+  .locator('[data-founding-pro="result"]')
+  .getByRole("link", { name: "Share your workflow" });
+check("Founding Pro appears after a successful result", await resultProLink.isVisible());
+await resultProLink.evaluate((link) => {
+  link.addEventListener("click", (event) => event.preventDefault(), { once: true });
+  link.click();
+});
+check(
+  "Pro interest event contains only allowlisted context",
+  await page.evaluate(() => {
+    const event = window.__productEvents.find((item) => item.name === "pro_interest_opened");
+    return (
+      event?.placement === "result" &&
+      event.tool === "merge" &&
+      Object.keys(event).sort().join(",") === "name,placement,tool"
+    );
+  }),
 );
 
 // ---------- cross-tool handoff (merge result -> compress) ----------

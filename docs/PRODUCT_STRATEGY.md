@@ -1,6 +1,6 @@
 # PDF Toolbox product strategy
 
-Last updated: 2026-08-14
+Last updated: 2026-08-18
 
 ## Product thesis
 
@@ -79,7 +79,7 @@ Exit: the public app has a credible landing experience, reproducible build, gree
 - [ ] Branded domain and social preview image
 - [x] Explicit privacy-safe activation event schema
 - [ ] Cookieless analytics transport after the owner creates a public site ID
-- Feedback/Founding Pro intent capture
+- [x] Optional Founding Pro intent capture via a structured public GitHub form
 - Performance budget and Core Web Vitals monitoring
 
 Exit: at least 100 weekly tool starts and enough funnel data to identify the top three jobs.
@@ -136,3 +136,4 @@ Payment-provider setup is intentionally deferred until purchase intent is valida
 - 2026-08-14: Monetize workflow automation, presets, offline use, and team productivity.
 - 2026-08-14: Start with launch readiness and evidence before payment infrastructure.
 - 2026-08-14: Use a one-time Founding Pro price as the first pricing test.
+- 2026-08-18: Validate Founding Pro demand with an explicit public GitHub issue form before adding accounts, payments, or a backend.

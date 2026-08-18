@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { CloudOff, Gauge, Search, ShieldCheck, UploadCloud, X } from "lucide-react";
 import { useT } from "../i18n";
 import { setHandoffFiles } from "../lib/handoff";
+import FoundingProCard from "../components/FoundingProCard";
 import { CATEGORIES, TOOLS } from "../tools";
 import type { ToolMeta } from "../tools";
 
@@ -211,6 +212,7 @@ export default function Home() {
           </section>
         );
       })}
+      <FoundingProCard placement="home" className="mt-12" />
     </div>
   );
 }

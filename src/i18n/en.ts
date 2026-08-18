@@ -27,6 +27,15 @@ export const en = {
     dropNeedsPdf: "This tool needs a PDF",
     dropNeedsImage: "This tool needs images",
   },
+  pro: {
+    eyebrow: "Founding Pro · $39 one-time",
+    title: "Would reusable PDF workflows save you time?",
+    body:
+      "We're testing reusable workflows, saved presets, and offline use while keeping every current tool free.",
+    cta: "Share your workflow",
+    privacy:
+      "Opens a public GitHub form. Do not include confidential or document information.",
+  },
   categories: {
     Organize: "Organize",
     Optimize: "Optimize",

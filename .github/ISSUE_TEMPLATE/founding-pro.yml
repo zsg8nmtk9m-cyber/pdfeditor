@@ -1,0 +1,37 @@
+name: Founding Pro interest
+description: Share which private PDF workflow would save you time.
+title: "[Founding Pro] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping shape PDF Toolbox Pro.
+
+        This creates a public GitHub issue. Do not include filenames, document contents, passwords, client names, personal contact details, or other confidential information.
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Which recurring workflow matters most?
+      description: Choose the closest job. This is product research, not a purchase.
+      options:
+        - Merge, watermark, number, and protect documents
+        - Review, compare, redact, and approve documents
+        - Convert scans or images and organize the result
+        - Sign, annotate, and prepare documents for sending
+        - Batch-process folders with reusable presets
+        - Another recurring PDF workflow
+    validations:
+      required: true
+  - type: checkboxes
+    id: price_intent
+    attributes:
+      label: Founding price signal
+      options:
+        - label: I would consider a $39 one-time Founding Pro license if it solved this workflow privately on my device.
+          required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Optional context
+      description: Describe the steps or time cost, but do not include sensitive document or personal information.
+      placeholder: "Example: I repeat four PDF steps for each weekly client packet."

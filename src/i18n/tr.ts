@@ -24,6 +24,15 @@ export const tr: Dict = {
     dropNeedsPdf: "Bu araç PDF gerektiriyor",
     dropNeedsImage: "Bu araç görsel gerektiriyor",
   },
+  pro: {
+    eyebrow: "Kurucu Pro · tek seferlik 39 $",
+    title: "Yeniden kullanılabilir PDF iş akışları size zaman kazandırır mı?",
+    body:
+      "Mevcut tüm araçları ücretsiz tutarken yeniden kullanılabilir iş akışlarını, kayıtlı ayarları ve çevrimdışı kullanımı test ediyoruz.",
+    cta: "İş akışınızı paylaşın",
+    privacy:
+      "Herkese açık bir GitHub formu açılır. Gizli bilgiler veya belge bilgileri eklemeyin.",
+  },
   categories: {
     Organize: "Sayfa Düzeni",
     Optimize: "Optimize Et",
