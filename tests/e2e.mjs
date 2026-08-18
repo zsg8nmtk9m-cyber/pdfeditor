@@ -29,6 +29,19 @@ function check(name, cond) {
 }
 const near = (a, b, tol = 2.5) => Math.abs(a - b) <= tol;
 
+const staticMergeHtml = readFileSync(join(here, "..", "dist", "merge", "index.html"), "utf8");
+const sitemapXml = readFileSync(join(here, "..", "dist", "sitemap.xml"), "utf8");
+const expectedSiteRoot = (process.env.SITE_URL || "https://zsg8nmtk9m-cyber.github.io/pdfeditor").replace(
+  /\/$/,
+  "",
+);
+check("static tool page has indexable copy", staticMergeHtml.includes("Combine multiple PDF files"));
+check(
+  "static tool page has a canonical URL",
+  staticMergeHtml.includes(`rel="canonical" href="${expectedSiteRoot}/merge/"`),
+);
+check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 17);
+
 async function pageCount(path, password) {
   const doc = await PDFDocument.load(readFileSync(path), { password });
   return doc.getPageCount();
@@ -59,21 +72,78 @@ async function grabDownload(page, buttonLocator, saveAs) {
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
 });
-const ctx = await browser.newContext({ acceptDownloads: true });
+const ctx = await browser.newContext({ acceptDownloads: true, locale: "tr-TR" });
 const page = await ctx.newPage();
 page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
+await page.addInitScript(() => {
+  window.__productEvents = [];
+  window.addEventListener("pdf-toolbox:metric", (event) => {
+    window.__productEvents.push(event.detail);
+  });
+});
 
 // ---------- home ----------
 console.log("home");
-await page.goto(BASE);
+await page.goto(BASE + "/");
+// Keep copy-based locators deterministic regardless of the host browser's locale.
+await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
 check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
+const toolSearch = page.getByRole("searchbox", { name: "Find a PDF tool" });
+await toolSearch.fill("split");
+check(
+  "English search is stable on a Turkish-locale browser",
+  await page.getByText("Split PDF", { exact: true }).isVisible(),
+);
+await toolSearch.fill("password");
+check("tool search filters cards", (await page.locator("a[data-tool]").count()) === 2);
+check("tool search finds Protect PDF", await page.getByText("Protect PDF", { exact: true }).isVisible());
+await page.getByRole("button", { name: "Clear search" }).click();
+check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 16);
+await page.keyboard.press("/");
+check("slash shortcut focuses tool search", await toolSearch.evaluate((input) => input === document.activeElement));
+await toolSearch.fill("merge");
+await page.keyboard.press("Escape");
+check(
+  "escape clears and leaves tool search",
+  (await toolSearch.inputValue()) === "" &&
+    !(await toolSearch.evaluate((input) => input === document.activeElement)),
+);
+check("home exposes one main landmark", (await page.getByRole("main").count()) === 1);
+
+// Verify the launch surface at the narrowest supported phone width. This is
+// intentionally a browser assertion rather than a screenshot snapshot so it
+// catches horizontal overflow across fonts and browser versions.
+await page.setViewportSize({ width: 320, height: 720 });
+check(
+  "home has no mobile horizontal overflow",
+  await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+);
+check("mobile tool cards remain visible", await page.locator('a[data-tool="merge"]').isVisible());
+await page.setViewportSize({ width: 1280, height: 720 });
 
 // ---------- merge ----------
 console.log("merge");
-await page.goto(BASE + "/merge");
+await page.goto(BASE + "/merge/");
+check(
+  "canonical trailing-slash tool route has specific metadata",
+  (await page.title()) === "Merge PDF — PDF Toolbox",
+);
+check(
+  "tool open emits an allowlisted activation event",
+  await page.evaluate(() =>
+    window.__productEvents.some((event) => event.name === "tool_opened" && event.tool === "merge"),
+  ),
+);
 await page.locator("input[type=file]").setInputFiles([join(FIX, "a.pdf"), join(FIX, "b.pdf")]);
 await page.getByText("3 pages ·").waitFor({ timeout: 20000 });
+check(
+  "file selection emits no document properties",
+  await page.evaluate(() => {
+    const event = window.__productEvents.find((item) => item.name === "file_selected");
+    return event?.tool === "merge" && Object.keys(event).sort().join(",") === "name,source,tool";
+  }),
+);
 check("merge cards show page counts", await page.getByText("2 pages ·").isVisible());
 check(
   "merge cards show thumbnails",
@@ -83,6 +153,14 @@ await page.getByRole("button", { name: /Merge 2 PDFs/ }).click();
 await page.getByText("Done!").waitFor({ timeout: 20000 });
 let out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "merged.pdf");
 check("merged has 5 pages", (await pageCount(out)) === 5);
+check(
+  "successful export emits a coarse activation event",
+  await page.evaluate(() =>
+    window.__productEvents.some(
+      (event) => event.name === "export_downloaded" && event.tool === "merge",
+    ),
+  ),
+);
 
 // ---------- cross-tool handoff (merge result -> compress) ----------
 console.log("handoff");
@@ -90,6 +168,15 @@ await page.getByLabel("Continue in another tool").selectOption({ label: "Compres
 await page.waitForURL("**/compress");
 await page.getByText("merged.pdf").waitFor({ timeout: 20000 });
 check("handed-off file loads in Compress", await page.getByText("5 pages ·").isVisible());
+check(
+  "cross-tool continuation emits an activation event",
+  await page.evaluate(() =>
+    window.__productEvents.some(
+      (event) =>
+        event.name === "workflow_continued" && event.from === "merge" && event.to === "compress",
+    ),
+  ),
+);
 
 // ---------- recent files picker ----------
 console.log("recents");

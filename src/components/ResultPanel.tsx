@@ -9,6 +9,7 @@ import { setHandoff } from "../lib/handoff";
 import { TOOLS } from "../tools";
 import { downloadBlob, formatBytes, makeZip } from "../lib/utils";
 import type { OutputFile } from "../lib/utils";
+import { trackProductEvent } from "../lib/analytics";
 
 interface ResultPanelProps {
   files: OutputFile[];
@@ -23,7 +24,9 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
   const t = useT();
   const [zipping, setZipping] = useState(false);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = rawPathname.replace(/\/+$/, "") || "/";
+  const currentTool = TOOLS.find((tool) => tool.path === pathname);
 
   // "Continue in another tool" applies to single-PDF results only.
   const canHandOff = files.length === 1 && files[0].name.toLowerCase().endsWith(".pdf");
@@ -38,12 +41,16 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
     try {
       const zip = await makeZip(files, zipName);
       downloadBlob(zip.blob, zip.name);
+      if (currentTool) {
+        trackProductEvent({ name: "export_downloaded", tool: currentTool.id, output: "zip" });
+      }
     } finally {
       setZipping(false);
     }
   }
 
   async function continueIn(path: string) {
+    const nextTool = TOOLS.find((tool) => tool.path === path);
     const bytes = new Uint8Array(await files[0].blob.arrayBuffer());
     setHandoff(files[0].name, bytes);
     try {
@@ -52,7 +59,17 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
     } catch {
       // best-effort; handoff works regardless
     }
+    if (currentTool && nextTool) {
+      trackProductEvent({ name: "workflow_continued", from: currentTool.id, to: nextTool.id });
+    }
     navigate(path);
+  }
+
+  function downloadOne(file: OutputFile) {
+    downloadBlob(file.blob, file.name);
+    if (currentTool) {
+      trackProductEvent({ name: "export_downloaded", tool: currentTool.id, output: "single" });
+    }
   }
 
   return (
@@ -81,7 +98,7 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
             <Button
               variant="secondary"
               className="!px-3 !py-1.5"
-              onClick={() => downloadBlob(f.blob, f.name)}
+              onClick={() => downloadOne(f)}
             >
               <Download className="h-4 w-4" /> {t.common.download}
             </Button>
@@ -96,7 +113,7 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
           </Button>
         )}
         {files.length === 1 && (
-          <Button onClick={() => downloadBlob(files[0].blob, files[0].name)}>
+          <Button onClick={() => downloadOne(files[0])}>
             <Download className="h-4 w-4" /> {t.common.download}
           </Button>
         )}

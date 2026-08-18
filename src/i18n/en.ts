@@ -15,6 +15,10 @@ export const en = {
     heroB: "right in your browser",
     subtitle:
       "Merge, split, compress, convert, watermark and protect PDFs — free and unlimited. Your files are processed on your device and never uploaded anywhere.",
+    searchLabel: "Find a PDF tool",
+    searchPlaceholder: "What do you want to do with your PDF?",
+    clearSearch: "Clear search",
+    noSearchResults: "No tools match that search.",
     chipPrivate: "Private by design",
     chipNoUploads: "No uploads, no servers",
     chipNoLimits: "No file-size limits",

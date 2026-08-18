@@ -12,6 +12,10 @@ export const es: Dict = {
     heroB: "directamente en tu navegador",
     subtitle:
       "Une, divide, comprime, convierte, añade marcas de agua y protege PDFs — gratis y sin límites. Tus archivos se procesan en tu dispositivo y nunca se suben a ningún sitio.",
+    searchLabel: "Buscar una herramienta PDF",
+    searchPlaceholder: "¿Qué quieres hacer con tu PDF?",
+    clearSearch: "Borrar búsqueda",
+    noSearchResults: "Ninguna herramienta coincide con la búsqueda.",
     chipPrivate: "Privado por diseño",
     chipNoUploads: "Sin subidas, sin servidores",
     chipNoLimits: "Sin límites de tamaño",

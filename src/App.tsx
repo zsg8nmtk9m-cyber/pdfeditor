@@ -1,4 +1,5 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { FileText, Globe, ShieldCheck } from "lucide-react";
 import { LANGUAGES, useI18n } from "./i18n";
 import type { Lang } from "./i18n";
@@ -19,9 +20,27 @@ import Metadata from "./pages/tools/Metadata";
 import Redact from "./pages/tools/Redact";
 import Protect from "./pages/tools/Protect";
 import Unlock from "./pages/tools/Unlock";
+import { TOOLS } from "./tools";
+import { trackProductEvent } from "./lib/analytics";
 
 export default function App() {
   const { lang, t, setLang } = useI18n();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = rawPathname.replace(/\/+$/, "") || "/";
+  const tool = TOOLS.find((entry) => entry.path === pathname);
+
+  useEffect(() => {
+    const title = tool ? `${t.tools[tool.id].name} — PDF Toolbox` : "PDF Toolbox — Every PDF tool, 100% private";
+    const description = tool ? t.tools[tool.id].description : t.home.subtitle;
+    document.title = title;
+    document.querySelector('meta[name="description"]')?.setAttribute("content", description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute("content", title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute("content", description);
+  }, [lang, pathname, t]);
+
+  useEffect(() => {
+    if (tool) trackProductEvent({ name: "tool_opened", tool: tool.id });
+  }, [pathname]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -60,7 +79,7 @@ export default function App() {
       </header>
 
       <main className="flex-1">
-        <Routes>
+        <Routes location={pathname}>
           <Route path="/" element={<Home />} />
           <Route path="/merge" element={<Merge />} />
           <Route path="/split" element={<Split />} />

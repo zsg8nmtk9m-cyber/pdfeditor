@@ -12,6 +12,10 @@ export const tr: Dict = {
     heroB: "doğrudan tarayıcınızda",
     subtitle:
       "PDF'leri birleştirin, bölün, sıkıştırın, dönüştürün, filigran ekleyin ve şifreleyin — ücretsiz ve sınırsız. Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez.",
+    searchLabel: "PDF aracı bul",
+    searchPlaceholder: "PDF'inizle ne yapmak istiyorsunuz?",
+    clearSearch: "Aramayı temizle",
+    noSearchResults: "Bu aramayla eşleşen araç yok.",
     chipPrivate: "Tasarım gereği gizli",
     chipNoUploads: "Yükleme yok, sunucu yok",
     chipNoLimits: "Dosya boyutu sınırı yok",
