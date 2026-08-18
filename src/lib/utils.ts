@@ -75,6 +75,12 @@ export function pdfBlob(bytes: Uint8Array): Blob {
   return new Blob([bytes], { type: "application/pdf" });
 }
 
+export function docxBlob(bytes: Uint8Array): Blob {
+  return new Blob([bytes], {
+    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  });
+}
+
 export function downloadBlob(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

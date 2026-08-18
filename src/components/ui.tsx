@@ -64,7 +64,7 @@ export const inputClass =
 export function ErrorBox({ children }: { children: ReactNode }) {
   if (!children) return null;
   return (
-    <div className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 ring-1 ring-rose-200">
+    <div role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 ring-1 ring-rose-200">
       {children}
     </div>
   );
@@ -72,7 +72,7 @@ export function ErrorBox({ children }: { children: ReactNode }) {
 
 export function ProgressBar({ value }: { value: number }) {
   return (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+    <div role="progressbar" aria-label="Progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(value * 100)} className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
       <div
         className="h-full rounded-full bg-indigo-500 transition-all duration-200"
         style={{ width: `${Math.round(value * 100)}%` }}

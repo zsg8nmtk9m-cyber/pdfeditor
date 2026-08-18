@@ -5,20 +5,20 @@ export const tr: Dict = {
     privacyBadge: "%100 gizli — dosyalarınız cihazınızdan asla ayrılmaz",
   },
   footer: {
-    line: "PDF Toolbox — tüm işlemler tarayıcınızda, yerel olarak çalışır. Yükleme yok, hesap yok, sınır yok.",
+    line: "Private Document Toolbox — tüm işlemler tarayıcınızda, yerel olarak çalışır. Yükleme yok, hesap yok, sınır yok.",
   },
   home: {
-    heroA: "İhtiyacınız olan tüm PDF araçları,",
+    heroA: "Özel belge araçları,",
     heroB: "doğrudan tarayıcınızda",
     subtitle:
-      "PDF'leri birleştirin, bölün, sıkıştırın, dönüştürün, filigran ekleyin ve şifreleyin — ücretsiz ve sınırsız. Dosyalarınız cihazınızda işlenir, hiçbir yere yüklenmez.",
-    searchLabel: "PDF aracı bul",
-    searchPlaceholder: "PDF'inizle ne yapmak istiyorsunuz?",
+      "PDF, görsel ve ofis belgeleriyle dosyalarınızı yüklemeden çalışın. Hızlı ve odaklı araçlar cihazınızda çalışır.",
+    searchLabel: "Belge aracı bul",
+    searchPlaceholder: "Belgenizle ne yapmak istiyorsunuz?",
     clearSearch: "Aramayı temizle",
     noSearchResults: "Bu aramayla eşleşen araç yok.",
     chipPrivate: "Tasarım gereği gizli",
     chipNoUploads: "Yükleme yok, sunucu yok",
-    chipNoLimits: "Dosya boyutu sınırı yok",
+    chipNoLimits: "Sunucu yükleme kotası yok",
     dropHint: "İpucu: başlamak için bir dosyayı doğrudan aşağıdaki araçlardan birine sürükleyin.",
     dropHere: (tool: string) => `${tool} aracında açmak için bırakın`,
     dropNeedsPdf: "Bu araç PDF gerektiriyor",
@@ -37,6 +37,7 @@ export const tr: Dict = {
     Organize: "Sayfa Düzeni",
     Optimize: "Optimize Et",
     Convert: "Dönüştür",
+    Office: "Ofis",
     Edit: "Düzenle",
     Security: "Güvenlik",
   },
@@ -94,12 +95,20 @@ export const tr: Dict = {
       description:
         "JPG, PNG veya WebP görsellerini tek bir PDF'te birleştirin. Sayfa boyutunu seçin ve dönüştürmeden önce sıralayın.",
     },
+    "images-to-docx": {
+      name: "Görsellerden Word",
+      tagline: "Görselleri bir Word belgesine yerleştirin",
+      description:
+        "JPG, PNG veya WebP görsellerini her sayfada bir görsel olacak şekilde DOCX'e dönüştürün. Görseller OCR metnine dönüşmez.",
+    },
     annotate: {
       name: "İmzala ve Not Ekle",
       tagline: "Herhangi bir sayfayı imzalayın, metin ekleyin",
       description:
         "İmzanızı çizin veya yazın, istediğiniz yere yerleştirin ve sayfalara metin notları ekleyin. Her şey PDF'in içine işlenir — özel bir okuyucu gerekmez.",
     },
+  
+
     watermark: {
       name: "Filigran",
       tagline: "Her sayfaya metin damgası vurun",
@@ -140,6 +149,7 @@ export const tr: Dict = {
   common: {
     allTools: "Tüm araçlar",
     download: "İndir",
+    cancel: "İptal",
     downloadAllZip: "Tümünü indir (ZIP)",
     startOver: "Baştan başla",
     done: "Tamamlandı!",
@@ -293,6 +303,24 @@ export const tr: Dict = {
     sizeFit: "Görselle aynı",
     action: (n: number) => `${n} görselden PDF oluştur`,
     failed: "Dönüştürme başarısız oldu.",
+  },
+  imagesToDocx: {
+    hint: "JPG, PNG veya WebP · en fazla 30 dosya",
+    pageSize: "Sayfa boyutu",
+    sizeA4: "A4",
+    sizeLetter: "US Letter",
+    orientation: "Yön",
+    orientAuto: "Otomatik (görsele göre)",
+    orientPortrait: "Dikey",
+    orientLandscape: "Yatay",
+    margin: "Sayfa kenar boşlukları",
+    marginNone: "Yok",
+    marginNarrow: "Dar (10 mm)",
+    marginNormal: "Normal (20 mm)",
+    note: "Her görsel ayrı bir Word sayfasına yerleştirilir ve görsel olarak kalır; düzenlenebilir OCR metnine dönüşmez.",
+    limits: "En fazla 30 görsel, dosya başına 25 MB ve toplam 100 MB. İşlem cihazınıza bağlıdır.",
+    action: (n: number) => `${n} görselden Word belgesi oluştur`,
+    failed: "Word belgesi oluşturulamadı.",
   },
   watermark: {
     textLabel: "Filigran metni",

@@ -5,20 +5,20 @@ export const es: Dict = {
     privacyBadge: "100 % privado — tus archivos nunca salen de tu dispositivo",
   },
   footer: {
-    line: "PDF Toolbox — todas las operaciones se ejecutan localmente en tu navegador. Sin subidas, sin cuentas, sin límites.",
+    line: "Private Document Toolbox — todas las operaciones se ejecutan localmente en tu navegador. Sin subidas, sin cuentas, sin límites.",
   },
   home: {
-    heroA: "Todas las herramientas PDF que necesitas,",
+    heroA: "Herramientas privadas para documentos,",
     heroB: "directamente en tu navegador",
     subtitle:
-      "Une, divide, comprime, convierte, añade marcas de agua y protege PDFs — gratis y sin límites. Tus archivos se procesan en tu dispositivo y nunca se suben a ningún sitio.",
-    searchLabel: "Buscar una herramienta PDF",
-    searchPlaceholder: "¿Qué quieres hacer con tu PDF?",
+      "Trabaja con PDF, imágenes y documentos de Office sin subirlos. Herramientas rápidas y específicas se ejecutan en tu dispositivo.",
+    searchLabel: "Buscar una herramienta",
+    searchPlaceholder: "¿Qué quieres hacer con tu documento?",
     clearSearch: "Borrar búsqueda",
     noSearchResults: "Ninguna herramienta coincide con la búsqueda.",
     chipPrivate: "Privado por diseño",
     chipNoUploads: "Sin subidas, sin servidores",
-    chipNoLimits: "Sin límites de tamaño",
+    chipNoLimits: "Sin cuotas de carga al servidor",
     dropHint: "Consejo: arrastra un archivo directamente a cualquier herramienta de abajo.",
     dropHere: (tool: string) => `Suelta para abrir en ${tool}`,
     dropNeedsPdf: "Esta herramienta necesita un PDF",
@@ -37,6 +37,7 @@ export const es: Dict = {
     Organize: "Organizar",
     Optimize: "Optimizar",
     Convert: "Convertir",
+    Office: "Office",
     Edit: "Editar",
     Security: "Seguridad",
   },
@@ -94,12 +95,20 @@ export const es: Dict = {
       description:
         "Combina imágenes JPG, PNG o WebP en un solo PDF. Elige el tamaño de página y reordena las imágenes antes de convertir.",
     },
+    "images-to-docx": {
+      name: "Imágenes a Word",
+      tagline: "Coloca imágenes en un documento de Word",
+      description:
+        "Convierte imágenes JPG, PNG o WebP en un DOCX con una imagen por página. Las imágenes siguen siendo imágenes; no es OCR.",
+    },
     annotate: {
       name: "Firmar y anotar",
       tagline: "Firma y añade texto a cualquier página",
       description:
         "Dibuja o escribe tu firma, colócala donde quieras y añade notas de texto en cualquier página. Todo queda integrado en el PDF — no hace falta ningún lector especial.",
     },
+  
+
     watermark: {
       name: "Marca de agua",
       tagline: "Estampa texto en cada página",
@@ -140,6 +149,7 @@ export const es: Dict = {
   common: {
     allTools: "Todas las herramientas",
     download: "Descargar",
+    cancel: "Cancelar",
     downloadAllZip: "Descargar todo (ZIP)",
     startOver: "Empezar de nuevo",
     done: "¡Listo!",
@@ -294,6 +304,24 @@ export const es: Dict = {
     sizeFit: "Igual que la imagen",
     action: (n: number) => `Crear PDF con ${n} imagen${n === 1 ? "" : "es"}`,
     failed: "Error al convertir.",
+  },
+  imagesToDocx: {
+    hint: "Imágenes JPG, PNG o WebP · hasta 30 archivos",
+    pageSize: "Tamaño de página",
+    sizeA4: "A4",
+    sizeLetter: "Carta EE. UU.",
+    orientation: "Orientación",
+    orientAuto: "Automática (según cada imagen)",
+    orientPortrait: "Vertical",
+    orientLandscape: "Horizontal",
+    margin: "Márgenes",
+    marginNone: "Sin márgenes",
+    marginNarrow: "Estrechos (10 mm)",
+    marginNormal: "Normales (20 mm)",
+    note: "Cada imagen se coloca en su propia página de Word y sigue siendo una imagen, no texto OCR editable.",
+    limits: "Hasta 30 imágenes, 25 MB por archivo y 100 MB en total. El procesamiento depende del dispositivo.",
+    action: (n: number) => `Crear documento de Word con ${n} imagen${n === 1 ? "" : "es"}`,
+    failed: "No se pudo crear el documento de Word.",
   },
   watermark: {
     textLabel: "Texto de la marca de agua",

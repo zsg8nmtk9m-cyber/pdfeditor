@@ -1,22 +1,21 @@
-# PDF Toolbox
+# Private Document Toolbox
 
-A private, browser-based suite for everyday PDF work. Merge, split, organize, compress, convert, annotate, compare, redact, encrypt, and unlock PDFs without uploading files to a server.
-
-All document processing happens in a Web Worker on the user's device. There are no accounts, file-size quotas, or server-side copies of sensitive documents.
+A private, browser-based suite for everyday PDF, image, and office work. The project is expanding beyond PDF while keeping one non-negotiable promise: document bytes are processed on the user's device, not uploaded to an application server.
 
 ## Product status
 
-PDF Toolbox currently ships 16 tools in English, Turkish, German, Spanish, and French. The application includes persistent on-device recent files, cross-tool handoff, drag-and-drop entry points, background processing, and an end-to-end suite that verifies generated PDFs rather than only checking the UI.
+The application currently ships 17 tools in English, Turkish, German, Spanish, and French:
 
-The product direction, business model, milestones, and decision log live in [docs/PRODUCT_STRATEGY.md](docs/PRODUCT_STRATEGY.md).
-
-## Tools
-
-- Organize: merge, split, reorder/delete pages, rotate
-- Optimize: compress, batch process, compare versions
-- Convert: PDF to images, images to PDF
-- Edit: sign and annotate, watermark, page numbers, metadata
+- Organize PDFs: merge, split, reorder/delete pages, rotate
+- Optimize PDFs: compress, batch process, compare versions
+- Convert: PDF to images and images to PDF
+- Office: images to Word (DOCX), with page size, orientation, margins, ordering, and cancellation
+- Edit PDFs: sign and annotate, watermark, page numbers, metadata
 - Security: permanent redaction, password protection, unlock
+
+Images to Word embeds one normalized image per page. It does not claim to turn pixels into editable text. Generated DOCX packages contain sequential media names rather than source filenames, and conversion runs in a dedicated worker with file, byte, and pixel safety budgets.
+
+The product roadmap and deliberate format boundaries live in [docs/PRODUCT_EXPANSION.md](docs/PRODUCT_EXPANSION.md). Business decisions remain in [docs/PRODUCT_STRATEGY.md](docs/PRODUCT_STRATEGY.md).
 
 ## Local development
 
@@ -27,47 +26,34 @@ npm ci
 npm run dev
 ```
 
-Production and type checks:
+Production and browser checks:
 
 ```bash
 npm run build
-```
-
-The production build also writes crawlable HTML for every tool route plus
-`sitemap.xml` and `robots.txt`. Set `SITE_URL` to the deployment root when
-building for a custom domain; it defaults to the repository's GitHub Pages URL.
-
-The full browser suite creates its own fixtures, starts the production preview, exercises every tool in Chromium, downloads the results, and reopens them with `pdf-lib` or PDF.js:
-
-```bash
 npx playwright install chromium
 npm run test:e2e
 ```
 
-Pull requests and launch branches run the same locked install, production
-build, and browser suite in GitHub Actions. The suite also covers keyboard
-tool discovery, route metadata, mobile overflow, and semantic landmarks.
+The production build writes crawlable HTML for every tool route plus `sitemap.xml` and `robots.txt`. Set `SITE_URL` for a custom domain; otherwise the repository's GitHub Pages URL is used.
 
 ## Architecture
 
 - React 18, TypeScript, Vite, and Tailwind CSS
-- PDF.js for rendering and text inspection
-- `@cantoo/pdf-lib` for PDF editing and encryption
-- A module Web Worker for CPU-heavy document operations
-- IndexedDB for optional on-device recent files
-- GitHub Actions for build/e2e verification and GitHub Pages deployment
+- PDF.js and `@cantoo/pdf-lib` for PDF rendering and editing
+- Separate module workers for PDF and Office operations
+- `fflate` for constrained OOXML packaging without a heavyweight Office suite
+- IndexedDB for optional on-device PDF recents
+- GitHub Actions for locked builds, artifact-level browser tests, and quality-gated Pages deployment
 
-## Privacy model
+## Privacy and safety model
 
-No PDF bytes are sent to an application server. Files and passwords stay inside the browser context. Recent-file storage is local to the device and can be cleared by the user. Third-party analytics must remain cookieless and receive product events only—never filenames, document metadata, contents, or passwords.
+No document bytes are sent to an application server. Files and passwords stay inside the browser context. Office media is re-encoded before packaging to remove embedded metadata. Recent PDF storage is local to the device and can be cleared by the user.
 
-The vendor-neutral event allowlist and integration checklist live in
-[docs/ANALYTICS.md](docs/ANALYTICS.md). The application emits these events
-locally but sends no analytics traffic until an owner configures a provider.
+“No server upload quotas” does not mean browsers have infinite memory. Each operation has practical safety budgets and must fail clearly rather than crash a tab. Third-party analytics may receive only allowlisted product events—never filenames, metadata, contents, passwords, or exact file sizes.
 
 ## Contributing
 
-Open an issue before large changes so product intent and privacy constraints stay aligned. Every new document operation should run in the worker, surface progress for long jobs, include localized UI copy, and add an end-to-end assertion against the resulting file.
+Every new operation should run off the main UI thread, surface progress for long jobs, support cancellation where practical, include localized UI copy, and add an assertion against the generated artifact—not only the visible UI.
 
 ## License
 

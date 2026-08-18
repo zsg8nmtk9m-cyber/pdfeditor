@@ -7,7 +7,8 @@ import { TOOLS } from "../tools";
 /** Shared page chrome for every tool: back link, title, description. */
 export default function ToolPage({ children }: { children: ReactNode }) {
   const t = useT();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = rawPathname.replace(/\/+$/, "") || "/";
   const tool = TOOLS.find((entry) => entry.path === pathname);
   if (!tool) return null;
   const Icon = tool.icon;

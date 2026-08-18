@@ -1,9 +1,9 @@
 {
-  "name": "pdf-toolbox",
+  "name": "private-document-toolbox",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Every PDF tool you need, right in your browser. Files never leave your device.",
+  "description": "Private PDF, image, and office tools that run in your browser.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build && node scripts/generate-static-pages.mjs",

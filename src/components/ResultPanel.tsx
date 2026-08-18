@@ -10,7 +10,6 @@ import { TOOLS } from "../tools";
 import { downloadBlob, formatBytes, makeZip } from "../lib/utils";
 import type { OutputFile } from "../lib/utils";
 import { trackProductEvent } from "../lib/analytics";
-import FoundingProCard from "./FoundingProCard";
 
 interface ResultPanelProps {
   files: OutputFile[];
@@ -142,7 +141,6 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
           </div>
         )}
       </div>
-      <FoundingProCard placement="result" tool={currentTool?.id} className="mt-6" />
     </Card>
   );
 }

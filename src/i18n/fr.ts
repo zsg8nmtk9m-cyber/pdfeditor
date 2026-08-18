@@ -5,20 +5,20 @@ export const fr: Dict = {
     privacyBadge: "100 % privé — vos fichiers ne quittent jamais votre appareil",
   },
   footer: {
-    line: "PDF Toolbox — toutes les opérations s'exécutent localement dans votre navigateur. Aucun envoi, aucun compte, aucune limite.",
+    line: "Private Document Toolbox — toutes les opérations s'exécutent localement dans votre navigateur. Aucun envoi, aucun compte, aucune limite.",
   },
   home: {
-    heroA: "Tous les outils PDF dont vous avez besoin,",
+    heroA: "Outils de documents privés,",
     heroB: "directement dans votre navigateur",
     subtitle:
-      "Fusionnez, divisez, compressez, convertissez, filigranez et protégez vos PDF — gratuitement et sans limite. Vos fichiers sont traités sur votre appareil et ne sont jamais envoyés nulle part.",
-    searchLabel: "Trouver un outil PDF",
-    searchPlaceholder: "Que voulez-vous faire avec votre PDF ?",
+      "Travaillez avec des PDF, images et documents Office sans les téléverser. Des outils rapides et ciblés s'exécutent sur votre appareil.",
+    searchLabel: "Trouver un outil de document",
+    searchPlaceholder: "Que voulez-vous faire avec votre document ?",
     clearSearch: "Effacer la recherche",
     noSearchResults: "Aucun outil ne correspond à cette recherche.",
     chipPrivate: "Privé par conception",
     chipNoUploads: "Aucun envoi, aucun serveur",
-    chipNoLimits: "Aucune limite de taille",
+    chipNoLimits: "Aucun quota d'envoi au serveur",
     dropHint: "Astuce : glissez un fichier directement sur l'un des outils ci-dessous.",
     dropHere: (tool: string) => `Déposez pour ouvrir dans ${tool}`,
     dropNeedsPdf: "Cet outil nécessite un PDF",
@@ -37,6 +37,7 @@ export const fr: Dict = {
     Organize: "Organiser",
     Optimize: "Optimiser",
     Convert: "Convertir",
+    Office: "Office",
     Edit: "Modifier",
     Security: "Sécurité",
   },
@@ -94,12 +95,20 @@ export const fr: Dict = {
       description:
         "Combinez des images JPG, PNG ou WebP en un seul PDF. Choisissez le format de page et réordonnez les images avant la conversion.",
     },
+    "images-to-docx": {
+      name: "Images vers Word",
+      tagline: "Placez des images dans un document Word",
+      description:
+        "Transformez des images JPG, PNG ou WebP en DOCX avec une image par page. Les images restent des images ; ce n'est pas de l'OCR.",
+    },
     annotate: {
       name: "Signer et annoter",
       tagline: "Signez et ajoutez du texte à toute page",
       description:
         "Dessinez ou tapez votre signature, placez-la où vous voulez et ajoutez des notes de texte sur n'importe quelle page. Tout est intégré au PDF — aucun lecteur spécial requis.",
     },
+  
+
     watermark: {
       name: "Filigrane",
       tagline: "Apposez un texte sur chaque page",
@@ -140,6 +149,7 @@ export const fr: Dict = {
   common: {
     allTools: "Tous les outils",
     download: "Télécharger",
+    cancel: "Annuler",
     downloadAllZip: "Tout télécharger (ZIP)",
     startOver: "Recommencer",
     done: "Terminé !",
@@ -294,6 +304,24 @@ export const fr: Dict = {
     sizeFit: "Identique à l'image",
     action: (n: number) => `Créer un PDF à partir de ${n} image${n === 1 ? "" : "s"}`,
     failed: "Échec de la conversion.",
+  },
+  imagesToDocx: {
+    hint: "Images JPG, PNG ou WebP · jusqu'à 30 fichiers",
+    pageSize: "Format de page",
+    sizeA4: "A4",
+    sizeLetter: "Lettre US",
+    orientation: "Orientation",
+    orientAuto: "Automatique (selon chaque image)",
+    orientPortrait: "Portrait",
+    orientLandscape: "Paysage",
+    margin: "Marges",
+    marginNone: "Aucune",
+    marginNarrow: "Étroit (10 mm)",
+    marginNormal: "Normal (20 mm)",
+    note: "Chaque image est placée sur sa propre page Word et reste une image, pas du texte OCR modifiable.",
+    limits: "Jusqu'à 30 images, 25 Mo par fichier et 100 Mo au total. Le traitement dépend de votre appareil.",
+    action: (n: number) => `Créer un document Word avec ${n} image${n === 1 ? "" : "s"}`,
+    failed: "Impossible de créer le document Word.",
   },
   watermark: {
     textLabel: "Texte du filigrane",

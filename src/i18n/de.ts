@@ -5,20 +5,20 @@ export const de: Dict = {
     privacyBadge: "100 % privat — Ihre Dateien verlassen nie Ihr Gerät",
   },
   footer: {
-    line: "PDF Toolbox — alle Vorgänge laufen lokal in Ihrem Browser. Keine Uploads, keine Konten, keine Limits.",
+    line: "Private Document Toolbox — alle Vorgänge laufen lokal in Ihrem Browser. Keine Uploads, keine Konten, keine Limits.",
   },
   home: {
-    heroA: "Alle PDF-Werkzeuge, die Sie brauchen,",
+    heroA: "Private Dokumentwerkzeuge,",
     heroB: "direkt in Ihrem Browser",
     subtitle:
-      "PDFs zusammenfügen, teilen, komprimieren, konvertieren, mit Wasserzeichen versehen und schützen — kostenlos und unbegrenzt. Ihre Dateien werden auf Ihrem Gerät verarbeitet und nirgendwohin hochgeladen.",
-    searchLabel: "PDF-Werkzeug finden",
-    searchPlaceholder: "Was möchten Sie mit Ihrer PDF machen?",
+      "Bearbeiten Sie PDFs, Bilder und Office-Dokumente ohne Upload. Schnelle, gezielte Werkzeuge laufen auf Ihrem Gerät.",
+    searchLabel: "Dokumentwerkzeug finden",
+    searchPlaceholder: "Was möchten Sie mit Ihrem Dokument tun?",
     clearSearch: "Suche löschen",
     noSearchResults: "Keine Werkzeuge entsprechen dieser Suche.",
     chipPrivate: "Privat per Design",
     chipNoUploads: "Keine Uploads, keine Server",
-    chipNoLimits: "Keine Dateigrößen-Limits",
+    chipNoLimits: "Keine Server-Upload-Quote",
     dropHint: "Tipp: Ziehen Sie eine Datei direkt auf eines der Werkzeuge unten.",
     dropHere: (tool: string) => `Ablegen, um in ${tool} zu öffnen`,
     dropNeedsPdf: "Dieses Werkzeug benötigt ein PDF",
@@ -37,6 +37,7 @@ export const de: Dict = {
     Organize: "Organisieren",
     Optimize: "Optimieren",
     Convert: "Konvertieren",
+    Office: "Office",
     Edit: "Bearbeiten",
     Security: "Sicherheit",
   },
@@ -94,12 +95,20 @@ export const de: Dict = {
       description:
         "Kombinieren Sie JPG-, PNG- oder WebP-Bilder in einem PDF. Wählen Sie die Seitengröße und ordnen Sie die Bilder vor der Umwandlung.",
     },
+    "images-to-docx": {
+      name: "Bilder zu Word",
+      tagline: "Bilder in ein Word-Dokument einfügen",
+      description:
+        "JPG-, PNG- oder WebP-Bilder in eine DOCX-Datei mit einem Bild pro Seite umwandeln. Die Bilder bleiben Bilder; keine OCR.",
+    },
     annotate: {
       name: "Signieren & Kommentieren",
       tagline: "Signieren und Text auf jeder Seite",
       description:
         "Zeichnen oder tippen Sie Ihre Unterschrift, platzieren Sie sie beliebig und fügen Sie Textnotizen hinzu. Alles wird fest ins PDF eingebettet — kein spezieller Reader nötig.",
     },
+  
+
     watermark: {
       name: "Wasserzeichen",
       tagline: "Text über jede Seite stempeln",
@@ -140,6 +149,7 @@ export const de: Dict = {
   common: {
     allTools: "Alle Werkzeuge",
     download: "Herunterladen",
+    cancel: "Abbrechen",
     downloadAllZip: "Alle herunterladen (ZIP)",
     startOver: "Neu beginnen",
     done: "Fertig!",
@@ -294,6 +304,24 @@ export const de: Dict = {
     sizeFit: "Wie das Bild",
     action: (n: number) => `PDF aus ${n} Bild${n === 1 ? "" : "ern"} erstellen`,
     failed: "Umwandlung fehlgeschlagen.",
+  },
+  imagesToDocx: {
+    hint: "JPG, PNG oder WebP · bis zu 30 Dateien",
+    pageSize: "Seitengröße",
+    sizeA4: "A4",
+    sizeLetter: "US Letter",
+    orientation: "Ausrichtung",
+    orientAuto: "Automatisch (je Bild)",
+    orientPortrait: "Hochformat",
+    orientLandscape: "Querformat",
+    margin: "Seitenränder",
+    marginNone: "Keine",
+    marginNarrow: "Schmal (10 mm)",
+    marginNormal: "Normal (20 mm)",
+    note: "Jedes Bild wird auf einer eigenen Word-Seite platziert und bleibt ein Bild – kein bearbeitbarer OCR-Text.",
+    limits: "Bis zu 30 Bilder, 25 MB je Datei und 100 MB insgesamt. Die Verarbeitung hängt vom Gerät ab.",
+    action: (n: number) => `Word-Dokument aus ${n} Bild${n === 1 ? "" : "ern"} erstellen`,
+    failed: "Das Word-Dokument konnte nicht erstellt werden.",
   },
   watermark: {
     textLabel: "Wasserzeichen-Text",

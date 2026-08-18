@@ -13,6 +13,7 @@ import Batch from "./pages/tools/Batch";
 import Compare from "./pages/tools/Compare";
 import PdfToImages from "./pages/tools/PdfToImages";
 import ImagesToPdf from "./pages/tools/ImagesToPdf";
+import ImagesToDocx from "./pages/tools/ImagesToDocx";
 import Annotate from "./pages/tools/Annotate";
 import Watermark from "./pages/tools/Watermark";
 import PageNumbers from "./pages/tools/PageNumbers";
@@ -30,7 +31,7 @@ export default function App() {
   const tool = TOOLS.find((entry) => entry.path === pathname);
 
   useEffect(() => {
-    const title = tool ? `${t.tools[tool.id].name} — PDF Toolbox` : "PDF Toolbox — Every PDF tool, 100% private";
+    const title = tool ? `${t.tools[tool.id].name} — Private Document Toolbox` : "Private Document Toolbox — PDF and office tools, on your device";
     const description = tool ? t.tools[tool.id].description : t.home.subtitle;
     document.title = title;
     document.querySelector('meta[name="description"]')?.setAttribute("content", description);
@@ -51,7 +52,7 @@ export default function App() {
               <FileText className="h-5 w-5" />
             </span>
             <span className="text-lg font-bold tracking-tight text-slate-900">
-              PDF Toolbox
+              Private Document Toolbox
             </span>
           </Link>
           <div className="flex items-center gap-3">
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/compare" element={<Compare />} />
           <Route path="/pdf-to-images" element={<PdfToImages />} />
           <Route path="/images-to-pdf" element={<ImagesToPdf />} />
+          <Route path="/images-to-docx" element={<ImagesToDocx />} />
           <Route path="/annotate" element={<Annotate />} />
           <Route path="/watermark" element={<Watermark />} />
           <Route path="/page-numbers" element={<PageNumbers />} />
