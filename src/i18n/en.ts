@@ -40,6 +40,7 @@ export const en = {
     Organize: "Organize",
     Optimize: "Optimize",
     Convert: "Convert",
+    Images: "Images",
     Office: "Office",
     Edit: "Edit",
     Security: "Security",
@@ -97,6 +98,12 @@ export const en = {
       tagline: "Turn photos and scans into a PDF",
       description:
         "Combine JPG, PNG or WebP images into a single PDF. Choose the page size and reorder images before converting.",
+    },
+    "image-workbench": {
+      name: "Image Workbench",
+      tagline: "Resize, compress and convert images",
+      description:
+        "Batch resize, compress, and convert JPG, PNG, or WebP images. Preserve aspect ratio and remove embedded metadata on your device.",
     },
     "images-to-docx": {
       name: "Images to Word",
@@ -304,6 +311,20 @@ export const en = {
     sizeFit: "Same as image",
     action: (n: number) => `Create PDF from ${n} image${n === 1 ? "" : "s"}`,
     failed: "Conversion failed.",
+  },
+  imageWorkbench: {
+    hint: "JPG, PNG or WebP images · up to 50 files",
+    format: "Output format",
+    formatJpeg: "JPG (small and compatible)",
+    formatPng: "PNG (lossless and transparent)",
+    formatWebp: "WebP (modern and compact)",
+    maxWidth: "Maximum width (px)",
+    maxHeight: "Maximum height (px)",
+    quality: (n: number) => `Quality — ${n}%`,
+    note: "Images keep their aspect ratio and are never enlarged. Re-encoding removes embedded metadata; JPG output replaces transparency with white.",
+    limits: "Up to 50 images, 25 MB each and 150 MB total. Processing depends on your device.",
+    action: (n: number) => `Optimize ${n} image${n === 1 ? "" : "s"}`,
+    failed: "Could not process the images.",
   },
   imagesToDocx: {
     hint: "JPG, PNG or WebP images · up to 30 files",

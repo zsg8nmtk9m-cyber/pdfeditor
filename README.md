@@ -4,11 +4,12 @@ A private, browser-based suite for everyday PDF, image, and office work. The pro
 
 ## Product status
 
-The application currently ships 17 tools in English, Turkish, German, Spanish, and French:
+The application currently ships 18 tools in English, Turkish, German, Spanish, and French:
 
 - Organize PDFs: merge, split, reorder/delete pages, rotate
 - Optimize PDFs: compress, batch process, compare versions
 - Convert: PDF to images and images to PDF
+- Images: batch resize, compression, metadata stripping, and JPG/PNG/WebP conversion
 - Office: images to Word (DOCX), with page size, orientation, margins, ordering, and cancellation
 - Edit PDFs: sign and annotate, watermark, page numbers, metadata
 - Security: permanent redaction, password protection, unlock
@@ -40,7 +41,7 @@ The production build writes crawlable HTML for every tool route plus `sitemap.xm
 
 - React 18, TypeScript, Vite, and Tailwind CSS
 - PDF.js and `@cantoo/pdf-lib` for PDF rendering and editing
-- Separate module workers for PDF and Office operations
+- Separate module workers for PDF, image, and Office operations
 - `fflate` for constrained OOXML packaging without a heavyweight Office suite
 - IndexedDB for optional on-device PDF recents
 - GitHub Actions for locked builds, artifact-level browser tests, and quality-gated Pages deployment

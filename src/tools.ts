@@ -17,9 +17,10 @@ import {
   Unlock,
   FileCog,
   FileType2,
+  ImageDown,
 } from "lucide-react";
 
-export type ToolCategory = "Organize" | "Optimize" | "Convert" | "Office" | "Edit" | "Security";
+export type ToolCategory = "Organize" | "Optimize" | "Convert" | "Images" | "Office" | "Edit" | "Security";
 
 export type ToolId =
   | "merge"
@@ -31,6 +32,7 @@ export type ToolId =
   | "pdf-to-images"
   | "images-to-pdf"
   | "images-to-docx"
+  | "image-workbench"
   | "annotate"
   | "watermark"
   | "page-numbers"
@@ -67,6 +69,7 @@ export const TOOLS: ToolMeta[] = [
   { id: "compare", path: "/compare", icon: GitCompare, category: "Optimize", accent: "bg-teal-100 text-teal-700", accepts: "application/pdf,.pdf", multi: true },
   { id: "pdf-to-images", path: "/pdf-to-images", icon: Images, category: "Convert", accent: "bg-amber-100 text-amber-600", accepts: "application/pdf,.pdf" },
   { id: "images-to-pdf", path: "/images-to-pdf", icon: FileImage, category: "Convert", accent: "bg-orange-100 text-orange-600", accepts: "image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp", multi: true },
+  { id: "image-workbench", path: "/image-workbench", icon: ImageDown, category: "Images", accent: "bg-fuchsia-100 text-fuchsia-700", accepts: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp", multi: true },
   { id: "images-to-docx", path: "/images-to-docx", icon: FileType2, category: "Office", accent: "bg-blue-100 text-blue-700", accepts: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp", multi: true },
   { id: "annotate", path: "/annotate", icon: PenLine, category: "Edit", accent: "bg-lime-100 text-lime-600", accepts: "application/pdf,.pdf" },
   { id: "watermark", path: "/watermark", icon: Stamp, category: "Edit", accent: "bg-rose-100 text-rose-600", accepts: "application/pdf,.pdf" },
@@ -81,6 +84,7 @@ export const CATEGORIES: ToolCategory[] = [
   "Organize",
   "Optimize",
   "Convert",
+  "Images",
   "Office",
   "Edit",
   "Security",

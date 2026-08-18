@@ -41,7 +41,7 @@ check(
   "static tool page has a canonical URL",
   staticMergeHtml.includes(`rel="canonical" href="${expectedSiteRoot}/merge/"`),
 );
-check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 18);
+check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 19);
 
 async function pageCount(path, password) {
   const doc = await PDFDocument.load(readFileSync(path), { password });
@@ -91,7 +91,7 @@ await page.goto(BASE + "/");
 // Keep copy-based locators deterministic regardless of the host browser's locale.
 await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("17 tool cards", (await page.locator("a[data-tool]").count()) === 17);
+check("18 tool cards", (await page.locator("a[data-tool]").count()) === 18);
 const toolSearch = page.getByRole("searchbox", { name: "Find a document tool" });
 await toolSearch.fill("split");
 check(
@@ -102,7 +102,7 @@ await toolSearch.fill("password");
 check("tool search filters cards", (await page.locator("a[data-tool]").count()) === 2);
 check("tool search finds Protect PDF", await page.getByText("Protect PDF", { exact: true }).isVisible());
 await page.getByRole("button", { name: "Clear search" }).click();
-check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 17);
+check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 18);
 await page.keyboard.press("/");
 check("slash shortcut focuses tool search", await toolSearch.evaluate((input) => input === document.activeElement));
 await toolSearch.fill("merge");
@@ -375,6 +375,52 @@ out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).
 check("images->pdf has 1 page", (await pageCount(out)) === 1);
 
 
+
+
+// ---------- image workbench (batch resize, convert and privacy) ----------
+console.log("image-workbench");
+requests.length = 0;
+await page.goto(BASE + "/image-workbench/");
+await page.locator("input[type=file]").setInputFiles([page1Png, page1Png]);
+await page.getByLabel("Output format").selectOption("webp");
+await page.getByLabel("Maximum width (px)").fill("300");
+await page.getByLabel("Maximum height (px)").fill("300");
+await page.setViewportSize({ width: 320, height: 720 });
+check(
+  "image workbench has no mobile horizontal overflow",
+  await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+);
+await page.setViewportSize({ width: 1280, height: 720 });
+await page.getByRole("button", { name: "Optimize 2 images" }).click();
+await page.getByText("Done!").waitFor({ timeout: 30000 });
+check("image workbench returns both batch outputs", (await page.locator("li:has-text('.webp')").count()) === 2);
+const optimizedImagePath = await grabDownload(
+  page,
+  page.locator("li", { hasText: "image-1.webp" }).getByRole("button", { name: "Download" }),
+  "optimized.webp",
+);
+{
+  const bytes = readFileSync(optimizedImagePath);
+  check(
+    "optimized output is a real WebP file",
+    bytes.subarray(0, 4).toString("ascii") === "RIFF" &&
+      bytes.subarray(8, 12).toString("ascii") === "WEBP",
+  );
+  const dimensions = await page.evaluate(async (data) => {
+    const bitmap = await createImageBitmap(new Blob([new Uint8Array(data)], { type: "image/webp" }));
+    const value = { width: bitmap.width, height: bitmap.height };
+    bitmap.close();
+    return value;
+  }, Array.from(bytes));
+  check(
+    "image workbench preserves aspect ratio within the requested bounds",
+    dimensions.width <= 300 && dimensions.height <= 300 && dimensions.width > 0 && dimensions.height > 0,
+  );
+}
+check(
+  "image processing sends no document traffic",
+  requests.every(({ method, url }) => method === "GET" && new URL(url).origin === new URL(BASE).origin),
+);
 
 // ---------- images -> Word (semantic OOXML and privacy checks) ----------
 console.log("images-to-docx");

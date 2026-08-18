@@ -37,6 +37,7 @@ export const de: Dict = {
     Organize: "Organisieren",
     Optimize: "Optimieren",
     Convert: "Konvertieren",
+    Images: "Bilder",
     Office: "Office",
     Edit: "Bearbeiten",
     Security: "Sicherheit",
@@ -94,6 +95,12 @@ export const de: Dict = {
       tagline: "Fotos und Scans in ein PDF verwandeln",
       description:
         "Kombinieren Sie JPG-, PNG- oder WebP-Bilder in einem PDF. Wählen Sie die Seitengröße und ordnen Sie die Bilder vor der Umwandlung.",
+    },
+    "image-workbench": {
+      name: "Bildwerkstatt",
+      tagline: "Bilder skalieren, komprimieren und konvertieren",
+      description:
+        "JPG-, PNG- oder WebP-Bilder stapelweise skalieren, komprimieren und konvertieren. Seitenverhältnis beibehalten und Metadaten auf dem Gerät entfernen.",
     },
     "images-to-docx": {
       name: "Bilder zu Word",
@@ -304,6 +311,20 @@ export const de: Dict = {
     sizeFit: "Wie das Bild",
     action: (n: number) => `PDF aus ${n} Bild${n === 1 ? "" : "ern"} erstellen`,
     failed: "Umwandlung fehlgeschlagen.",
+  },
+  imageWorkbench: {
+    hint: "JPG, PNG oder WebP · bis zu 50 Dateien",
+    format: "Ausgabeformat",
+    formatJpeg: "JPG (klein und kompatibel)",
+    formatPng: "PNG (verlustfrei und transparent)",
+    formatWebp: "WebP (modern und kompakt)",
+    maxWidth: "Maximale Breite (px)",
+    maxHeight: "Maximale Höhe (px)",
+    quality: (n: number) => `Qualität — ${n}%`,
+    note: "Das Seitenverhältnis bleibt erhalten und Bilder werden nie vergrößert. Neukodierung entfernt Metadaten; JPG füllt Transparenz mit Weiß.",
+    limits: "Bis zu 50 Bilder, 25 MB je Datei und 150 MB insgesamt. Die Verarbeitung hängt vom Gerät ab.",
+    action: (n: number) => `${n} Bild${n === 1 ? "" : "er"} optimieren`,
+    failed: "Die Bilder konnten nicht verarbeitet werden.",
   },
   imagesToDocx: {
     hint: "JPG, PNG oder WebP · bis zu 30 Dateien",

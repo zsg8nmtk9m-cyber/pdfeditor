@@ -14,6 +14,7 @@ import Compare from "./pages/tools/Compare";
 import PdfToImages from "./pages/tools/PdfToImages";
 import ImagesToPdf from "./pages/tools/ImagesToPdf";
 import ImagesToDocx from "./pages/tools/ImagesToDocx";
+import ImageWorkbench from "./pages/tools/ImageWorkbench";
 import Annotate from "./pages/tools/Annotate";
 import Watermark from "./pages/tools/Watermark";
 import PageNumbers from "./pages/tools/PageNumbers";
@@ -92,6 +93,7 @@ export default function App() {
           <Route path="/pdf-to-images" element={<PdfToImages />} />
           <Route path="/images-to-pdf" element={<ImagesToPdf />} />
           <Route path="/images-to-docx" element={<ImagesToDocx />} />
+          <Route path="/image-workbench" element={<ImageWorkbench />} />
           <Route path="/annotate" element={<Annotate />} />
           <Route path="/watermark" element={<Watermark />} />
           <Route path="/page-numbers" element={<PageNumbers />} />

@@ -19,6 +19,7 @@ const pages = [
   ["compare", "Compare PDFs", "Find visually changed pages between two PDF versions without uploading either file."],
   ["pdf-to-images", "PDF to Images", "Export PDF pages as high-quality PNG or JPG images."],
   ["images-to-pdf", "Images to PDF", "Turn one or more images into a PDF with the page size you choose."],
+  ["image-workbench", "Image Workbench", "Batch resize, compress, and convert JPG, PNG, or WebP images without uploading them."],
   ["images-to-docx", "Images to Word", "Place JPG, PNG, or WebP images into a private Word document with one image per page."],
   ["annotate", "Sign and Annotate PDF", "Add text, drawings, and signatures to a PDF locally in your browser."],
   ["watermark", "Watermark PDF", "Add a configurable text watermark to every PDF page."],
