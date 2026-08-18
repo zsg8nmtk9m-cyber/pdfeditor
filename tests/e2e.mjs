@@ -9,6 +9,7 @@
 import { chromium } from "playwright";
 import { PDFDocument, PDFName } from "pdf-lib";
 import { getDocument as pdfjsGetDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+import { strFromU8, unzipSync } from "fflate";
 import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,7 +41,7 @@ check(
   "static tool page has a canonical URL",
   staticMergeHtml.includes(`rel="canonical" href="${expectedSiteRoot}/merge/"`),
 );
-check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 17);
+check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 18);
 
 async function pageCount(path, password) {
   const doc = await PDFDocument.load(readFileSync(path), { password });
@@ -74,6 +75,8 @@ const browser = await chromium.launch({
 });
 const ctx = await browser.newContext({ acceptDownloads: true, locale: "tr-TR" });
 const page = await ctx.newPage();
+const requests = [];
+page.on("request", (request) => requests.push({ method: request.method(), url: request.url() }));
 page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 await page.addInitScript(() => {
   window.__productEvents = [];
@@ -88,16 +91,8 @@ await page.goto(BASE + "/");
 // Keep copy-based locators deterministic regardless of the host browser's locale.
 await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
-check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
-const homePro = page.locator('[data-founding-pro="home"]');
-check("home shows the Founding Pro price hypothesis", await homePro.getByText("$39 one-time").isVisible());
-check(
-  "home interest link uses the public structured form",
-  (await homePro.getByRole("link", { name: "Share your workflow" }).getAttribute("href"))?.endsWith(
-    "issues/new?template=founding-pro.yml",
-  ),
-);
-const toolSearch = page.getByRole("searchbox", { name: "Find a PDF tool" });
+check("17 tool cards", (await page.locator("a[data-tool]").count()) === 17);
+const toolSearch = page.getByRole("searchbox", { name: "Find a document tool" });
 await toolSearch.fill("split");
 check(
   "English search is stable on a Turkish-locale browser",
@@ -107,7 +102,7 @@ await toolSearch.fill("password");
 check("tool search filters cards", (await page.locator("a[data-tool]").count()) === 2);
 check("tool search finds Protect PDF", await page.getByText("Protect PDF", { exact: true }).isVisible());
 await page.getByRole("button", { name: "Clear search" }).click();
-check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 16);
+check("clearing tool search restores cards", (await page.locator("a[data-tool]").count()) === 17);
 await page.keyboard.press("/");
 check("slash shortcut focuses tool search", await toolSearch.evaluate((input) => input === document.activeElement));
 await toolSearch.fill("merge");
@@ -135,7 +130,7 @@ console.log("merge");
 await page.goto(BASE + "/merge/");
 check(
   "canonical trailing-slash tool route has specific metadata",
-  (await page.title()) === "Merge PDF — PDF Toolbox",
+  (await page.title()) === "Merge PDF — Private Document Toolbox",
 );
 check(
   "tool open emits an allowlisted activation event",
@@ -169,26 +164,6 @@ check(
     ),
   ),
 );
-const resultProLink = page
-  .locator('[data-founding-pro="result"]')
-  .getByRole("link", { name: "Share your workflow" });
-check("Founding Pro appears after a successful result", await resultProLink.isVisible());
-await resultProLink.evaluate((link) => {
-  link.addEventListener("click", (event) => event.preventDefault(), { once: true });
-  link.click();
-});
-check(
-  "Pro interest event contains only allowlisted context",
-  await page.evaluate(() => {
-    const event = window.__productEvents.find((item) => item.name === "pro_interest_opened");
-    return (
-      event?.placement === "result" &&
-      event.tool === "merge" &&
-      Object.keys(event).sort().join(",") === "name,placement,tool"
-    );
-  }),
-);
-
 // ---------- cross-tool handoff (merge result -> compress) ----------
 console.log("handoff");
 await page.getByLabel("Continue in another tool").selectOption({ label: "Compress PDF" });
@@ -387,17 +362,56 @@ check("images zip non-empty", readFileSync(out).length > 1000);
 
 // ---------- images -> pdf ----------
 console.log("images-to-pdf");
-out = await grabDownload(
+const page1Png = await grabDownload(
   page,
   page.locator("li", { hasText: "page-1" }).getByRole("button", { name: "Download" }),
   "page1.png",
 );
 await page.goto(BASE + "/images-to-pdf");
-await page.locator("input[type=file]").setInputFiles(out);
+await page.locator("input[type=file]").setInputFiles(page1Png);
 await page.getByRole("button", { name: /Create PDF from 1 image/ }).click();
 await page.getByText("Done!").waitFor({ timeout: 20000 });
 out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "from-images.pdf");
 check("images->pdf has 1 page", (await pageCount(out)) === 1);
+
+
+
+// ---------- images -> Word (semantic OOXML and privacy checks) ----------
+console.log("images-to-docx");
+requests.length = 0;
+await page.goto(BASE + "/images-to-docx/");
+await page.locator("input[type=file]").setInputFiles(page1Png);
+check("Word tool explains that images are not OCR text", await page.getByText(/not editable OCR text/).isVisible());
+await page.getByRole("button", { name: /Create Word document from 1 image/ }).click();
+await page.getByText("Done!").waitFor({ timeout: 30000 });
+const docxPath = await grabDownload(
+  page,
+  page.getByRole("button", { name: /^Download$/ }).last(),
+  "images.docx",
+);
+{
+  const pkg = unzipSync(new Uint8Array(readFileSync(docxPath)));
+  const required = [
+    "[Content_Types].xml",
+    "_rels/.rels",
+    "word/document.xml",
+    "word/_rels/document.xml.rels",
+    "docProps/core.xml",
+    "docProps/app.xml",
+  ];
+  check("DOCX contains every required OOXML part", required.every((path) => pkg[path]));
+  const media = Object.keys(pkg).filter((path) => path.startsWith("word/media/"));
+  check("DOCX contains exactly one sequential media asset", media.length === 1 && /image1\.(png|jpg)$/.test(media[0]));
+  const documentXml = strFromU8(pkg["word/document.xml"]);
+  const relationships = strFromU8(pkg["word/_rels/document.xml.rels"]);
+  check("DOCX records image geometry and page settings", documentXml.includes("<wp:extent") && documentXml.includes("<w:pgSz"));
+  check("DOCX has no external relationships", !relationships.includes('TargetMode="External"'));
+  check("DOCX package does not leak the source filename", !Object.keys(pkg).join("\n").includes("page1"));
+}
+check(
+  "Office conversion sends no document traffic",
+  requests.every(({ method, url }) => method === "GET" && new URL(url).origin === new URL(BASE).origin),
+);
 
 // ---------- watermark with non-WinAnsi (Turkish) text ----------
 console.log("watermark (Unicode)");

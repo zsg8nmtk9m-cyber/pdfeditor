@@ -2,7 +2,7 @@
 
 ## Mission
 
-PDF Toolbox is a privacy-first, browser-only PDF application built with React, TypeScript, Vite, Tailwind CSS, PDF.js, and `@cantoo/pdf-lib`. Preserve the core promise: document bytes, filenames, metadata, and passwords stay on the user device unless a future feature explicitly changes that product contract.
+Private Document Toolbox is a privacy-first, browser-only PDF, image, and office utility suite built with React, TypeScript, Vite, Tailwind CSS, PDF.js, and `@cantoo/pdf-lib`. Preserve the core promise: document bytes, filenames, metadata, and passwords stay on the user device unless a future feature explicitly changes that product contract.
 
 ## Environment
 

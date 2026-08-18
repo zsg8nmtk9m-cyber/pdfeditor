@@ -137,3 +137,8 @@ Payment-provider setup is intentionally deferred until purchase intent is valida
 - 2026-08-14: Start with launch readiness and evidence before payment infrastructure.
 - 2026-08-14: Use a one-time Founding Pro price as the first pricing test.
 - 2026-08-18: Validate Founding Pro demand with an explicit public GitHub issue form before adding accounts, payments, or a backend.
+
+
+## Product expansion decision — 2026-08-18
+
+Monetization prompts are paused while the product broadens into Private Document Toolbox. The immediate focus is release quality and useful local-first PDF, image, office, and data tools. The first Office milestone is Images to Word with honest image-based fidelity; high-fidelity Office-to-PDF and PDF-to-editable-Office remain deferred until a sandboxed backend or Office-grade renderer is justified.

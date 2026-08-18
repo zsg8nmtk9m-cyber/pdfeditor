@@ -8,20 +8,20 @@ export const en = {
     privacyBadge: "100% private — files never leave your device",
   },
   footer: {
-    line: "PDF Toolbox — every operation runs locally in your browser. No uploads, no accounts, no limits.",
+    line: "Private Document Toolbox — every operation runs locally in your browser. No uploads, no accounts, no limits.",
   },
   home: {
-    heroA: "Every PDF tool you need,",
+    heroA: "Private document tools,",
     heroB: "right in your browser",
     subtitle:
-      "Merge, split, compress, convert, watermark and protect PDFs — free and unlimited. Your files are processed on your device and never uploaded anywhere.",
-    searchLabel: "Find a PDF tool",
-    searchPlaceholder: "What do you want to do with your PDF?",
+      "Work with PDFs, images, and office documents without uploading them. Fast, focused tools run on your device and keep sensitive files under your control.",
+    searchLabel: "Find a document tool",
+    searchPlaceholder: "What do you want to do with your document?",
     clearSearch: "Clear search",
     noSearchResults: "No tools match that search.",
     chipPrivate: "Private by design",
     chipNoUploads: "No uploads, no servers",
-    chipNoLimits: "No file-size limits",
+    chipNoLimits: "No server upload quotas",
     dropHint: "Tip: drag a file straight onto any tool below to get started.",
     dropHere: (tool: string) => `Drop to open in ${tool}`,
     dropNeedsPdf: "This tool needs a PDF",
@@ -40,6 +40,7 @@ export const en = {
     Organize: "Organize",
     Optimize: "Optimize",
     Convert: "Convert",
+    Office: "Office",
     Edit: "Edit",
     Security: "Security",
   },
@@ -97,12 +98,20 @@ export const en = {
       description:
         "Combine JPG, PNG or WebP images into a single PDF. Choose the page size and reorder images before converting.",
     },
+    "images-to-docx": {
+      name: "Images to Word",
+      tagline: "Place images into a Word document",
+      description:
+        "Turn JPG, PNG, or WebP images into a DOCX with one image per page. Images stay as images; this is not OCR.",
+    },
     annotate: {
       name: "Sign & Annotate",
       tagline: "Sign and add text to any page",
       description:
         "Draw or type your signature, place it anywhere, and add text notes to any page. Everything is flattened into the PDF — no special reader needed.",
     },
+  
+
     watermark: {
       name: "Watermark",
       tagline: "Stamp text over every page",
@@ -143,6 +152,7 @@ export const en = {
   common: {
     allTools: "All tools",
     download: "Download",
+    cancel: "Cancel",
     downloadAllZip: "Download all (ZIP)",
     startOver: "Start over",
     done: "Done!",
@@ -294,6 +304,24 @@ export const en = {
     sizeFit: "Same as image",
     action: (n: number) => `Create PDF from ${n} image${n === 1 ? "" : "s"}`,
     failed: "Conversion failed.",
+  },
+  imagesToDocx: {
+    hint: "JPG, PNG or WebP images · up to 30 files",
+    pageSize: "Page size",
+    sizeA4: "A4",
+    sizeLetter: "US Letter",
+    orientation: "Orientation",
+    orientAuto: "Auto (match each image)",
+    orientPortrait: "Portrait",
+    orientLandscape: "Landscape",
+    margin: "Page margins",
+    marginNone: "None",
+    marginNarrow: "Narrow (10 mm)",
+    marginNormal: "Normal (20 mm)",
+    note: "Each image is placed on its own Word page and remains an image—not editable OCR text.",
+    limits: "Up to 30 images, 25 MB each and 100 MB total. Processing depends on your device.",
+    action: (n: number) => `Create Word document from ${n} image${n === 1 ? "" : "s"}`,
+    failed: "Could not create the Word document.",
   },
   watermark: {
     textLabel: "Watermark text",

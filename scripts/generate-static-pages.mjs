@@ -19,6 +19,7 @@ const pages = [
   ["compare", "Compare PDFs", "Find visually changed pages between two PDF versions without uploading either file."],
   ["pdf-to-images", "PDF to Images", "Export PDF pages as high-quality PNG or JPG images."],
   ["images-to-pdf", "Images to PDF", "Turn one or more images into a PDF with the page size you choose."],
+  ["images-to-docx", "Images to Word", "Place JPG, PNG, or WebP images into a private Word document with one image per page."],
   ["annotate", "Sign and Annotate PDF", "Add text, drawings, and signatures to a PDF locally in your browser."],
   ["watermark", "Watermark PDF", "Add a configurable text watermark to every PDF page."],
   ["page-numbers", "Add PDF Page Numbers", "Number PDF pages automatically with flexible positions and formats."],
@@ -37,7 +38,7 @@ function replaceMeta(html, attribute, key, content) {
 }
 
 function renderPage(template, page) {
-  const title = `${page.title} — Private, Free, In Your Browser | PDF Toolbox`;
+  const title = `${page.title} — Private, Free, In Your Browser | Private Document Toolbox`;
   const url = `${siteRoot}/${page.slug}/`;
   let html = template.replace(/<title>[^<]*<\/title>/i, `<title>${escapeHtml(title)}</title>`);
   html = replaceMeta(html, "name", "description", page.description);
@@ -47,7 +48,7 @@ function renderPage(template, page) {
     "</head>",
     `    <link rel="canonical" href="${url}" />\n    <meta property="og:url" content="${url}" />\n  </head>`,
   );
-  const fallback = `<main style="max-width:48rem;margin:4rem auto;padding:0 1rem;font-family:system-ui,sans-serif"><h1>${escapeHtml(page.title)}</h1><p>${escapeHtml(page.description)}</p><p>Files are processed on your device and never uploaded. No account, file-size limit, or server-side copy.</p><p><a href="./">Open ${escapeHtml(page.title)}</a></p></main>`;
+  const fallback = `<main style="max-width:48rem;margin:4rem auto;padding:0 1rem;font-family:system-ui,sans-serif"><h1>${escapeHtml(page.title)}</h1><p>${escapeHtml(page.description)}</p><p>Files are processed on your device and never uploaded. No account, server upload, or server-side copy.</p><p><a href="./">Open ${escapeHtml(page.title)}</a></p></main>`;
   return html.replace('<div id="root"></div>', `<div id="root">${fallback}</div>`);
 }
 

@@ -3,16 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { CloudOff, Gauge, Search, ShieldCheck, UploadCloud, X } from "lucide-react";
 import { useT } from "../i18n";
 import { setHandoffFiles } from "../lib/handoff";
-import FoundingProCard from "../components/FoundingProCard";
 import { CATEGORIES, TOOLS } from "../tools";
 import type { ToolMeta } from "../tools";
-
-/** Does this file match what the tool consumes? */
-function fileMatches(file: File, accepts: ToolMeta["accepts"]): boolean {
-  return accepts === "pdf"
-    ? file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")
-    : file.type.startsWith("image/");
-}
+import { matchesAcceptedFile, matchesAcceptedMimeType } from "../lib/fileTypes";
 
 export default function Home() {
   const t = useT();
@@ -57,7 +50,7 @@ export default function Home() {
     e.preventDefault();
     setDragTarget(null);
     const dropped = Array.from(e.dataTransfer.files).filter((f) =>
-      fileMatches(f, tool.accepts),
+      matchesAcceptedFile(f, tool.accepts),
     );
     if (dropped.length === 0) return;
     setHandoffFiles(tool.multi ? dropped : dropped.slice(0, 1));
@@ -74,7 +67,7 @@ export default function Home() {
     const ok =
       items.length === 0 ||
       items.some((i) =>
-        tool.accepts === "pdf" ? i.type === "application/pdf" : i.type.startsWith("image/"),
+        matchesAcceptedMimeType(i.type, tool.accepts),
       );
     setDragTarget({ id: tool.id, ok });
   }
@@ -199,7 +192,7 @@ export default function Home() {
                         }`}
                       >
                         {rejecting
-                          ? tool.accepts === "pdf"
+                          ? tool.accepts.includes("pdf")
                             ? t.home.dropNeedsPdf
                             : t.home.dropNeedsImage
                           : t.home.dropHere(copy.name)}
@@ -212,7 +205,6 @@ export default function Home() {
           </section>
         );
       })}
-      <FoundingProCard placement="home" className="mt-12" />
     </div>
   );
 }
