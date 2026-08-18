@@ -72,7 +72,7 @@ async function grabDownload(page, buttonLocator, saveAs) {
 const browser = await chromium.launch({
   executablePath: process.env.CHROMIUM_PATH || undefined,
 });
-const ctx = await browser.newContext({ acceptDownloads: true });
+const ctx = await browser.newContext({ acceptDownloads: true, locale: "tr-TR" });
 const page = await ctx.newPage();
 page.on("pageerror", (e) => console.log("PAGE ERROR:", e.message));
 await page.addInitScript(() => {
@@ -90,6 +90,11 @@ await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
 check("16 tool cards", (await page.locator("a[href^='/']:has(h3)").count()) === 16);
 const toolSearch = page.getByRole("searchbox", { name: "Find a PDF tool" });
+await toolSearch.fill("split");
+check(
+  "English search is stable on a Turkish-locale browser",
+  await page.getByText("Split PDF", { exact: true }).isVisible(),
+);
 await toolSearch.fill("password");
 check("tool search filters cards", (await page.locator("a[data-tool]").count()) === 2);
 check("tool search finds Protect PDF", await page.getByText("Protect PDF", { exact: true }).isVisible());
@@ -119,8 +124,11 @@ await page.setViewportSize({ width: 1280, height: 720 });
 
 // ---------- merge ----------
 console.log("merge");
-await page.goto(BASE + "/merge");
-check("tool route has specific metadata", (await page.title()) === "Merge PDF — PDF Toolbox");
+await page.goto(BASE + "/merge/");
+check(
+  "canonical trailing-slash tool route has specific metadata",
+  (await page.title()) === "Merge PDF — PDF Toolbox",
+);
 check(
   "tool open emits an allowlisted activation event",
   await page.evaluate(() =>

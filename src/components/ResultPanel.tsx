@@ -24,7 +24,8 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
   const t = useT();
   const [zipping, setZipping] = useState(false);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = rawPathname.replace(/\/+$/, "") || "/";
   const currentTool = TOOLS.find((tool) => tool.path === pathname);
 
   // "Continue in another tool" applies to single-PDF results only.

@@ -23,13 +23,13 @@ export default function Home() {
   const [dragTarget, setDragTarget] = useState<{ id: string; ok: boolean } | null>(null);
 
   const matchingTools = useMemo(() => {
-    const needle = query.trim().toLocaleLowerCase();
+    const needle = query.trim().toLowerCase();
     if (!needle) return TOOLS;
     return TOOLS.filter((tool) => {
       const copy = t.tools[tool.id];
       return [copy.name, copy.tagline, copy.description, t.categories[tool.category]]
         .join(" ")
-        .toLocaleLowerCase()
+        .toLowerCase()
         .includes(needle);
     });
   }, [query, t]);

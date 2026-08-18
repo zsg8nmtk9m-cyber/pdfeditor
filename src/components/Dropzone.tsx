@@ -20,7 +20,8 @@ interface DropzoneProps {
 
 export default function Dropzone({ accept, multiple, onFiles, hint, compact }: DropzoneProps) {
   const t = useT();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = rawPathname.replace(/\/+$/, "") || "/";
   const tool = TOOLS.find((entry) => entry.path === pathname);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);

@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = process.env.PORT ?? "4173";
+const basePath = `/${(process.env.BASE_PATH ?? "/").replace(/^\/+|\/+$/g, "")}`;
+const baseUrl = `http://localhost:${PORT}${basePath === "/" ? "" : basePath}`;
 
 function run(cmd, args, opts = {}) {
   return new Promise((resolve, reject) => {
@@ -38,9 +40,9 @@ async function waitForServer(url, timeoutMs = 20000) {
 
 let exitCode = 0;
 try {
-  await waitForServer(`http://localhost:${PORT}/`);
+  await waitForServer(`${baseUrl}/`);
   await run("node", ["tests/e2e.mjs"], {
-    env: { ...process.env, BASE_URL: `http://localhost:${PORT}` },
+    env: { ...process.env, BASE_URL: baseUrl },
   });
 } catch (err) {
   console.error(err.message);

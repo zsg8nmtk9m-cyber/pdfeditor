@@ -25,7 +25,8 @@ import { trackProductEvent } from "./lib/analytics";
 
 export default function App() {
   const { lang, t, setLang } = useI18n();
-  const { pathname } = useLocation();
+  const { pathname: rawPathname } = useLocation();
+  const pathname = rawPathname.replace(/\/+$/, "") || "/";
   const tool = TOOLS.find((entry) => entry.path === pathname);
 
   useEffect(() => {
