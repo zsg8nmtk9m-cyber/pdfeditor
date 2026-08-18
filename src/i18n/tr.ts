@@ -37,6 +37,7 @@ export const tr: Dict = {
     Organize: "Sayfa Düzeni",
     Optimize: "Optimize Et",
     Convert: "Dönüştür",
+    Images: "Görseller",
     Office: "Ofis",
     Edit: "Düzenle",
     Security: "Güvenlik",
@@ -94,6 +95,12 @@ export const tr: Dict = {
       tagline: "Fotoğraf ve taramalardan PDF oluşturun",
       description:
         "JPG, PNG veya WebP görsellerini tek bir PDF'te birleştirin. Sayfa boyutunu seçin ve dönüştürmeden önce sıralayın.",
+    },
+    "image-workbench": {
+      name: "Görsel Atölyesi",
+      tagline: "Görselleri boyutlandırın, sıkıştırın ve dönüştürün",
+      description:
+        "JPG, PNG veya WebP görsellerini toplu olarak boyutlandırın, sıkıştırın ve dönüştürün. En-boy oranını koruyup gömülü meta verileri cihazınızda kaldırın.",
     },
     "images-to-docx": {
       name: "Görsellerden Word",
@@ -303,6 +310,20 @@ export const tr: Dict = {
     sizeFit: "Görselle aynı",
     action: (n: number) => `${n} görselden PDF oluştur`,
     failed: "Dönüştürme başarısız oldu.",
+  },
+  imageWorkbench: {
+    hint: "JPG, PNG veya WebP · en fazla 50 dosya",
+    format: "Çıktı biçimi",
+    formatJpeg: "JPG (küçük ve uyumlu)",
+    formatPng: "PNG (kayıpsız ve şeffaf)",
+    formatWebp: "WebP (modern ve kompakt)",
+    maxWidth: "En fazla genişlik (px)",
+    maxHeight: "En fazla yükseklik (px)",
+    quality: (n: number) => `Kalite — %${n}`,
+    note: "Görsellerin en-boy oranı korunur ve büyütme yapılmaz. Yeniden kodlama gömülü meta verileri kaldırır; JPG şeffaflığı beyazla doldurur.",
+    limits: "En fazla 50 görsel, dosya başına 25 MB ve toplam 150 MB. İşlem cihazınıza bağlıdır.",
+    action: (n: number) => `${n} görseli optimize et`,
+    failed: "Görseller işlenemedi.",
   },
   imagesToDocx: {
     hint: "JPG, PNG veya WebP · en fazla 30 dosya",

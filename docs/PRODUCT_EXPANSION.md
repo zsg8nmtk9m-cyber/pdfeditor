@@ -6,7 +6,7 @@ Private Document Toolbox is a focused set of PDF, image, document, and data util
 
 ## Release sequence
 
-### M1 — Office foundation and Images to Word
+### M1 — Office foundation and Images to Word (complete)
 
 - Dedicated Office worker and typed message boundary
 - Capability-aware file matching
@@ -14,9 +14,10 @@ Private Document Toolbox is a focused set of PDF, image, document, and data util
 - Semantic OOXML assertions and a no-document-network-request browser check
 - Broader product identity in all five languages
 
-### M2 — Image and scan workbench
+### M2 — Image and scan workbench (in progress)
 
-- Resize, compress, crop, rotate, and convert PNG/JPG/WebP
+- Shipped: batch resize, compress, and convert PNG/JPG/WebP with metadata stripping, aspect-ratio preservation, no upscaling, safety budgets, progress, and cancellation
+- Next: crop, rotate, and image presets
 - Metadata viewer and scrubber
 - OCR to TXT and searchable PDF with language packs loaded only when requested
 - PDF image extraction and scan cleanup

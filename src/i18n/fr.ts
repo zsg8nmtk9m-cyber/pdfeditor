@@ -37,6 +37,7 @@ export const fr: Dict = {
     Organize: "Organiser",
     Optimize: "Optimiser",
     Convert: "Convertir",
+    Images: "Images",
     Office: "Office",
     Edit: "Modifier",
     Security: "Sécurité",
@@ -94,6 +95,12 @@ export const fr: Dict = {
       tagline: "Transformez photos et scans en PDF",
       description:
         "Combinez des images JPG, PNG ou WebP en un seul PDF. Choisissez le format de page et réordonnez les images avant la conversion.",
+    },
+    "image-workbench": {
+      name: "Atelier d'images",
+      tagline: "Redimensionnez, compressez et convertissez",
+      description:
+        "Redimensionnez, compressez et convertissez par lot des images JPG, PNG ou WebP. Conservez les proportions et supprimez les métadonnées sur votre appareil.",
     },
     "images-to-docx": {
       name: "Images vers Word",
@@ -304,6 +311,20 @@ export const fr: Dict = {
     sizeFit: "Identique à l'image",
     action: (n: number) => `Créer un PDF à partir de ${n} image${n === 1 ? "" : "s"}`,
     failed: "Échec de la conversion.",
+  },
+  imageWorkbench: {
+    hint: "Images JPG, PNG ou WebP · jusqu'à 50 fichiers",
+    format: "Format de sortie",
+    formatJpeg: "JPG (léger et compatible)",
+    formatPng: "PNG (sans perte et transparent)",
+    formatWebp: "WebP (moderne et compact)",
+    maxWidth: "Largeur maximale (px)",
+    maxHeight: "Hauteur maximale (px)",
+    quality: (n: number) => `Qualité — ${n}%`,
+    note: "Les proportions sont conservées et les images ne sont jamais agrandies. Le réencodage supprime les métadonnées ; JPG remplace la transparence par du blanc.",
+    limits: "Jusqu'à 50 images, 25 Mo par fichier et 150 Mo au total. Le traitement dépend de votre appareil.",
+    action: (n: number) => `Optimiser ${n} image${n === 1 ? "" : "s"}`,
+    failed: "Impossible de traiter les images.",
   },
   imagesToDocx: {
     hint: "Images JPG, PNG ou WebP · jusqu'à 30 fichiers",
