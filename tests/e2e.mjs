@@ -84,7 +84,7 @@ await page.addInitScript(() => {
 
 // ---------- home ----------
 console.log("home");
-await page.goto(BASE);
+await page.goto(BASE + "/");
 // Keep copy-based locators deterministic regardless of the host browser's locale.
 await page.getByLabel("Language").selectOption("en");
 check("hero renders", await page.getByRole("heading", { level: 1 }).isVisible());
