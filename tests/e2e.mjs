@@ -383,6 +383,14 @@ requests.length = 0;
 await page.goto(BASE + "/image-workbench/");
 await page.locator("input[type=file]").setInputFiles([page1Png, page1Png]);
 await page.getByLabel("Output format").selectOption("webp");
+await page.getByLabel("Resize preset").selectOption("email");
+check(
+  "resize preset applies its dimensions",
+  (await page.getByLabel("Maximum width (px)").inputValue()) === "1280" &&
+    (await page.getByLabel("Maximum height (px)").inputValue()) === "1280",
+);
+await page.getByLabel("Center crop").selectOption("16:9");
+await page.getByLabel("Rotate").selectOption("90");
 await page.getByLabel("Maximum width (px)").fill("300");
 await page.getByLabel("Maximum height (px)").fill("300");
 await page.setViewportSize({ width: 320, height: 720 });
@@ -394,6 +402,7 @@ await page.setViewportSize({ width: 1280, height: 720 });
 await page.getByRole("button", { name: "Optimize 2 images" }).click();
 await page.getByText("Done!").waitFor({ timeout: 30000 });
 check("image workbench returns both batch outputs", (await page.locator("li:has-text('.webp')").count()) === 2);
+check("image workbench reports before and after batch size", await page.getByText(/Batch size:/).isVisible());
 const optimizedImagePath = await grabDownload(
   page,
   page.locator("li", { hasText: "image-1.webp" }).getByRole("button", { name: "Download" }),
@@ -413,8 +422,9 @@ const optimizedImagePath = await grabDownload(
     return value;
   }, Array.from(bytes));
   check(
-    "image workbench preserves aspect ratio within the requested bounds",
-    dimensions.width <= 300 && dimensions.height <= 300 && dimensions.width > 0 && dimensions.height > 0,
+    "center crop and rotation produce the requested 9:16 output geometry",
+    dimensions.height === 300 &&
+      Math.abs(dimensions.width / dimensions.height - 9 / 16) < 0.02,
   );
 }
 check(

@@ -1,10 +1,14 @@
 export type ImageOutputFormat = "jpeg" | "png" | "webp";
+export type ImageCropMode = "none" | "square" | "4:3" | "16:9";
+export type ImageRotation = 0 | 90 | 180 | 270;
 
 export interface ImageWorkbenchOptions {
   format: ImageOutputFormat;
   maxWidth: number;
   maxHeight: number;
   quality: number;
+  crop: ImageCropMode;
+  rotation: ImageRotation;
 }
 
 export interface ProcessedImage {

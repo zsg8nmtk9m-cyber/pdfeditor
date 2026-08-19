@@ -1,4 +1,9 @@
-import type { ImageOutputFormat, ImageWorkbenchOptions, ProcessedImage } from "./types";
+import type {
+  ImageCropMode,
+  ImageOutputFormat,
+  ImageWorkbenchOptions,
+  ProcessedImage,
+} from "./types";
 
 const MAX_FILES = 50;
 const MAX_FILE_BYTES = 25 * 1024 * 1024;
@@ -6,6 +11,13 @@ const MAX_TOTAL_BYTES = 150 * 1024 * 1024;
 const MAX_PIXELS = 40_000_000;
 const MAX_TOTAL_PIXELS = 200_000_000;
 const MAX_DIMENSION = 12_000;
+
+interface CropRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 function validateInput(file: File): void {
   const name = file.name.toLowerCase();
@@ -39,6 +51,51 @@ function validateOptions(options: ImageWorkbenchOptions): void {
   }
 }
 
+function cropRect(width: number, height: number, mode: ImageCropMode): CropRect {
+  const ratio = mode === "square" ? 1 : mode === "4:3" ? 4 / 3 : mode === "16:9" ? 16 / 9 : null;
+  if (!ratio) return { x: 0, y: 0, width, height };
+  const sourceRatio = width / height;
+  if (sourceRatio > ratio) {
+    const cropWidth = height * ratio;
+    return { x: (width - cropWidth) / 2, y: 0, width: cropWidth, height };
+  }
+  const cropHeight = width / ratio;
+  return { x: 0, y: (height - cropHeight) / 2, width, height: cropHeight };
+}
+
+function drawTransformed(
+  context: OffscreenCanvasRenderingContext2D,
+  bitmap: ImageBitmap,
+  source: CropRect,
+  scaledWidth: number,
+  scaledHeight: number,
+  rotation: 0 | 90 | 180 | 270,
+  canvasWidth: number,
+  canvasHeight: number,
+): void {
+  if (rotation === 90) {
+    context.translate(canvasWidth, 0);
+    context.rotate(Math.PI / 2);
+  } else if (rotation === 180) {
+    context.translate(canvasWidth, canvasHeight);
+    context.rotate(Math.PI);
+  } else if (rotation === 270) {
+    context.translate(0, canvasHeight);
+    context.rotate(-Math.PI / 2);
+  }
+  context.drawImage(
+    bitmap,
+    source.x,
+    source.y,
+    source.width,
+    source.height,
+    0,
+    0,
+    scaledWidth,
+    scaledHeight,
+  );
+}
+
 async function processImage(file: File, options: ImageWorkbenchOptions): Promise<ProcessedImage> {
   let bitmap: ImageBitmap;
   try {
@@ -52,10 +109,17 @@ async function processImage(file: File, options: ImageWorkbenchOptions): Promise
     throw new Error(`"${file.name}" exceeds the 40-megapixel safety limit.`);
   }
 
-  const scale = Math.min(1, options.maxWidth / bitmap.width, options.maxHeight / bitmap.height);
-  const width = Math.max(1, Math.round(bitmap.width * scale));
-  const height = Math.max(1, Math.round(bitmap.height * scale));
-  const canvas = new OffscreenCanvas(width, height);
+  const source = cropRect(bitmap.width, bitmap.height, options.crop);
+  const swapsAxes = options.rotation === 90 || options.rotation === 270;
+  const orientedWidth = swapsAxes ? source.height : source.width;
+  const orientedHeight = swapsAxes ? source.width : source.height;
+  const scale = Math.min(1, options.maxWidth / orientedWidth, options.maxHeight / orientedHeight);
+  const outputWidth = Math.max(1, Math.round(orientedWidth * scale));
+  const outputHeight = Math.max(1, Math.round(orientedHeight * scale));
+  const scaledWidth = swapsAxes ? outputHeight : outputWidth;
+  const scaledHeight = swapsAxes ? outputWidth : outputHeight;
+
+  const canvas = new OffscreenCanvas(outputWidth, outputHeight);
   const context = canvas.getContext("2d");
   if (!context) {
     bitmap.close();
@@ -64,11 +128,20 @@ async function processImage(file: File, options: ImageWorkbenchOptions): Promise
   const target = outputDetails(options.format);
   if (target.mimeType === "image/jpeg") {
     context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, width, height);
+    context.fillRect(0, 0, outputWidth, outputHeight);
   }
   context.imageSmoothingEnabled = true;
   context.imageSmoothingQuality = "high";
-  context.drawImage(bitmap, 0, 0, width, height);
+  drawTransformed(
+    context,
+    bitmap,
+    source,
+    scaledWidth,
+    scaledHeight,
+    options.rotation,
+    outputWidth,
+    outputHeight,
+  );
   bitmap.close();
 
   let blob: Blob;
@@ -87,8 +160,8 @@ async function processImage(file: File, options: ImageWorkbenchOptions): Promise
     bytes: await blob.arrayBuffer(),
     mimeType: target.mimeType,
     extension: target.extension,
-    width,
-    height,
+    width: outputWidth,
+    height: outputHeight,
   };
 }
 

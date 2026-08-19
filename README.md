@@ -9,7 +9,7 @@ The application currently ships 18 tools in English, Turkish, German, Spanish, a
 - Organize PDFs: merge, split, reorder/delete pages, rotate
 - Optimize PDFs: compress, batch process, compare versions
 - Convert: PDF to images and images to PDF
-- Images: batch resize, compression, metadata stripping, and JPG/PNG/WebP conversion
+- Images: presets, centered aspect-ratio crops, rotation, batch resize, compression, metadata stripping, and JPG/PNG/WebP conversion
 - Office: images to Word (DOCX), with page size, orientation, margins, ordering, and cancellation
 - Edit PDFs: sign and annotate, watermark, page numbers, metadata
 - Security: permanent redaction, password protection, unlock

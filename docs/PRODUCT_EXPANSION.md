@@ -16,8 +16,8 @@ Private Document Toolbox is a focused set of PDF, image, document, and data util
 
 ### M2 — Image and scan workbench (in progress)
 
-- Shipped: batch resize, compress, and convert PNG/JPG/WebP with metadata stripping, aspect-ratio preservation, no upscaling, safety budgets, progress, and cancellation
-- Next: crop, rotate, and image presets
+- Shipped: batch resize presets, centered 1:1/4:3/16:9 crops, rotation, PNG/JPG/WebP conversion, metadata stripping, before/after size reporting, aspect-ratio preservation, no upscaling, safety budgets, progress, and cancellation
+- Next: metadata inspection and reusable image presets
 - Metadata viewer and scrubber
 - OCR to TXT and searchable PDF with language packs loaded only when requested
 - PDF image extraction and scan cleanup
