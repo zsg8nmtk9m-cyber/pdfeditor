@@ -49,15 +49,12 @@ export default function App() {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4">
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to="/" aria-label="Private Document Toolbox" className="flex shrink-0 items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
               <FileText className="h-5 w-5" />
             </span>
-            <span className="hidden text-lg font-bold tracking-tight text-slate-900 min-[420px]:inline">
+            <span className="hidden text-lg font-bold tracking-tight text-slate-900 min-[520px]:inline">
               Private Document Toolbox
-            </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900 min-[420px]:hidden">
-              Toolbox
             </span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
