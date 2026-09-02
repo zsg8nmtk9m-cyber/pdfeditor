@@ -13,6 +13,8 @@ cookieless analytics property has been configured.
 | `file_selected` | `tool`, `source` (`device` or `recent`) | A valid local input entered a tool |
 | `export_downloaded` | `tool`, `output` (`single` or `zip`) | The user downloaded a completed result |
 | `workflow_continued` | `from`, `to` | A result moved directly into another tool |
+| `release_scan_completed` | `findingBand` (`none` or `review`) | A local release scan finished |
+| `safe_export_created` | `verified` | A flattened output was created and rechecked |
 | `pro_interest_opened` | `placement` (`home` or `result`), optional `tool` | A user opened the public Founding Pro research form |
 
 The union in `src/lib/analytics.ts` is the allowlist. Do not add arbitrary

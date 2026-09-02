@@ -23,15 +23,56 @@ export const de: Dict = {
     dropHere: (tool: string) => `Ablegen, um in ${tool} zu öffnen`,
     dropNeedsPdf: "Dieses Werkzeug benötigt ein PDF",
     dropNeedsImage: "Dieses Werkzeug benötigt Bilder",
+    quickTools: "Schnellwerkzeuge",
+    quickToolsBody: "Nutzen Sie einen einzelnen Vorgang oder ziehen Sie eine Datei auf ein Werkzeug.",
   },
   pro: {
-    eyebrow: "Founding Pro · einmalig 39 $",
-    title: "Würden wiederverwendbare PDF-Abläufe Ihnen Zeit sparen?",
+    eyebrow: "Founding-Pro-Forschung",
+    title: "Würden wiederholbare Freigabeprüfungen Zeit sparen?",
     body:
-      "Wir testen wiederverwendbare Abläufe, gespeicherte Vorgaben und Offline-Nutzung, während alle heutigen Werkzeuge kostenlos bleiben.",
-    cta: "Arbeitsablauf teilen",
+      "Wir testen gespeicherte Freigaberegeln, Stapelprüfungen und einen Belegverlauf, während alle Einzelwerkzeuge kostenlos bleiben.",
+    cta: "Freigabeablauf teilen",
     privacy:
       "Öffnet ein öffentliches GitHub-Formular. Keine vertraulichen oder dokumentbezogenen Angaben eingeben.",
+  },
+  safeToShare: {
+    nav: "Sicher teilen",
+    homeEyebrow: "Zentraler Freigabe-Workflow",
+    homeTitle: "Dieses PDF sicher zum Teilen vorbereiten.",
+    homeBody:
+      "Verborgene Risikosignale finden, eine reduzierte Freigabekopie erstellen und das Ergebnis prüfen — ohne das Dokument zu versenden.",
+    homeCta: "Sicher teilen öffnen",
+    dropHint: "Ein PDF zum Prüfen und Vorbereiten auswählen",
+    howEyebrow: "Finden · bereinigen · belegen",
+    howTitle: "Eine Freigabeprüfung statt einer Blackbox",
+    howScan: "Prüft Metadaten, Anmerkungen, Formulare, Anhänge, Skripte und auswählbare Textmuster.",
+    howFlatten: "Erstellt jede sichtbare Seite in einem neuen PDF ohne verborgene Inhalte neu.",
+    howVerify: "Prüft die Ausgabe erneut und erstellt einen Beleg mit SHA-256-Hashes vor und nach der Bearbeitung.",
+    scanning: "PDF wird lokal geprüft…",
+    scanEyebrow: "Freigabeprüfung",
+    scanClear: "Keine automatischen Risikosignale gefunden",
+    scanFound: (n: number) => `${n} Signal${n === 1 ? "" : "e"} zu prüfen`,
+    riskMetadata: "Metadatenfelder",
+    riskAnnotations: "Anmerkungen und Links",
+    riskForms: "Interaktive Formularfelder",
+    riskAttachments: "Eingebettete Anhänge",
+    riskScripts: "Skripte und Aktionen",
+    riskSensitive: "Mögliche sensible Textmuster",
+    imageOnlyWarning:
+      "Kein auswählbarer Text gefunden. Text in Scans oder Bildern kann nicht automatisch geprüft werden; kontrollieren Sie jede sichtbare Seite.",
+    textScanNote:
+      "Die Mustersuche ist nur eine Prüfhilfe. Namen, Adressen, Bildtext und kontextspezifische vertrauliche Angaben können übersehen werden.",
+    exportTitle: "Freigabekopie mit maximaler Sicherheit erstellen",
+    exportBody:
+      "Jede Seite wird als Bild in ein neues PDF übertragen. Verborgener Text und interaktive Inhalte werden entfernt; auswählbarer Text, Links, Formulare und Barrierefreiheitsstruktur gehen verloren.",
+    acknowledge:
+      "Ich habe die sichtbaren Seiten geprüft und verstehe, dass automatische Prüfungen sensible Inhalte übersehen können, besonders Text in Bildern.",
+    action: "Geprüfte Kopie erstellen",
+    openRedact: "Sichtbare Inhalte zuerst schwärzen",
+    verified: "Ausgabeprüfung bestanden",
+    verificationWarning: "Die Ausgabe enthält noch ein zu prüfendes Signal",
+    resultNote: "Ihr reduziertes PDF und der Freigabebeleg sind bereit.",
+    failed: "Die Freigabeprüfung konnte nicht abgeschlossen werden.",
   },
   categories: {
     Organize: "Organisieren",
@@ -43,6 +84,12 @@ export const de: Dict = {
     Security: "Sicherheit",
   },
   tools: {
+    "safe-to-share": {
+      name: "Sicher teilen",
+      tagline: "Verborgene Risiken finden und saubere Kopie prüfen",
+      description:
+        "Prüfen Sie ein PDF auf Freigaberisiken, erstellen Sie lokal eine bereinigte sichtbare Kopie und einen Prüfbeleg.",
+    },
     merge: {
       name: "PDF zusammenfügen",
       tagline: "Mehrere PDFs zu einem vereinen",

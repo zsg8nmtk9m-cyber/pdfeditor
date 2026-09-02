@@ -23,15 +23,56 @@ export const tr: Dict = {
     dropHere: (tool: string) => `${tool} aracında açmak için bırakın`,
     dropNeedsPdf: "Bu araç PDF gerektiriyor",
     dropNeedsImage: "Bu araç görsel gerektiriyor",
+    quickTools: "Hızlı araçlar",
+    quickToolsBody: "Tek bir işleme odaklanın veya dosyayı aşağıdaki araca bırakın.",
   },
   pro: {
-    eyebrow: "Kurucu Pro · tek seferlik 39 $",
-    title: "Yeniden kullanılabilir PDF iş akışları size zaman kazandırır mı?",
+    eyebrow: "Kurucu Pro araştırması",
+    title: "Tekrarlanabilir teslim kontrolleri size zaman kazandırır mı?",
     body:
-      "Mevcut tüm araçları ücretsiz tutarken yeniden kullanılabilir iş akışlarını, kayıtlı ayarları ve çevrimdışı kullanımı test ediyoruz.",
-    cta: "İş akışınızı paylaşın",
+      "Tüm bağımsız araçları ücretsiz tutarken kayıtlı teslim kurallarını, toplu doğrulamayı ve makbuz geçmişini test ediyoruz.",
+    cta: "Teslim iş akışınızı paylaşın",
     privacy:
       "Herkese açık bir GitHub formu açılır. Gizli bilgiler veya belge bilgileri eklemeyin.",
+  },
+  safeToShare: {
+    nav: "Paylaşmaya Hazır",
+    homeEyebrow: "Ana belge teslim iş akışı",
+    homeTitle: "Bu PDF'yi güvenle paylaşmaya hazırlayın.",
+    homeBody:
+      "Gizli risk işaretlerini bulun, düzleştirilmiş bir teslim kopyası oluşturun ve sonucu doğrulayın — belgeyi hiçbir yere göndermeden.",
+    homeCta: "Paylaşmaya Hazır'ı aç",
+    dropHint: "Taramak ve paylaşıma hazırlamak için bir PDF seçin",
+    howEyebrow: "Bul · düzelt · kanıtla",
+    howTitle: "Başka bir kara kutu değil, teslim öncesi kontrol",
+    howScan: "Meta verileri, açıklamaları, formları, ekleri, betikleri ve seçilebilir metin kalıplarını tarar.",
+    howFlatten: "Her görünür sayfayı gizli içerikten arındırılmış yeni bir PDF olarak yeniden oluşturur.",
+    howVerify: "Çıktıyı tekrar tarar ve önce/sonra SHA-256 özetlerini içeren bir makbuz oluşturur.",
+    scanning: "PDF cihazınızda inceleniyor…",
+    scanEyebrow: "Teslim taraması",
+    scanClear: "Otomatik risk işareti bulunmadı",
+    scanFound: (n: number) => `İncelenecek ${n} işaret`,
+    riskMetadata: "Meta veri alanları",
+    riskAnnotations: "Açıklamalar ve bağlantılar",
+    riskForms: "Etkileşimli form alanları",
+    riskAttachments: "Gömülü ekler",
+    riskScripts: "Betikler ve eylemler",
+    riskSensitive: "Olası hassas metin kalıpları",
+    imageOnlyWarning:
+      "Seçilebilir metin bulunmadı. Tarama veya görsellerdeki metin otomatik kontrol edilemez; görünür tüm sayfaları inceleyin.",
+    textScanNote:
+      "Kalıp eşleştirme yalnızca incelemeye yardımcı olur. İsimleri, adresleri, görsel içindeki metni ve bağlama özgü gizli bilgileri kaçırabilir.",
+    exportTitle: "Azami güvenlikte teslim kopyası oluşturun",
+    exportBody:
+      "Her sayfa yeni bir PDF'ye görüntü olarak işlenecek. Gizli metin ve etkileşimli içerik kaldırılır; ancak seçilebilir metin, bağlantılar, formlar ve erişilebilirlik yapısı kaybolur.",
+    acknowledge:
+      "Görünür sayfaları inceledim ve otomatik kontrollerin özellikle görsellerdeki hassas içeriği kaçırabileceğini anlıyorum.",
+    action: "Doğrulanmış kopya oluştur",
+    openRedact: "Önce görünür içeriği karart",
+    verified: "Çıktı doğrulaması başarılı",
+    verificationWarning: "Çıktıda hâlâ incelenmesi gereken bir işaret var",
+    resultNote: "Düzleştirilmiş PDF'niz ve teslim makbuzunuz hazır.",
+    failed: "Teslim kontrolü tamamlanamadı.",
   },
   categories: {
     Organize: "Sayfa Düzeni",
@@ -43,6 +84,12 @@ export const tr: Dict = {
     Security: "Güvenlik",
   },
   tools: {
+    "safe-to-share": {
+      name: "Paylaşmaya Hazır",
+      tagline: "Gizli riskleri bulun ve temiz kopyayı doğrulayın",
+      description:
+        "Bir PDF'yi teslim risklerine karşı inceleyin, görünür sayfaları temiz bir kopyaya dönüştürün ve doğrulama makbuzunu cihazınızda oluşturun.",
+    },
     merge: {
       name: "PDF Birleştir",
       tagline: "Birden çok PDF'i tek dosyada toplayın",

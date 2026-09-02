@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { Link, Route, Routes, useLocation } from "react-router-dom";
-import { FileText, Globe, ShieldCheck } from "lucide-react";
+import { FileText, Globe, ScanSearch, ShieldCheck } from "lucide-react";
 import { LANGUAGES, useI18n } from "./i18n";
 import type { Lang } from "./i18n";
 import Home from "./pages/Home";
+import SafeToShare from "./pages/SafeToShare";
 import Merge from "./pages/tools/Merge";
 import Split from "./pages/tools/Split";
 import Organize from "./pages/tools/Organize";
@@ -32,7 +33,7 @@ export default function App() {
   const tool = TOOLS.find((entry) => entry.path === pathname);
 
   useEffect(() => {
-    const title = tool ? `${t.tools[tool.id].name} — Private Document Toolbox` : "Private Document Toolbox — PDF and office tools, on your device";
+    const title = tool ? `${t.tools[tool.id].name} — Private Document Toolbox` : "Safe to Share — Private Document Toolbox";
     const description = tool ? t.tools[tool.id].description : t.home.subtitle;
     document.title = title;
     document.querySelector('meta[name="description"]')?.setAttribute("content", description);
@@ -48,15 +49,27 @@ export default function App() {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4">
-          <Link to="/" className="flex items-center gap-2.5">
+          <Link to="/" aria-label="Private Document Toolbox" className="flex shrink-0 items-center gap-2.5">
             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
               <FileText className="h-5 w-5" />
             </span>
-            <span className="text-lg font-bold tracking-tight text-slate-900">
+            <span className="hidden text-lg font-bold tracking-tight text-slate-900 min-[520px]:inline">
               Private Document Toolbox
             </span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/safe-to-share"
+              aria-label={t.safeToShare.nav}
+              className={`flex h-9 items-center gap-2 rounded-xl px-2.5 text-sm font-semibold transition-colors sm:px-3 ${
+                pathname === "/safe-to-share"
+                  ? "bg-violet-100 text-violet-800"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-violet-700"
+              }`}
+            >
+              <ScanSearch className="h-4 w-4" />
+              <span className="hidden sm:inline">{t.safeToShare.nav}</span>
+            </Link>
             <span className="hidden items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200 lg:flex">
               <ShieldCheck className="h-4 w-4" />
               {t.header.privacyBadge}
@@ -83,6 +96,7 @@ export default function App() {
       <main className="flex-1">
         <Routes location={pathname}>
           <Route path="/" element={<Home />} />
+          <Route path="/safe-to-share" element={<SafeToShare />} />
           <Route path="/merge" element={<Merge />} />
           <Route path="/split" element={<Split />} />
           <Route path="/organize" element={<Organize />} />

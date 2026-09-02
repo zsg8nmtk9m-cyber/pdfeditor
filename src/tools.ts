@@ -18,11 +18,13 @@ import {
   FileCog,
   FileType2,
   ImageDown,
+  ShieldCheck,
 } from "lucide-react";
 
 export type ToolCategory = "Organize" | "Optimize" | "Convert" | "Images" | "Office" | "Edit" | "Security";
 
 export type ToolId =
+  | "safe-to-share"
   | "merge"
   | "split"
   | "organize"
@@ -60,6 +62,7 @@ export interface ToolMeta {
 }
 
 export const TOOLS: ToolMeta[] = [
+  { id: "safe-to-share", path: "/safe-to-share", icon: ShieldCheck, category: "Security", accent: "bg-violet-100 text-violet-700", accepts: "application/pdf,.pdf" },
   { id: "merge", path: "/merge", icon: Combine, category: "Organize", accent: "bg-indigo-100 text-indigo-600", accepts: "application/pdf,.pdf", multi: true },
   { id: "split", path: "/split", icon: Scissors, category: "Organize", accent: "bg-violet-100 text-violet-600", accepts: "application/pdf,.pdf" },
   { id: "organize", path: "/organize", icon: LayoutGrid, category: "Organize", accent: "bg-sky-100 text-sky-600", accepts: "application/pdf,.pdf" },

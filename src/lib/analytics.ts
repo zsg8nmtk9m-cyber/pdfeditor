@@ -14,6 +14,8 @@ export type ProductEvent =
   | { name: "file_selected"; tool: ToolId; source: "device" | "recent" }
   | { name: "export_downloaded"; tool: ToolId; output: "single" | "zip" }
   | { name: "workflow_continued"; from: ToolId; to: ToolId }
+  | { name: "release_scan_completed"; findingBand: "none" | "review" }
+  | { name: "safe_export_created"; verified: boolean }
   | {
       name: "pro_interest_opened";
       placement: "home" | "result";

@@ -23,15 +23,56 @@ export const fr: Dict = {
     dropHere: (tool: string) => `Déposez pour ouvrir dans ${tool}`,
     dropNeedsPdf: "Cet outil nécessite un PDF",
     dropNeedsImage: "Cet outil nécessite des images",
+    quickTools: "Outils rapides",
+    quickToolsBody: "Utilisez une opération précise ou déposez un fichier sur un outil.",
   },
   pro: {
-    eyebrow: "Founding Pro · 39 $ en une fois",
-    title: "Des flux PDF réutilisables vous feraient-ils gagner du temps ?",
+    eyebrow: "Étude Founding Pro",
+    title: "Des contrôles de diffusion répétables vous feraient-ils gagner du temps ?",
     body:
-      "Nous testons des flux réutilisables, des réglages enregistrés et l'usage hors ligne, tout en gardant gratuits les outils actuels.",
-    cta: "Partager votre flux",
+      "Nous testons des règles de diffusion enregistrées, la vérification par lot et l'historique des reçus, tout en gardant gratuits les outils autonomes.",
+    cta: "Partager votre flux de diffusion",
     privacy:
       "Ouvre un formulaire GitHub public. N'ajoutez aucune information confidentielle ou liée à un document.",
+  },
+  safeToShare: {
+    nav: "Prêt à partager",
+    homeEyebrow: "Flux principal de diffusion",
+    homeTitle: "Préparez ce PDF pour un partage sûr.",
+    homeBody:
+      "Repérez les signaux de risque cachés, créez une copie aplatie et vérifiez le résultat sans envoyer le document nulle part.",
+    homeCta: "Ouvrir Prêt à partager",
+    dropHint: "Choisissez un PDF à contrôler et préparer pour diffusion",
+    howEyebrow: "Repérer · corriger · prouver",
+    howTitle: "Un contrôle de diffusion, pas une boîte noire",
+    howScan: "Contrôle les métadonnées, annotations, formulaires, pièces jointes, scripts et motifs de texte sélectionnable.",
+    howFlatten: "Reconstruit chaque page visible dans un nouveau PDF sans contenu caché.",
+    howVerify: "Contrôle à nouveau le résultat et crée un reçu avec les empreintes SHA-256 avant et après.",
+    scanning: "Contrôle local du PDF…",
+    scanEyebrow: "Contrôle de diffusion",
+    scanClear: "Aucun signal de risque automatisé trouvé",
+    scanFound: (n: number) => `${n} ${n === 1 ? "signal" : "signaux"} à examiner`,
+    riskMetadata: "Champs de métadonnées",
+    riskAnnotations: "Annotations et liens",
+    riskForms: "Champs de formulaire interactifs",
+    riskAttachments: "Pièces jointes intégrées",
+    riskScripts: "Scripts et actions",
+    riskSensitive: "Motifs de texte potentiellement sensible",
+    imageOnlyWarning:
+      "Aucun texte sélectionnable trouvé. Le texte des scans ou images ne peut pas être contrôlé automatiquement ; examinez chaque page visible.",
+    textScanNote:
+      "La recherche de motifs aide à la vérification sans décider à votre place. Elle peut manquer des noms, adresses, textes en image et informations confidentielles liées au contexte.",
+    exportTitle: "Créer une copie de diffusion à sécurité maximale",
+    exportBody:
+      "Chaque page sera convertie en image dans un nouveau PDF. Le texte caché et le contenu interactif seront supprimés, mais le texte sélectionnable, les liens, formulaires et la structure d'accessibilité seront perdus.",
+    acknowledge:
+      "J'ai examiné les pages visibles et je comprends que les contrôles automatiques peuvent manquer du contenu sensible, surtout le texte intégré aux images.",
+    action: "Créer une copie vérifiée",
+    openRedact: "Masquer d'abord le contenu visible",
+    verified: "La vérification du résultat est réussie",
+    verificationWarning: "Le résultat contient encore un signal à examiner",
+    resultNote: "Votre PDF aplati et le reçu de diffusion sont prêts.",
+    failed: "Impossible de terminer le contrôle de diffusion.",
   },
   categories: {
     Organize: "Organiser",
@@ -43,6 +84,12 @@ export const fr: Dict = {
     Security: "Sécurité",
   },
   tools: {
+    "safe-to-share": {
+      name: "Prêt à partager",
+      tagline: "Repérez les risques cachés et vérifiez une copie propre",
+      description:
+        "Contrôlez les risques d'un PDF avant diffusion, aplatissez ses pages visibles et générez localement un reçu de vérification.",
+    },
     merge: {
       name: "Fusionner PDF",
       tagline: "Combinez plusieurs PDF en un seul",

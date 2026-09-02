@@ -19,6 +19,8 @@ import type {
   PdfToImagesOptions,
   ProgressCallback,
   RedactionRect,
+  ReleaseAudit,
+  SensitivePatternKind,
   WatermarkOptions,
 } from "./types";
 import { TEXT_BASELINE, TEXT_LINE_HEIGHT } from "./types";
@@ -625,6 +627,159 @@ export async function redactPdf(
       }
       onProgress?.(i + 1, total);
     }
+    return out.save();
+  } finally {
+    await pdf.destroy();
+  }
+}
+
+// ---------------------------------------------------------------- Safe to Share
+
+const SENSITIVE_PATTERNS: Record<Exclude<SensitivePatternKind, "payment-card">, RegExp> = {
+  email: /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi,
+  phone: /(?:^|\D)(\+?\d[\d\s().-]{7,}\d)(?=\D|$)/g,
+  "us-id": /\b\d{3}[- ]?\d{2}[- ]?\d{4}\b/g,
+};
+
+function countMatches(text: string, pattern: RegExp): number {
+  pattern.lastIndex = 0;
+  return Array.from(text.matchAll(pattern)).length;
+}
+
+function passesLuhn(value: string): boolean {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length < 13 || digits.length > 19) return false;
+  let sum = 0;
+  let double = false;
+  for (let i = digits.length - 1; i >= 0; i--) {
+    let digit = Number(digits[i]);
+    if (double) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
+    }
+    sum += digit;
+    double = !double;
+  }
+  return sum % 10 === 0;
+}
+
+function countPaymentCards(text: string): number {
+  const candidates = text.match(/\b(?:\d[ -]*?){13,19}\b/g) ?? [];
+  return candidates.filter(passesLuhn).length;
+}
+
+function countActions(value: unknown, seen = new Set<unknown>()): number {
+  if (typeof value === "string") return value.trim() ? 1 : 0;
+  if (!value || typeof value !== "object" || seen.has(value)) return 0;
+  seen.add(value);
+  if (Array.isArray(value)) return value.reduce((sum, item) => sum + countActions(item, seen), 0);
+  return Object.values(value as Record<string, unknown>).reduce<number>(
+    (sum, item) => sum + countActions(item, seen),
+    0,
+  );
+}
+
+/**
+ * Inspect release risks without returning document text or matched values.
+ * Counts are deliberately coarse so the UI can explain what needs review
+ * without copying sensitive content out of the worker.
+ */
+export async function auditPdfForRelease(
+  srcBytes: Uint8Array,
+  onProgress?: ProgressCallback,
+): Promise<ReleaseAudit> {
+  const doc = await loadPdf(srcBytes);
+  const pdf = await openForRender(srcBytes);
+  try {
+    const metadata = [
+      doc.getTitle(),
+      doc.getAuthor(),
+      doc.getSubject(),
+      doc.getKeywords(),
+      doc.getCreator(),
+      doc.getProducer(),
+    ];
+    let formFields = 0;
+    try {
+      formFields = doc.getForm().getFields().length;
+    } catch {
+      // A malformed form structure is still caught by the annotation scan.
+    }
+
+    const attachments = await pdf.getAttachments();
+    const actions = await pdf.getJSActions();
+    let annotations = 0;
+    let selectableTextCharacters = 0;
+    const possibleSensitiveText: Record<SensitivePatternKind, number> = {
+      email: 0,
+      phone: 0,
+      "us-id": 0,
+      "payment-card": 0,
+    };
+
+    for (let i = 0; i < pdf.numPages; i++) {
+      const page = await pdf.getPage(i + 1);
+      const [pageAnnotations, textContent] = await Promise.all([
+        page.getAnnotations({ intent: "display" }),
+        page.getTextContent(),
+      ]);
+      annotations += pageAnnotations.length;
+      const text = textContent.items
+        .map((item) => ("str" in item ? item.str : ""))
+        .join(" ");
+      selectableTextCharacters += text.replace(/\s/g, "").length;
+      possibleSensitiveText.email += countMatches(text, SENSITIVE_PATTERNS.email);
+      possibleSensitiveText.phone += countMatches(text, SENSITIVE_PATTERNS.phone);
+      possibleSensitiveText["us-id"] += countMatches(text, SENSITIVE_PATTERNS["us-id"]);
+      possibleSensitiveText["payment-card"] += countPaymentCards(text);
+      page.cleanup();
+      onProgress?.(i + 1, pdf.numPages);
+    }
+
+    return {
+      pageCount: pdf.numPages,
+      metadataFields: metadata.filter((value) => value?.trim()).length,
+      annotations,
+      formFields,
+      attachments: attachments ? Object.keys(attachments).length : 0,
+      scripts: countActions(actions),
+      selectableTextCharacters,
+      possibleSensitiveText,
+    };
+  } finally {
+    await pdf.destroy();
+  }
+}
+
+/**
+ * Maximum-safety release export: render every visible page to pixels and
+ * rebuild a fresh PDF. This removes hidden text, metadata, annotations,
+ * forms, attachments and executable actions at the cost of selectable text.
+ */
+export async function sanitizePdfForRelease(
+  srcBytes: Uint8Array,
+  dpi = 150,
+  onProgress?: ProgressCallback,
+): Promise<Uint8Array> {
+  const pdf = await openForRender(srcBytes);
+  try {
+    const out = await PDFDocument.create();
+    const scale = dpi / 72;
+    for (let i = 0; i < pdf.numPages; i++) {
+      const { canvas, widthPts, heightPts } = await renderPage(pdf, i, scale);
+      const blob = await canvas.convertToBlob({ type: "image/jpeg", quality: 0.94 });
+      releaseCanvas(canvas);
+      const image = await out.embedJpg(await blob.arrayBuffer());
+      const page = out.addPage([widthPts, heightPts]);
+      page.drawImage(image, { x: 0, y: 0, width: widthPts, height: heightPts });
+      onProgress?.(i + 1, pdf.numPages);
+    }
+    out.setTitle("");
+    out.setAuthor("");
+    out.setSubject("");
+    out.setKeywords([]);
+    out.setCreator("");
+    out.setProducer("");
     return out.save();
   } finally {
     await pdf.destroy();

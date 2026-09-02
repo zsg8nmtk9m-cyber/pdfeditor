@@ -41,7 +41,7 @@ check(
   "static tool page has a canonical URL",
   staticMergeHtml.includes(`rel="canonical" href="${expectedSiteRoot}/merge/"`),
 );
-check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 19);
+check("sitemap contains every tool plus home", (sitemapXml.match(/<url>/g) ?? []).length === 20);
 
 async function pageCount(path, password) {
   const doc = await PDFDocument.load(readFileSync(path), { password });
@@ -124,6 +124,70 @@ check(
 );
 check("mobile tool cards remain visible", await page.locator('a[data-tool="merge"]').isVisible());
 await page.setViewportSize({ width: 1280, height: 720 });
+let out;
+
+// ---------- Safe to Share flagship ----------
+console.log("safe-to-share");
+requests.length = 0;
+await page.goto(BASE + "/safe-to-share");
+check(
+  "flagship route has specific metadata",
+  (await page.title()) === "Safe to Share — Private Document Toolbox",
+);
+await page.locator("input[type=file]").setInputFiles(join(FIX, "release-risk.pdf"));
+await page.getByText(/signals to review/).waitFor({ timeout: 30000 });
+check("release scan finds metadata", await page.getByText("Metadata fields").isVisible());
+check("release scan finds possible sensitive text", await page.getByText("Possible sensitive text patterns").isVisible());
+await page.getByLabel(/I reviewed the visible pages/).check();
+await page.getByRole("button", { name: "Create verified copy" }).click();
+await page.getByText("Output verification passed").waitFor({ timeout: 60000 });
+const safePdfRow = page.locator("li").filter({ hasText: "release-risk-safe-to-share.pdf" });
+out = await grabDownload(page, safePdfRow.getByRole("button", { name: "Download" }), "safe-to-share.pdf");
+check("safe release keeps the source page count", (await pageCount(out)) === 1);
+const safeDoc = await PDFDocument.load(readFileSync(out));
+check(
+  "safe release clears descriptive metadata",
+  !safeDoc.getTitle() && !safeDoc.getAuthor() && !safeDoc.getSubject() && !safeDoc.getKeywords(),
+);
+const safeText = (await firstPageText(out)).map((item) => item.str).join("");
+check("safe release removes selectable source text", safeText.length === 0);
+const receiptRow = page.locator("li").filter({ hasText: "release-risk-release-receipt.json" });
+const receiptPath = await grabDownload(
+  page,
+  receiptRow.getByRole("button", { name: "Download" }),
+  "release-receipt.json",
+);
+const receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
+check("release receipt verifies the exported bytes", receipt.verified === true);
+check("release receipt records distinct SHA-256 hashes", receipt.sourceSha256 !== receipt.outputSha256);
+check(
+  "release scan catches text hidden behind a drawn shape",
+  receipt.sourceFindings.possibleSensitiveText["us-id"] >= 1,
+);
+check(
+  "release scan records interactive and embedded risks",
+  receipt.sourceFindings.formFields >= 1 &&
+    receipt.sourceFindings.attachments >= 1 &&
+    receipt.sourceFindings.scripts >= 1,
+);
+check(
+  "post-export verification finds no retained structures or selectable patterns",
+  receipt.verification.formFields === 0 &&
+    receipt.verification.attachments === 0 &&
+    receipt.verification.scripts === 0 &&
+    Object.values(receipt.verification.possibleSensitiveText).every((count) => count === 0),
+);
+check(
+  "safe export event contains no document properties",
+  await page.evaluate(() => {
+    const event = window.__productEvents.find((item) => item.name === "safe_export_created");
+    return event?.verified === true && Object.keys(event).sort().join(",") === "name,verified";
+  }),
+);
+check(
+  "Safe to Share sends no document request",
+  requests.every(({ method, url }) => method === "GET" && new URL(url).origin === new URL(BASE).origin),
+);
 
 // ---------- merge ----------
 console.log("merge");
@@ -154,7 +218,7 @@ check(
 );
 await page.getByRole("button", { name: /Merge 2 PDFs/ }).click();
 await page.getByText("Done!").waitFor({ timeout: 20000 });
-let out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "merged.pdf");
+out = await grabDownload(page, page.getByRole("button", { name: /^Download$/ }).last(), "merged.pdf");
 check("merged has 5 pages", (await pageCount(out)) === 5);
 check(
   "successful export emits a coarse activation event",
@@ -649,7 +713,7 @@ await page.goto(BASE + "/");
 await page.getByLabel("Language").selectOption("tr");
 check(
   "hero switches to Turkish",
-  await page.getByText("doğrudan tarayıcınızda").isVisible(),
+  await page.getByText("Bu PDF'yi güvenle paylaşmaya hazırlayın.").isVisible(),
 );
 check("tool cards translate", await page.getByText("PDF Birleştir").isVisible());
 await page.goto(BASE + "/merge");
@@ -665,7 +729,7 @@ await page.goto(BASE + "/");
 await page.getByLabel("Language").selectOption("en");
 check(
   "switching back to English works",
-  await page.getByText("right in your browser").isVisible(),
+  await page.getByText("Make this PDF safe to share.").isVisible(),
 );
 
 await browser.close();

@@ -18,6 +18,7 @@ import type {
   PdfToImagesOptions,
   ProgressCallback,
   RedactionRect,
+  ReleaseAudit,
   WatermarkOptions,
 } from "./types";
 
@@ -154,3 +155,14 @@ export const redactPdf = (
   dpi?: number,
   onProgress?: ProgressCallback,
 ) => call<Uint8Array>("redact", [bytes, rects, dpi], onProgress);
+
+export const auditPdfForRelease = (
+  bytes: Uint8Array,
+  onProgress?: ProgressCallback,
+) => call<ReleaseAudit>("releaseAudit", [bytes], onProgress);
+
+export const sanitizePdfForRelease = (
+  bytes: Uint8Array,
+  dpi?: number,
+  onProgress?: ProgressCallback,
+) => call<Uint8Array>("releaseSanitize", [bytes, dpi], onProgress);

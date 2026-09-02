@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CloudOff, Gauge, Search, ShieldCheck, UploadCloud, X } from "lucide-react";
+import { ArrowRight, CloudOff, Gauge, ScanSearch, Search, ShieldCheck, X } from "lucide-react";
+import Dropzone from "../components/Dropzone";
 import { useT } from "../i18n";
 import { setHandoffFiles } from "../lib/handoff";
 import { CATEGORIES, TOOLS } from "../tools";
 import type { ToolMeta } from "../tools";
 import { matchesAcceptedFile, matchesAcceptedMimeType } from "../lib/fileTypes";
+import { trackProductEvent } from "../lib/analytics";
+
+const QUICK_TOOLS = TOOLS.filter((tool) => tool.id !== "safe-to-share");
 
 export default function Home() {
   const t = useT();
@@ -18,8 +22,8 @@ export default function Home() {
 
   const matchingTools = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    if (!needle) return TOOLS;
-    return TOOLS.filter((tool) => {
+    if (!needle) return QUICK_TOOLS;
+    return QUICK_TOOLS.filter((tool) => {
       const copy = t.tools[tool.id];
       return [copy.name, copy.tagline, copy.description, t.categories[tool.category]]
         .join(" ")
@@ -72,14 +76,65 @@ export default function Home() {
     setDragTarget({ id: tool.id, ok });
   }
 
+  function openSafeToShare(files: File[]) {
+    const file = files[0];
+    if (!file) return;
+    setHandoffFiles([file]);
+    trackProductEvent({ name: "file_selected", tool: "safe-to-share", source: "device" });
+    navigate("/safe-to-share");
+  }
+
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-24">
-      <section className="py-14 text-center sm:py-20">
-        <h1 className="mx-auto max-w-3xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">
-          {t.home.heroA} <span className="text-indigo-600">{t.home.heroB}</span>
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-500">{t.home.subtitle}</p>
-        <div className="relative mx-auto mt-8 max-w-xl text-left">
+      <section className="py-8 sm:py-12">
+        <div className="overflow-hidden rounded-[2rem] bg-slate-950 px-5 py-6 text-white shadow-xl shadow-slate-300/40 sm:px-8 sm:py-8 lg:grid lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-10">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-violet-300">
+              <ScanSearch className="h-4 w-4" /> {t.safeToShare.homeEyebrow}
+            </p>
+            <h1 className="mt-4 max-w-xl text-3xl font-extrabold tracking-tight sm:text-4xl">
+              {t.safeToShare.homeTitle}
+            </h1>
+            <p className="mt-3 max-w-xl text-base leading-7 text-slate-300">
+              {t.safeToShare.homeBody}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-slate-300">
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" /> {t.home.chipPrivate}
+              </span>
+              <span className="flex items-center gap-2">
+                <CloudOff className="h-4 w-4 text-violet-300" /> {t.home.chipNoUploads}
+              </span>
+            </div>
+            <Link
+              to="/safe-to-share"
+              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-violet-200 hover:text-white lg:hidden"
+            >
+              {t.safeToShare.homeCta} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-6 rounded-2xl bg-white/5 p-2 ring-1 ring-white/10 lg:mt-0">
+            <Dropzone
+              accept="application/pdf,.pdf"
+              onFiles={openSafeToShare}
+              hint={t.safeToShare.dropHint}
+              compact
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="mb-8">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-xl font-bold tracking-tight text-slate-900">{t.home.quickTools}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t.home.quickToolsBody}</p>
+          </div>
+          <span className="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <Gauge className="h-4 w-4 text-amber-500" /> {t.home.chipNoLimits}
+          </span>
+        </div>
+        <div className="relative max-w-xl text-left">
           <Search
             aria-hidden="true"
             className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
@@ -113,20 +168,6 @@ export default function Home() {
             </kbd>
           )}
         </div>
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-medium text-slate-600">
-          <span className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-emerald-500" /> {t.home.chipPrivate}
-          </span>
-          <span className="flex items-center gap-2">
-            <CloudOff className="h-5 w-5 text-indigo-500" /> {t.home.chipNoUploads}
-          </span>
-          <span className="flex items-center gap-2">
-            <Gauge className="h-5 w-5 text-amber-500" /> {t.home.chipNoLimits}
-          </span>
-        </div>
-        <p className="mt-6 flex items-center justify-center gap-2 text-sm text-slate-400">
-          <UploadCloud className="h-4 w-4" /> {t.home.dropHint}
-        </p>
       </section>
 
       {matchingTools.length === 0 ? (

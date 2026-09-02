@@ -23,15 +23,56 @@ export const es: Dict = {
     dropHere: (tool: string) => `Suelta para abrir en ${tool}`,
     dropNeedsPdf: "Esta herramienta necesita un PDF",
     dropNeedsImage: "Esta herramienta necesita imágenes",
+    quickTools: "Herramientas rápidas",
+    quickToolsBody: "Usa una operación concreta o arrastra un archivo a una herramienta.",
   },
   pro: {
-    eyebrow: "Founding Pro · 39 $ una vez",
-    title: "¿Te ahorrarían tiempo los flujos PDF reutilizables?",
+    eyebrow: "Investigación Founding Pro",
+    title: "¿Te ahorrarían tiempo las revisiones de entrega repetibles?",
     body:
-      "Estamos probando flujos reutilizables, ajustes guardados y uso sin conexión, manteniendo gratis todas las herramientas actuales.",
-    cta: "Comparte tu flujo",
+      "Estamos probando políticas de entrega guardadas, verificación por lotes e historial de recibos, manteniendo gratis cada herramienta independiente.",
+    cta: "Comparte tu flujo de entrega",
     privacy:
       "Abre un formulario público de GitHub. No incluyas información confidencial ni de documentos.",
+  },
+  safeToShare: {
+    nav: "Listo para compartir",
+    homeEyebrow: "Flujo principal de entrega",
+    homeTitle: "Prepara este PDF para compartirlo con seguridad.",
+    homeBody:
+      "Detecta señales de riesgo ocultas, crea una copia aplanada y verifica el resultado sin enviar el documento a ningún sitio.",
+    homeCta: "Abrir Listo para compartir",
+    dropHint: "Elige un PDF para revisarlo y prepararlo para entrega",
+    howEyebrow: "Detectar · corregir · demostrar",
+    howTitle: "Una revisión de entrega, no otra caja negra",
+    howScan: "Revisa metadatos, anotaciones, formularios, adjuntos, scripts y patrones de texto seleccionable.",
+    howFlatten: "Reconstruye cada página visible en un PDF nuevo sin contenido oculto.",
+    howVerify: "Vuelve a revisar el resultado y crea un recibo con hashes SHA-256 de antes y después.",
+    scanning: "Revisando el PDF localmente…",
+    scanEyebrow: "Revisión de entrega",
+    scanClear: "No se encontraron señales automáticas de riesgo",
+    scanFound: (n: number) => `${n} señal${n === 1 ? "" : "es"} para revisar`,
+    riskMetadata: "Campos de metadatos",
+    riskAnnotations: "Anotaciones y enlaces",
+    riskForms: "Campos de formulario interactivos",
+    riskAttachments: "Archivos adjuntos incrustados",
+    riskScripts: "Scripts y acciones",
+    riskSensitive: "Posibles patrones de texto sensible",
+    imageOnlyWarning:
+      "No se encontró texto seleccionable. El texto de escaneos o imágenes no puede revisarse automáticamente; comprueba cada página visible.",
+    textScanNote:
+      "La búsqueda de patrones solo ayuda a revisar. Puede omitir nombres, direcciones, texto en imágenes e información confidencial dependiente del contexto.",
+    exportTitle: "Crear una copia de máxima seguridad",
+    exportBody:
+      "Cada página se convertirá en imagen dentro de un PDF nuevo. Se elimina el texto oculto y el contenido interactivo, pero se pierden el texto seleccionable, enlaces, formularios y estructura accesible.",
+    acknowledge:
+      "He revisado las páginas visibles y entiendo que las comprobaciones automáticas pueden omitir contenido sensible, especialmente texto dentro de imágenes.",
+    action: "Crear copia verificada",
+    openRedact: "Censurar primero contenido visible",
+    verified: "La verificación del resultado se completó",
+    verificationWarning: "El resultado aún contiene una señal que debe revisarse",
+    resultNote: "Tu PDF aplanado y el recibo de entrega están listos.",
+    failed: "No se pudo completar la revisión de entrega.",
   },
   categories: {
     Organize: "Organizar",
@@ -43,6 +84,12 @@ export const es: Dict = {
     Security: "Seguridad",
   },
   tools: {
+    "safe-to-share": {
+      name: "Listo para compartir",
+      tagline: "Detecta riesgos ocultos y verifica una copia limpia",
+      description:
+        "Revisa un PDF antes de compartirlo, aplana sus páginas visibles y genera localmente un recibo de verificación.",
+    },
     merge: {
       name: "Unir PDF",
       tagline: "Combina varios PDFs en uno",
