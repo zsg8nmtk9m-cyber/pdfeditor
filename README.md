@@ -1,10 +1,20 @@
-# Private Document Toolbox
+# Private Document Toolbox — Safe to Share
 
-A private, browser-based suite for everyday PDF, image, and office work. The project is expanding beyond PDF while keeping one non-negotiable promise: document bytes are processed on the user's device, not uploaded to an application server.
+A private, browser-based document-release product with a supporting suite of PDF, image, and office tools. Its flagship workflow, **Safe to Share**, checks a PDF for hidden release-risk signals, creates a maximum-safety flattened copy, rechecks the output, and produces a receipt with before-and-after hashes. Document bytes are processed on the user's device, not uploaded to an application server.
 
 ## Product status
 
-The application currently ships 18 tools in English, Turkish, German, Spanish, and French:
+The application ships Safe to Share plus 18 focused tools in English, Turkish, German, Spanish, and French.
+
+Safe to Share currently:
+
+- checks descriptive metadata, annotations, forms, attachments, scripts/actions, and common sensitive-text patterns without returning matched values to the UI
+- creates a fresh rasterized PDF that removes hidden text and interactive content
+- reopens and rechecks the exported bytes
+- generates a local JSON release receipt with SHA-256 hashes and the checks performed
+- clearly requires human review and does not claim legal or regulatory certification
+
+The supporting toolbox includes:
 
 - Organize PDFs: merge, split, reorder/delete pages, rotate
 - Optimize PDFs: compress, batch process, compare versions
@@ -49,6 +59,8 @@ The production build writes crawlable HTML for every tool route plus `sitemap.xm
 ## Privacy and safety model
 
 No document bytes are sent to an application server. Files and passwords stay inside the browser context. Office media is re-encoded before packaging to remove embedded metadata. Recent PDF storage is local to the device and can be cleared by the user.
+
+Safe to Share deliberately uses a maximum-safety rasterized export. That removes selectable text, links, forms, annotations, attachments, scripts, and document structure along with hidden content. It cannot inspect text that exists only inside images, understand context-specific confidentiality, or replace a human release review. Its receipt records what the software checked; it is not a compliance certificate.
 
 “No server upload quotas” does not mean browsers have infinite memory. Each operation has practical safety budgets and must fail clearly rather than crash a tab. Third-party analytics may receive only allowlisted product events—never filenames, metadata, contents, passwords, or exact file sizes.
 

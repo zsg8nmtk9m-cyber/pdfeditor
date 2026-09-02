@@ -22,6 +22,28 @@ await makePdf("a.pdf", "Document A", 3);
 await makePdf("b.pdf", "Document B", 2);
 await makePdf("big.pdf", "Big Doc", 5);
 
+// A deliberately risky release fixture: visible sensitive-looking text,
+// metadata, an interactive form, an attachment and JavaScript.
+{
+  const doc = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Helvetica);
+  const page = doc.addPage([595, 842]);
+  page.drawText("Client: sample@example.com", { x: 60, y: 760, size: 18, font });
+  page.drawText("Test card: 4111 1111 1111 1111", { x: 60, y: 720, size: 18, font });
+  page.drawText("Hidden ID: 123-45-6789", { x: 60, y: 680, size: 18, font });
+  page.drawRectangle({ x: 50, y: 670, width: 300, height: 34, color: rgb(1, 1, 1) });
+  doc.setTitle("Confidential client release");
+  doc.setAuthor("Fixture Author");
+  const field = doc.getForm().createTextField("internal.case-note");
+  field.setText("Do not release");
+  field.addToPage(page, { x: 60, y: 640, width: 220, height: 32 });
+  await doc.attach(new TextEncoder().encode("internal attachment"), "internal.txt", {
+    mimeType: "text/plain",
+  });
+  doc.addJavaScript("release-warning", "app.alert('internal');");
+  writeFileSync(join(FIX, "release-risk.pdf"), await doc.save());
+}
+
 // A copy of a.pdf whose page 2 differs — used by the compare tool's checks.
 {
   const doc = await PDFDocument.create();

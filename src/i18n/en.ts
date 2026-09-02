@@ -26,15 +26,56 @@ export const en = {
     dropHere: (tool: string) => `Drop to open in ${tool}`,
     dropNeedsPdf: "This tool needs a PDF",
     dropNeedsImage: "This tool needs images",
+    quickTools: "Quick tools",
+    quickToolsBody: "Use one focused operation, or drag a file onto a tool below.",
   },
   pro: {
-    eyebrow: "Founding Pro · $39 one-time",
-    title: "Would reusable PDF workflows save you time?",
+    eyebrow: "Founding Pro research",
+    title: "Would repeatable release checks save you time?",
     body:
-      "We're testing reusable workflows, saved presets, and offline use while keeping every current tool free.",
-    cta: "Share your workflow",
+      "We're testing saved release policies, batch verification, and receipt history while keeping every standalone tool free.",
+    cta: "Share your release workflow",
     privacy:
       "Opens a public GitHub form. Do not include confidential or document information.",
+  },
+  safeToShare: {
+    nav: "Safe to Share",
+    homeEyebrow: "Flagship release workflow",
+    homeTitle: "Make this PDF safe to share.",
+    homeBody:
+      "Find hidden-risk signals, create a flattened release copy, and verify the result — without sending the document anywhere.",
+    homeCta: "Open Safe to Share",
+    dropHint: "Choose one PDF to scan and prepare for release",
+    howEyebrow: "Find · fix · prove",
+    howTitle: "A release check, not another black box",
+    howScan: "Scan metadata, annotations, forms, attachments, scripts, and selectable text patterns.",
+    howFlatten: "Rebuild every visible page into a clean PDF with hidden content removed.",
+    howVerify: "Re-scan the output and create a receipt with before-and-after SHA-256 hashes.",
+    scanning: "Inspecting this PDF locally…",
+    scanEyebrow: "Release scan",
+    scanClear: "No automated risk signals found",
+    scanFound: (n: number) => `${n} signal${n === 1 ? "" : "s"} to review`,
+    riskMetadata: "Metadata fields",
+    riskAnnotations: "Annotations and links",
+    riskForms: "Interactive form fields",
+    riskAttachments: "Embedded attachments",
+    riskScripts: "Scripts and actions",
+    riskSensitive: "Possible sensitive text patterns",
+    imageOnlyWarning:
+      "No selectable text was found. Text inside scans or images cannot be checked automatically; review every visible page.",
+    textScanNote:
+      "Pattern matching is a review aid, not a decision. It can miss names, addresses, image-only text, and context-specific confidential information.",
+    exportTitle: "Create a maximum-safety release copy",
+    exportBody:
+      "Every page will be rasterized into a new PDF. This removes hidden text and interactive content, but selectable text, links, forms, and accessibility structure will be lost.",
+    acknowledge:
+      "I reviewed the visible pages and understand that automated checks can miss sensitive content, especially text inside images.",
+    action: "Create verified copy",
+    openRedact: "Redact visible content first",
+    verified: "Output verification passed",
+    verificationWarning: "The output still contains a signal that needs review",
+    resultNote: "Your flattened PDF and release receipt are ready.",
+    failed: "Could not complete the release check.",
   },
   categories: {
     Organize: "Organize",
@@ -46,6 +87,12 @@ export const en = {
     Security: "Security",
   },
   tools: {
+    "safe-to-share": {
+      name: "Safe to Share",
+      tagline: "Find hidden risks and verify a clean copy",
+      description:
+        "Inspect a PDF for release risks, flatten visible pages into a clean copy, and generate a verification receipt locally.",
+    },
     merge: {
       name: "Merge PDF",
       tagline: "Combine multiple PDFs into one",

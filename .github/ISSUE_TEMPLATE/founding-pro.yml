@@ -1,37 +1,41 @@
-name: Founding Pro interest
-description: Share which private PDF workflow would save you time.
+name: Safe to Share Pro interest
+description: Share how you review confidential PDFs before release.
 title: "[Founding Pro] "
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for helping shape PDF Toolbox Pro.
+        Thanks for helping shape Safe to Share Pro.
 
         This creates a public GitHub issue. Do not include filenames, document contents, passwords, client names, personal contact details, or other confidential information.
   - type: dropdown
     id: workflow
     attributes:
-      label: Which recurring workflow matters most?
+      label: Which recurring release job matters most?
       description: Choose the closest job. This is product research, not a purchase.
       options:
-        - Merge, watermark, number, and protect documents
-        - Review, compare, redact, and approve documents
-        - Convert scans or images and organize the result
-        - Sign, annotate, and prepare documents for sending
-        - Batch-process folders with reusable presets
-        - Another recurring PDF workflow
+        - Check and sanitize one PDF before sending it
+        - Batch-check a folder of documents
+        - Reuse a release policy for the same client or matter
+        - Search and redact repeated sensitive terms
+        - Keep a local history of verification receipts
+        - Another confidential document-release workflow
     validations:
       required: true
-  - type: checkboxes
+  - type: dropdown
     id: price_intent
     attributes:
-      label: Founding price signal
+      label: Which price would you seriously consider if it solved this job?
       options:
-        - label: I would consider a $39 one-time Founding Pro license if it solved this workflow privately on my device.
-          required: true
+        - $9 for a 72-hour release pass
+        - $12 per month for unlimited releases
+        - $99 per year for unlimited releases
+        - I need to see more before considering payment
+    validations:
+      required: true
   - type: textarea
     id: context
     attributes:
       label: Optional context
       description: Describe the steps or time cost, but do not include sensitive document or personal information.
-      placeholder: "Example: I repeat four PDF steps for each weekly client packet."
+      placeholder: "Example: I review and release several client PDFs each week."

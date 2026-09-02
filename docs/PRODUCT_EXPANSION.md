@@ -2,7 +2,14 @@
 
 ## Product identity
 
-Private Document Toolbox is a focused set of PDF, image, document, and data utilities that run on the user's device. Breadth is valuable only when privacy, output honesty, and browser reliability survive the expansion.
+Private Document Toolbox is now led by **Safe to Share**: a local document-release workflow for professionals handling confidential PDFs. The focused PDF, image, document, and data utilities remain free acquisition and support tools. Breadth is valuable only when it reinforces the release workflow or demonstrates real user demand.
+
+## Commercial priority — Safe to Share
+
+- Shipped: local release-risk scan for metadata, annotations, forms, attachments, scripts/actions, and common selectable-text patterns
+- Shipped: maximum-safety flattened export, post-export verification, SHA-256 release receipt, and explicit human-review acknowledgement
+- Next: search-assisted manual redaction, stronger hostile-PDF fixtures, batch release checks, reusable local release policies, and receipt history
+- Deferred: OCR, AI review, cloud case storage, team administration, and compliance claims
 
 ## Release sequence
 
@@ -14,11 +21,10 @@ Private Document Toolbox is a focused set of PDF, image, document, and data util
 - Semantic OOXML assertions and a no-document-network-request browser check
 - Broader product identity in all five languages
 
-### M2 — Image and scan workbench (in progress)
+### M2 — Image and scan workbench (maintenance)
 
 - Shipped: batch resize presets, centered 1:1/4:3/16:9 crops, rotation, PNG/JPG/WebP conversion, metadata stripping, before/after size reporting, aspect-ratio preservation, no upscaling, safety budgets, progress, and cancellation
-- Next: metadata inspection and reusable image presets
-- Metadata viewer and scrubber
+- Metadata viewer and reusable image presets when supported by observed demand
 - OCR to TXT and searchable PDF with language packs loaded only when requested
 - PDF image extraction and scan cleanup
 

@@ -30,10 +30,10 @@ export default function ResultPanel({ files, zipName = "files.zip", onReset, not
 
   // "Continue in another tool" applies to single-PDF results only.
   const canHandOff = files.length === 1 && files[0].name.toLowerCase().endsWith(".pdf");
-  // Batch and images-to-pdf take many/non-PDF inputs, so a single-file
-  // handoff into them makes no sense — leave them out of the target list.
+  // Only offer destinations that consume exactly one PDF. Capability metadata
+  // keeps image tools, batch tools, and two-file comparison out of this list.
   const handoffTools = TOOLS.filter(
-    (t) => t.id !== "images-to-pdf" && t.id !== "batch" && t.path !== pathname,
+    (tool) => tool.accepts.includes("pdf") && !tool.multi && tool.path !== pathname,
   );
 
   async function downloadAll() {

@@ -10,6 +10,7 @@ const siteRoot = (process.env.SITE_URL || "https://zsg8nmtk9m-cyber.github.io/pd
 );
 
 const pages = [
+  ["safe-to-share", "Safe to Share", "Inspect a PDF for hidden release risks, create a flattened clean copy, and verify the result without uploading the document."],
   ["merge", "Merge PDF", "Combine multiple PDF files into one document in the order you choose."],
   ["split", "Split PDF", "Extract selected pages, split page ranges, or export every page as a separate PDF."],
   ["organize", "Organize PDF", "Reorder, rotate, or remove PDF pages with a visual page grid."],

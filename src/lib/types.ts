@@ -168,3 +168,18 @@ export interface PdfMetadata {
   creator: string;
   producer: string;
 }
+
+// ---------------------------------------------------------------- Safe to Share
+
+export type SensitivePatternKind = "email" | "phone" | "us-id" | "payment-card";
+
+export interface ReleaseAudit {
+  pageCount: number;
+  metadataFields: number;
+  annotations: number;
+  formFields: number;
+  attachments: number;
+  scripts: number;
+  selectableTextCharacters: number;
+  possibleSensitiveText: Record<SensitivePatternKind, number>;
+}
